@@ -5,6 +5,12 @@ from src.config import STATE_FILE
 def load_seen_jobs() -> set:
     """Load the set of seen job URLs or IDs from the state file."""
     if not os.path.exists(STATE_FILE):
+        # Automatically create seen_jobs.json if it doesn't exist
+        try:
+            with open(STATE_FILE, "w") as f:
+                json.dump([], f)
+        except Exception as e:
+            print(f"Error creating state file: {e}")
         return set()
     try:
         with open(STATE_FILE, "r") as f:
