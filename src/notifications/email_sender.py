@@ -11,11 +11,11 @@ def send_job_email(jobs: List[Dict]):
 
     # Validate that secrets exist
     if not EMAIL or not EMAIL_PASSWORD:
-        print("❌ ERROR: Email credentials missing! Please set EMAIL and EMAIL_PASSWORD secrets in GitHub Actions.")
+        print("ERROR: Email credentials missing! Please set EMAIL and EMAIL_PASSWORD secrets in GitHub Actions.")
         return
     
     if not RECEIVER_EMAIL:
-        print("❌ ERROR: RECEIVER_EMAIL is missing (and EMAIL is also empty). Cannot send email.")
+        print("ERROR: RECEIVER_EMAIL is missing (and EMAIL is also empty). Cannot send email.")
         return
 
     msg = MIMEMultipart('alternative')
@@ -74,6 +74,6 @@ def send_job_email(jobs: List[Dict]):
         server.login(EMAIL, EMAIL_PASSWORD)
         server.sendmail(EMAIL, RECEIVER_EMAIL, msg.as_string())
         server.quit()
-        print("✅ Email sent successfully!")
+        print("SUCCESS: Email sent successfully!")
     except Exception as e:
         print(f"Failed to send email: {e}")
