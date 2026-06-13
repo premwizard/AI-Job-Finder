@@ -27,3 +27,16 @@ def save_seen_jobs(seen_jobs: set):
             json.dump(list(seen_jobs), f, indent=4)
     except Exception as e:
         print(f"Error saving seen jobs: {e}")
+
+def get_job_hashes(job: dict) -> list[str]:
+    """Generate duplicate detection hashes for a job (URL and Company+Role)."""
+    company = job.get('company', '').lower().strip()
+    role = job.get('role', '').lower().strip()
+    link = job.get('apply_link', '').strip()
+    
+    hashes = []
+    if link:
+        hashes.append(f"link::{link}")
+    if company and role and company != "unknown":
+        hashes.append(f"comprole::{company}::{role}")
+    return hashes
