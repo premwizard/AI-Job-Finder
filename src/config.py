@@ -1,60 +1,60 @@
 import os
 from typing import List
 
-# Job Search Configuration
-ROLES: List[str] = [
+# --- SCORING ENGINE CONFIGURATION ---
+
+SCORE_THRESHOLD = 50
+
+ACCEPT_ROLES: List[str] = [
     "AI Engineer",
     "Machine Learning Engineer",
+    "ML Engineer",
     "Software Engineer",
-    "Full Stack Developer",
     "Backend Developer",
+    "Full Stack Developer",
     "Python Developer",
     "AI Developer",
-    "Data Engineer"
+    "Data Engineer",
+    "Junior Developer",
+    "Associate Developer"
 ]
 
-LOCATIONS: List[str] = [
-    "India",
-    "coimbatore",
-    "Remote"
+REJECT_DOMAINS: List[str] = [
+    "iOS", "Android", "Mobile", "DevOps", "SRE", "QA", "Embedded"
 ]
 
-# Fresher Filtering Keywords
-EXPERIENCE_LEVELS: List[str] = [
-    "Internship",
-    "Graduate",
-    "Fresher",
-    "Entry Level",
-    "Junior",
-    "Associate",
-    "0-1 years",
-    "0-2 years"
+ACCEPT_EXPERIENCE: List[str] = [
+    "Internship", "Fresher", "Entry Level", "Junior", "Graduate", "Associate", "0-2 years", "0-1 years"
 ]
 
-# Exclusion Keywords (Reject high experience)
-EXCLUDE_KEYWORDS: List[str] = [
-    "Senior", "Lead", "Principal", "Manager", "Director", "Staff", 
-    "Head", "VP", "3+", "4+", "5+", "6+", "7+", "8+", "10+"
+REJECT_EXPERIENCE: List[str] = [
+    "Senior", "Staff", "Principal", "Lead", "Manager", "Director", "Architect", 
+    "3+ years", "4+ years", "5+ years", "6+ years", "7+ years", "8+ years", "10+ years", "3+", "4+", "5+"
 ]
 
-# Greenhouse & Lever Target Companies
+ACCEPT_LOCATIONS: List[str] = [
+    "India", "coimbatore", "Remote"
+]
+
+REJECT_LOCATIONS: List[str] = [
+    "USA only", "Brazil only", "Germany only", "Europe only", "Americas only"
+]
+
+# --- SCRAPER CONFIGURATION ---
+
 TARGET_COMPANIES: List[str] = [
     "openai", "anthropic", "huggingface", "scaleai", "cohere", "midjourney"
 ]
 
 MAX_JOBS_PER_EMAIL = 100
 
-# Adzuna API
 ADZUNA_APP_ID = os.environ.get("ADZUNA_APP_ID", "")
 ADZUNA_APP_KEY = os.environ.get("ADZUNA_APP_KEY", "")
 
-# SMTP Configuration
+# --- NOTIFICATION & STATE ---
 EMAIL = os.environ.get("EMAIL", "")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
-# Default to sending the email to yourself if RECEIVER_EMAIL is missing
 RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", EMAIL)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-
-# State
 STATE_FILE = "seen_jobs.json"

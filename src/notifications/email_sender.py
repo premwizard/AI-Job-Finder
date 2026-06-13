@@ -54,11 +54,15 @@ def send_job_email(jobs: List[Dict]):
     """
 
     for category, cat_jobs in sorted(grouped_jobs.items()):
+        # Sort jobs within category by highest score
+        cat_jobs.sort(key=lambda x: x.get('score', 0), reverse=True)
+        
         html_content += f"<h3 class='category'>{category} ({len(cat_jobs)})</h3>\n"
         for job in cat_jobs:
+            score = job.get('score', 0)
             html_content += f"""
               <div class="job-card">
-                <p class="job-title">{job['role']}</p>
+                <p class="job-title">{job['role']} <span style="color: #28a745; font-size: 14px;">[Score: {score}]</span></p>
                 <p class="company">🏢 {job['company']} <span style="font-size: 12px; color: #888;">(via {job['source']})</span></p>
                 <p class="details">📍 {job['location']} | 📅 {job['date_posted']}</p>
                 <a href="{job['apply_link']}" class="apply-btn">Apply Now</a>
