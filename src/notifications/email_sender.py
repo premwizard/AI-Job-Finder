@@ -2,20 +2,25 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import List, Dict
-from src.config import SMTP_EMAIL, SMTP_PASSWORD, RECEIVER_EMAIL, SMTP_SERVER, SMTP_PORT
+from src.config import EMAIL, EMAIL_PASSWORD, RECEIVER_EMAIL, SMTP_SERVER, SMTP_PORT
 
 def send_job_email(jobs: List[Dict]):
     if not jobs:
         print("No new jobs to send.")
         return
 
-    if not SMTP_EMAIL or not SMTP_PASSWORD or not RECEIVER_EMAIL:
-        print("SMTP configuration missing. Cannot send email.")
+    # Validate that secrets exist
+    if not EMAIL or not EMAIL_PASSWORD:
+        print("❌ ERROR: Email credentials missing! Please set EMAIL and EMAIL_PASSWORD secrets in GitHub Actions.")
+        return
+    
+    if not RECEIVER_EMAIL:
+        print("❌ ERROR: RECEIVER_EMAIL is missing (and EMAIL is also empty). Cannot send email.")
         return
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = f"AI Job Finder: {len(jobs)} New Jobs Today!"
-    msg['From'] = SMTP_EMAIL
+    msg['From'] = EMAIL
     msg['To'] = RECEIVER_EMAIL
 
     # Create HTML content
@@ -62,10 +67,13 @@ def send_job_email(jobs: List[Dict]):
     msg.attach(MIMEText(html_content, 'html'))
 
     try:
-        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
-        server.login(SMTP_EMAIL, SMTP_PASSWORD)
-        server.sendmail(SMTP_EMAIL, RECEIVER_EMAIL, msg.as_string())
+        # Use port 587 and starttls for standard Gmail SMTP security
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.ehlo()
+        server.starttls()
+        server.login(EMAIL, EMAIL_PASSWORD)
+        server.sendmail(EMAIL, RECEIVER_EMAIL, msg.as_string())
         server.quit()
-        print("Email sent successfully!")
+        print("✅ Email sent successfully!")
     except Exception as e:
         print(f"Failed to send email: {e}")

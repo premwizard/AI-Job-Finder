@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+env/
+.DS_Store
+# NOTE: seen_jobs.json is NOT in this gitignore because it MUST be committed by the GitHub Action to persist state.

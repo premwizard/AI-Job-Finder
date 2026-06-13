@@ -16,7 +16,8 @@ class DuckDuckGoScraper(BaseScraper):
         
         for role in roles:
             for location in locations:
-                query = f"site:{self.platform_domain} \"{role}\" \"{location}\""
+                # Remove strict quotes to improve search yield via DuckDuckGo API wrapper
+                query = f"{role} {location} site:{self.platform_domain}"
                 print(f"Searching {self.source_name} for: {query}")
                 try:
                     results = ddgs.text(query, max_results=10)

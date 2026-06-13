@@ -21,11 +21,12 @@ EXPERIENCE_LEVELS: List[str] = [
 ]
 
 # SMTP Configuration
-SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "")
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
-RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "")
+EMAIL = os.environ.get("EMAIL", "")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
+# Default to sending the email to yourself if RECEIVER_EMAIL is missing
+RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", EMAIL)
 SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 465
+SMTP_PORT = 587
 
 # State
 STATE_FILE = "seen_jobs.json"
