@@ -38,9 +38,11 @@ jobs:
 
     - name: Commit changes
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add seen_jobs.json || true
-        git commit -m "Update seen jobs" || echo "No changes"
-        git push || echo "No changes to push"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+        git add .
+
+        git diff --staged --quiet || git commit -m "Update job database"
+
+        git push || true
