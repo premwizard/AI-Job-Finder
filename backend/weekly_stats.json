@@ -1,1 +1,37 @@
-[]
+[
+    {
+        "date": "2026-06-15",
+        "raw_jobs": 788,
+        "new_jobs": 1,
+        "source_health": {
+            "Remotive": {
+                "fetched": 32,
+                "status": "OK"
+            },
+            "Arbeitnow": {
+                "fetched": 100,
+                "status": "OK"
+            },
+            "RemoteOK": {
+                "fetched": 100,
+                "status": "OK"
+            },
+            "TheMuse": {
+                "fetched": 0,
+                "status": "OK"
+            },
+            "Adzuna": {
+                "fetched": 0,
+                "status": "OK"
+            },
+            "Greenhouse": {
+                "fetched": 556,
+                "status": "OK"
+            },
+            "Lever": {
+                "fetched": 0,
+                "status": "OK"
+            }
+        }
+    }
+]
