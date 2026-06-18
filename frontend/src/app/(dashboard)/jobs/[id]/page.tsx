@@ -43,7 +43,15 @@ Requirements:
 - Proven experience deploying models to production.
 - Strong Python programming skills.
 - Familiarity with containerization (Docker, Kubernetes) is a strong plus.`,
-    aiAnalysis: "Your profile is a very strong match for this role. You have extensive experience with Python, PyTorch, and LLMs which are the core requirements. The only gap is in containerization (Docker/Kubernetes). We recommend spending a weekend building a small project with Docker to cover this gap before the interview."
+    aiAnalysis: "Your profile is a very strong match for this role. You have extensive experience with Python, PyTorch, and LLMs which are the core requirements. The only gap is in containerization (Docker/Kubernetes). We recommend spending a weekend building a small project with Docker to cover this gap before the interview.",
+    companyInfo: "TechNova is a leading AI research and product company based in San Francisco. We specialize in building foundational models and enterprise solutions that help businesses leverage AI effectively.",
+    benefits: [
+      "Comprehensive health, dental, and vision coverage",
+      "Flexible unlimited PTO",
+      "$2,000 annual learning stipend",
+      "Remote-first culture with optional offices",
+      "401(k) matching up to 5%"
+    ]
   };
 
   return (
@@ -105,6 +113,22 @@ Requirements:
                   <h3 className="text-lg font-semibold mb-4">Job Description</h3>
                   <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
                     {job.description}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Benefits & Perks</h3>
+                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
+                    {job.benefits.map((benefit, i) => (
+                      <li key={i}>{benefit}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">About {job.company}</h3>
+                  <div className="text-muted-foreground leading-relaxed">
+                    {job.companyInfo}
                   </div>
                 </div>
               </div>

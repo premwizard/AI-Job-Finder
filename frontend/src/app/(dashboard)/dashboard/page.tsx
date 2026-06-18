@@ -41,7 +41,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Top Metrics Row */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card className="bg-card/50 backdrop-blur-sm border-border/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">AI Match Score</CardTitle>
@@ -93,6 +93,19 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">Jobs with &gt;90% match score</p>
           </CardContent>
         </Card>
+
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50 md:col-span-2 lg:col-span-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Applications Sent</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-500">12</div>
+            <p className="text-xs text-muted-foreground mt-1 text-green-500 flex items-center gap-1">
+               <TrendingUp className="w-3 h-3" /> +3 this week
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -135,6 +148,13 @@ export default function DashboardPage() {
                     <div className="pt-2 flex flex-wrap gap-2">
                       {job.skills.map(s => <Badge key={s} variant="outline" className="text-xs">{s}</Badge>)}
                       {job.missingSkills.map(s => <Badge key={s} variant="outline" className="text-xs border-red-500/30 text-red-400">{s} (Missing)</Badge>)}
+                    </div>
+                    <div className="pt-3 flex flex-wrap items-center gap-2 border-t border-border/50 mt-4">
+                      <Button size="sm" variant="default" className="flex-1 sm:flex-none">View Job</Button>
+                      <Button size="sm" variant="outline" className="flex-1 sm:flex-none">Save</Button>
+                      <Button size="sm" variant="secondary" className="flex-1 sm:flex-none gap-2 bg-primary/10 text-primary hover:bg-primary/20">
+                        <FileText className="w-4 h-4" /> Generate Cover Letter
+                      </Button>
                     </div>
                   </div>
                 </div>

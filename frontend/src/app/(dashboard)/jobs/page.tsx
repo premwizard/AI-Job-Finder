@@ -29,20 +29,49 @@ export default function JobsPage() {
 
       {/* Search and Filters */}
       <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search job titles, skills, or companies..." className="pl-9" />
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2 shrink-0">
+        <CardContent className="p-4 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search job titles, skills, or companies..." className="pl-9" />
+            </div>
+            <div className="relative md:w-48">
+              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Location" className="pl-9" />
+            </div>
+            <Button variant="outline" className="gap-2 shrink-0 w-full md:w-auto">
               <Filter className="w-4 h-4" />
-              Filters
+              More Filters
             </Button>
-            <div className="hidden md:flex gap-2">
+          </div>
+          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/20">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">Remote:</Label>
               <Badge variant="secondary" className="px-3 py-1 text-sm bg-primary/10 text-primary border-primary/20 cursor-pointer">Remote Only</Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">Experience:</Label>
+              <select className="bg-background border border-input rounded-md text-sm px-3 py-1.5 focus:ring-2 focus:ring-ring focus:outline-none h-9">
+                <option>Any Level</option>
+                <option>Entry Level</option>
+                <option>Mid Level</option>
+                <option>Senior Level</option>
+              </select>
+            </div>
+             <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium">Salary (Min):</Label>
+              <select className="bg-background border border-input rounded-md text-sm px-3 py-1.5 focus:ring-2 focus:ring-ring focus:outline-none h-9">
+                <option>Any Salary</option>
+                <option>$80k+</option>
+                <option>$120k+</option>
+                <option>$160k+</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2 flex-1 md:justify-end">
+              <Label className="text-sm font-medium mr-2">Skills:</Label>
               <Badge variant="outline" className="px-3 py-1 text-sm cursor-pointer">Python</Badge>
               <Badge variant="outline" className="px-3 py-1 text-sm cursor-pointer">Machine Learning</Badge>
+              <Badge variant="outline" className="px-3 py-1 text-sm border-dashed text-muted-foreground hover:text-foreground hover:border-foreground cursor-pointer">+ Add Skill</Badge>
             </div>
           </div>
         </CardContent>
@@ -110,6 +139,9 @@ export default function JobsPage() {
                         <Button variant="outline" className="gap-2">
                           <FileText className="w-4 h-4" />
                           Cover Letter
+                        </Button>
+                        <Button variant="default" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white border-transparent">
+                          Apply
                         </Button>
                         <Link href={`/jobs/${job.id}`}>
                           <Button className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
