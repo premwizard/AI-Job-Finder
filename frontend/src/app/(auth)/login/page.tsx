@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { authService } from "@/services/auth";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -21,7 +23,19 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+
+  const loginMutation = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.access_token);
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error("Login failed:", error);
+      // In a real app, show a toast notification here
+      alert("Login failed. Please check your credentials.");
+    }
+  });
 
   const {
     register,
@@ -36,13 +50,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log(data);
-      router.push("/dashboard");
-    }, 1500);
+    loginMutation.mutate(data);
   };
 
   return (
@@ -81,8 +89,8 @@ export default function LoginPage() {
             />
             {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+            {loginMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Login
           </Button>
           

@@ -12,6 +12,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { authService } from "@/services/auth";
+import { resumeService } from "@/services/resume";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -49,6 +52,7 @@ export default function RegisterPage() {
   const [newSkill, setNewSkill] = useState("");
   const [newLocation, setNewLocation] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
 
   const {
     register,
@@ -76,6 +80,44 @@ export default function RegisterPage() {
   });
 
   const watchAllFields = watch();
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterFormValues) => {
+      // Register user
+      const userPayload = {
+        email: data.email,
+        full_name: data.name,
+        password: data.password,
+        preferred_role: data.preferredRole,
+        experience: data.experience.toString(),
+        education: data.education,
+        work_preference: data.workPreference
+      };
+      
+      await authService.register(userPayload);
+      
+      // Auto login
+      const loginResponse = await authService.login({
+        email: data.email,
+        password: data.password
+      });
+      localStorage.setItem("token", loginResponse.access_token);
+
+      // Upload resume if file exists
+      if (resumeFile) {
+        await resumeService.uploadResume(resumeFile);
+      }
+      
+      return loginResponse;
+    },
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error("Registration failed:", error);
+      alert("Registration failed. Please try again.");
+    }
+  });
 
   const handleNext = async () => {
     const currentStepFields = steps.find(s => s.id === step)?.fields as any[];
@@ -113,13 +155,7 @@ export default function RegisterPage() {
   };
 
   const onSubmit = async (data: RegisterFormValues) => {
-    setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      console.log("Submitted Profile:", data);
-      router.push("/dashboard");
-    }, 1500);
+    registerMutation.mutate(data);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -134,15 +170,18 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setResumeFile(e.dataTransfer.files[0]);
       setValue("resumeUploaded", true, { shouldValidate: true });
     }
   };
   
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+       setResumeFile(e.target.files[0]);
        setValue("resumeUploaded", true, { shouldValidate: true });
     }
   }
+
 
   return (
     <Card className="w-full max-w-xl mx-auto border-border/50 bg-card/50 backdrop-blur-sm shadow-2xl transition-all duration-300">

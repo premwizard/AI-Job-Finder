@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,11 +11,38 @@ import {
   Briefcase, 
   Filter, 
   BookmarkCheck, 
-  FileText
+  FileText,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { jobsService } from "@/services/jobs";
 
 export default function SavedJobsPage() {
+  const queryClient = useQueryClient();
+
+  const { data: savedJobs, isLoading } = useQuery({
+    queryKey: ['savedJobs'],
+    queryFn: jobsService.getSavedJobs
+  });
+
+  const removeJobMutation = useMutation({
+    mutationFn: (id: number) => jobsService.removeSavedJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedJobs'] });
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const jobList = savedJobs || [];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -23,7 +52,7 @@ export default function SavedJobsPage() {
             Saved Jobs
           </h2>
           <p className="text-muted-foreground mt-1">
-            You have {savedJobs.length} saved jobs.
+            You have {jobList.length} saved jobs.
           </p>
         </div>
       </div>
@@ -46,29 +75,31 @@ export default function SavedJobsPage() {
 
       {/* Job Listings */}
       <div className="grid gap-4">
-        {savedJobs.map((job) => (
-          <Card key={job.id} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
+        {jobList.length > 0 ? jobList.map((item: any) => {
+          const job = item.job;
+          return (
+          <Card key={item.id} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row gap-6">
                 <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center font-bold text-2xl text-primary shrink-0 shadow-inner">
-                  {job.company[0]}
+                  {job.company_name?.[0] || 'A'}
                 </div>
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                     <div>
                       <Link href={`/jobs/${job.id}`}>
-                        <h3 className="text-xl font-bold hover:text-primary transition-colors cursor-pointer">{job.title}</h3>
+                        <h3 className="text-xl font-bold hover:text-primary transition-colors cursor-pointer">{job.job_title}</h3>
                       </Link>
                       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-2">
-                        <span className="flex items-center gap-1.5"><Building2 className="w-4 h-4" /> {job.company}</span>
-                        <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {job.location}</span>
-                        <span className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" /> {job.type}</span>
-                        <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded">{job.salary}</span>
+                        <span className="flex items-center gap-1.5"><Building2 className="w-4 h-4" /> {job.company_name}</span>
+                        <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {job.location || 'Remote'}</span>
+                        <span className="flex items-center gap-1.5"><Briefcase className="w-4 h-4" /> {job.employment_type || 'Full-time'}</span>
+                        {job.salary && <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded">{job.salary}</span>}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                        {job.matchScore}% Match
+                        {job.score || 95}% Match
                       </Badge>
                     </div>
                   </div>
@@ -76,16 +107,17 @@ export default function SavedJobsPage() {
                   <div className="pt-2 border-t border-border/50">
                     <div className="flex flex-col sm:flex-row gap-4 justify-between items-end">
                       <div className="space-y-3">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1.5">Required Skills you have:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {job.skills.map(s => <Badge key={s} variant="secondary" className="bg-primary/5 text-primary/80">{s}</Badge>)}
-                          </div>
+                        <div className="flex flex-wrap gap-2 pt-2">
                         </div>
                       </div>
                       
                       <div className="flex flex-wrap items-end gap-2 shrink-0 mt-4 sm:mt-0">
-                        <Button variant="outline" className="gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 border-border/50">
+                        <Button 
+                          variant="outline" 
+                          className="gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 border-border/50"
+                          onClick={() => removeJobMutation.mutate(job.id)}
+                          disabled={removeJobMutation.isPending}
+                        >
                           Remove
                         </Button>
                         <Button variant="outline" className="gap-2">
@@ -104,33 +136,10 @@ export default function SavedJobsPage() {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )}) : (
+          <p className="text-muted-foreground">You haven't saved any jobs yet.</p>
+        )}
       </div>
     </div>
   );
 }
-
-const savedJobs = [
-  {
-    id: 1,
-    title: "Senior AI Engineer",
-    company: "TechNova",
-    location: "San Francisco, CA (Remote)",
-    type: "Full-time",
-    salary: "$150k - $200k",
-    matchScore: 95,
-    skills: ["Python", "PyTorch", "LLMs", "Transformers"],
-    missingSkills: ["Docker"]
-  },
-  {
-    id: 3,
-    title: "AI Product Engineer",
-    company: "InnovateAI",
-    location: "Remote",
-    type: "Full-time",
-    salary: "$140k - $180k",
-    matchScore: 88,
-    skills: ["Python", "React", "Next.js", "LangChain"],
-    missingSkills: ["System Design"]
-  }
-];

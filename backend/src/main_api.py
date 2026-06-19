@@ -6,7 +6,7 @@ import os
 # Ensure the backend directory is in the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.api.routers import jobs, analytics, resume, saved_jobs
+from src.api.routers import jobs, analytics, resume, saved_jobs, auth, users, applications
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -24,10 +24,13 @@ app.add_middleware(
 )
 
 # Include Routers
+app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(jobs.router)
 app.include_router(analytics.router)
 app.include_router(resume.router)
 app.include_router(saved_jobs.router)
+app.include_router(applications.router)
 
 @app.get("/")
 def read_root():

@@ -13,9 +13,10 @@ from src.scrapers.themuse import TheMuseScraper
 from src.scrapers.adzuna import AdzunaScraper
 from src.scrapers.greenhouse import GreenhouseScraper
 from src.scrapers.lever import LeverScraper
-from src.storage.state_manager import load_seen_jobs, save_seen_jobs, get_job_hashes, load_weekly_stats, save_weekly_stats
 from src.filters.job_filter import score_job
 from src.notifications.email_sender import send_job_email, send_weekly_email
+from src.database.database import SessionLocal
+from src.models import models
 
 class AnalyticsTracker:
     def __init__(self):
@@ -82,15 +83,21 @@ def run_diagnostics():
     print(f"EMAIL configured: {'YES' if EMAIL else 'NO'}")
     print(f"EMAIL_PASSWORD configured: {'YES' if EMAIL_PASSWORD else 'NO'}")
     print(f"Receiver email configured: {'YES' if RECEIVER_EMAIL else 'NO'}\n")
-    print(f"Storage file exists: {'YES' if os.path.exists(STATE_FILE) else 'NO'}\n")
     print("======================================\n")
+
+def generate_job_hash(job: dict) -> str:
+    company = job.get('company', '').lower().strip()
+    role = job.get('role', '').lower().strip()
+    link = job.get('apply_link', '').strip()
+    if link:
+        return f"link::{link}"
+    return f"comprole::{company}::{role}"
 
 def main():
     run_diagnostics()
     print("Starting AI Job Finder V3.1 Pipeline...")
     
-    seen_jobs = load_seen_jobs()
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    db = SessionLocal()
     new_jobs = []
     tracker = AnalyticsTracker()
     
@@ -126,21 +133,28 @@ def main():
                 job['category'] = score_result['category']
                 job['score'] = score
                     
-                # 2. Check Duplicates
-                job_hashes = get_job_hashes(job)
-                is_duplicate = False
-                for j_hash in job_hashes:
-                    if j_hash in seen_jobs:
-                        is_duplicate = True
-                        break
-                        
-                if is_duplicate:
+                # 2. Check Duplicates in PostgreSQL
+                job_hash = generate_job_hash(job)
+                existing_job = db.query(models.Job).filter(models.Job.job_hash == job_hash).first()
+                if existing_job:
                     tracker.duplicates += 1
                     continue
                     
-                # 3. Accept Job
-                for j_hash in job_hashes:
-                    seen_jobs[j_hash] = today_str
+                # 3. Accept Job - Store in PostgreSQL
+                new_db_job = models.Job(
+                    job_hash=job_hash,
+                    company_name=job.get('company', 'Unknown'),
+                    job_title=job.get('role', 'Unknown'),
+                    location=job.get('location', 'Unknown'),
+                    salary=job.get('salary', None),
+                    description=job.get('description', ''),
+                    source=scraper.source_name,
+                    job_url=job.get('apply_link', '')
+                )
+                db.add(new_db_job)
+                db.commit()
+                db.refresh(new_db_job)
+                
                 new_jobs.append(job)
                 tracker.new_jobs += 1
                 
@@ -157,32 +171,13 @@ def main():
                 
     tracker.print_summary()
     
-    # Save Weekly Stats
-    weekly_stats = load_weekly_stats()
-    daily_stat = {
-        "date": today_str,
-        "raw_jobs": tracker.raw_jobs,
-        "new_jobs": tracker.new_jobs,
-        "source_health": tracker.source_health
-    }
-    weekly_stats.append(daily_stat)
-    save_weekly_stats(weekly_stats)
-    
-    # Check if Sunday
-    is_sunday = datetime.now().weekday() == 6
-    if is_sunday:
-        print("It's Sunday! Sending Weekly Summary Email...")
-        send_weekly_email(weekly_stats)
-        save_weekly_stats([]) # Reset
-    
     if new_jobs:
         print("Sending ranked email notification...")
         send_job_email(new_jobs)
-        print("Saving updated seen jobs state...")
-        save_seen_jobs(seen_jobs)
     else:
         print("No new jobs found. Skipping daily email.")
-        save_seen_jobs(seen_jobs)
+
+    db.close()
 
 if __name__ == "__main__":
     main()

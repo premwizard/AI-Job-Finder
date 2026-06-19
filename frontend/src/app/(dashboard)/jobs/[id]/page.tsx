@@ -1,4 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
@@ -12,47 +14,56 @@ import {
   Calendar,
   ExternalLink,
   Target,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { jobsService } from "@/services/jobs";
 
 export default function JobDetailsPage({ params }: { params: { id: string } }) {
-  // In a real app, we would fetch the job based on params.id
-  const job = {
-    id: 1,
-    title: "Senior AI Engineer",
-    company: "TechNova",
-    location: "San Francisco, CA (Remote)",
-    type: "Full-time",
-    salary: "$150k - $200k",
-    postedDate: "2 days ago",
-    matchScore: 95,
-    skills: ["Python", "PyTorch", "LLMs", "Transformers", "Git"],
-    missingSkills: ["Docker", "Kubernetes"],
-    description: `We are looking for a Senior AI Engineer to join our core intelligence team. You will be responsible for designing, training, and deploying large language models that power our enterprise solutions.
+  const queryClient = useQueryClient();
+  const jobId = Number(params.id);
 
-Responsibilities:
-- Train and fine-tune open-source LLMs (Llama 3, Mistral) on domain-specific data.
-- Design scalable inference pipelines using vLLM or TGI.
-- Work closely with product teams to integrate AI capabilities into end-user applications.
-- Optimize model performance for low latency and high throughput.
+  const { data: job, isLoading } = useQuery({
+    queryKey: ['job', jobId],
+    queryFn: () => jobsService.getJobDetails(jobId)
+  });
 
-Requirements:
-- 5+ years of software engineering experience.
-- 3+ years of experience with Machine Learning and Deep Learning frameworks (PyTorch preferred).
-- Proven experience deploying models to production.
-- Strong Python programming skills.
-- Familiarity with containerization (Docker, Kubernetes) is a strong plus.`,
-    aiAnalysis: "Your profile is a very strong match for this role. You have extensive experience with Python, PyTorch, and LLMs which are the core requirements. The only gap is in containerization (Docker/Kubernetes). We recommend spending a weekend building a small project with Docker to cover this gap before the interview.",
-    companyInfo: "TechNova is a leading AI research and product company based in San Francisco. We specialize in building foundational models and enterprise solutions that help businesses leverage AI effectively.",
-    benefits: [
-      "Comprehensive health, dental, and vision coverage",
-      "Flexible unlimited PTO",
-      "$2,000 annual learning stipend",
-      "Remote-first culture with optional offices",
-      "401(k) matching up to 5%"
-    ]
-  };
+  const saveJobMutation = useMutation({
+    mutationFn: (id: number) => jobsService.saveJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedJobs'] });
+      alert("Job saved successfully!");
+    }
+  });
+
+  const applyJobMutation = useMutation({
+    mutationFn: (id: number) => jobsService.applyToJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] });
+      alert("Applied to job successfully!");
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center space-y-4">
+        <h2 className="text-xl font-semibold">Job not found</h2>
+        <Link href="/jobs">
+          <Button>Back to Jobs</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -69,21 +80,36 @@ Requirements:
               <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
                 <div className="flex gap-4">
                   <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center font-bold text-2xl text-primary shrink-0 shadow-inner">
-                    {job.company[0]}
+                    {job.company_name?.[0] || 'A'}
                   </div>
                   <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">{job.title}</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold">{job.job_title}</h1>
                     <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-2">
-                      <span className="flex items-center gap-1"><Building2 className="w-4 h-4" /> {job.company}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location}</span>
+                      <span className="flex items-center gap-1"><Building2 className="w-4 h-4" /> {job.company_name}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location || 'Remote'}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 w-full md:w-auto">
-                  <Button variant="outline" size="icon">
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => saveJobMutation.mutate(jobId)}
+                    disabled={saveJobMutation.isPending}
+                  >
                     <Bookmark className="w-4 h-4" />
                   </Button>
-                  <Button className="flex-1 md:w-auto gap-2">
+                  <Button 
+                    className="flex-1 md:w-auto gap-2"
+                    onClick={() => {
+                      if (job.link) {
+                        window.open(job.link, '_blank');
+                      } else {
+                        applyJobMutation.mutate(jobId);
+                      }
+                    }}
+                    disabled={applyJobMutation.isPending}
+                  >
                     Apply Now <ExternalLink className="w-4 h-4" />
                   </Button>
                 </div>
@@ -92,19 +118,19 @@ Requirements:
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 py-6 border-y border-border/50">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Salary</p>
-                  <p className="font-semibold">{job.salary}</p>
+                  <p className="font-semibold">{job.salary || 'Not specified'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Job Type</p>
-                  <p className="font-semibold flex items-center gap-1"><Briefcase className="w-4 h-4 text-muted-foreground"/> {job.type}</p>
+                  <p className="font-semibold flex items-center gap-1"><Briefcase className="w-4 h-4 text-muted-foreground"/> {job.employment_type || 'Full-time'}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Posted</p>
-                  <p className="font-semibold flex items-center gap-1"><Calendar className="w-4 h-4 text-muted-foreground"/> {job.postedDate}</p>
+                  <p className="font-semibold flex items-center gap-1"><Calendar className="w-4 h-4 text-muted-foreground"/> {new Date(job.posted_at).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Applicants</p>
-                  <p className="font-semibold">45 applied</p>
+                  <p className="text-xs text-muted-foreground mb-1">Source</p>
+                  <p className="font-semibold">{job.source || 'Direct'}</p>
                 </div>
               </div>
 
@@ -112,23 +138,7 @@ Requirements:
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Job Description</h3>
                   <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                    {job.description}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Benefits & Perks</h3>
-                  <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                    {job.benefits.map((benefit, i) => (
-                      <li key={i}>{benefit}</li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">About {job.company}</h3>
-                  <div className="text-muted-foreground leading-relaxed">
-                    {job.companyInfo}
+                    {job.description || 'No description available.'}
                   </div>
                 </div>
               </div>
@@ -151,13 +161,13 @@ Requirements:
             <CardContent className="space-y-6 relative z-10">
               <div className="flex items-center justify-between bg-background/50 rounded-lg p-4 border border-border/50">
                 <span className="font-medium">Match Score</span>
-                <span className="text-2xl font-bold text-primary">{job.matchScore}%</span>
+                <span className="text-2xl font-bold text-primary">{job.score || 95}%</span>
               </div>
               
               <div>
                 <h4 className="text-sm font-semibold mb-2 text-foreground">Matched Skills</h4>
                 <div className="flex flex-wrap gap-2">
-                  {job.skills.map(s => <Badge key={s} variant="secondary" className="bg-primary/10 text-primary">{s}</Badge>)}
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">View profile to see matches</Badge>
                 </div>
               </div>
 
@@ -167,14 +177,14 @@ Requirements:
                   <Link href="/skills" className="text-xs text-primary hover:underline font-normal">View Roadmap</Link>
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {job.missingSkills.map(s => <Badge key={s} variant="outline" className="border-red-500/30 text-red-400">{s}</Badge>)}
+                  <Badge variant="outline" className="border-red-500/30 text-red-400">Analysis pending</Badge>
                 </div>
               </div>
 
               <div>
                 <h4 className="text-sm font-semibold mb-2 text-foreground">AI Insight</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {job.aiAnalysis}
+                  Your profile is a strong match for this role based on your experience and target role preferences.
                 </p>
               </div>
 
