@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import { BrainCircuit, Send, User, Sparkles, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const suggestedPrompts = [
-  "Find remote AI jobs",
-  "Analyze my resume for Product Manager roles",
-  "What skills should I learn next?",
-  "Prepare 5 interview questions for a Senior Backend Engineer role at Stripe",
-  "Why was 'Senior AI Engineer at TechNova' recommended to me?"
+  "Analyze my resume",
+  "Find AI jobs",
+  "What skills should I learn?",
+  "Why was this job recommended?"
 ];
 
 type Message = {
@@ -34,6 +33,15 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -80,7 +88,7 @@ export default function AIChatPage() {
       </div>
 
       <Card className="flex-1 border-border/50 bg-card/50 backdrop-blur-sm flex flex-col overflow-hidden shadow-lg">
-        <ScrollArea className="flex-1 p-4">
+        <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
           <div className="space-y-6 max-w-3xl mx-auto pb-4">
             {messages.map((msg) => (
               <div
@@ -100,7 +108,7 @@ export default function AIChatPage() {
                   "px-4 py-3 rounded-2xl max-w-[85%] text-sm shadow-sm",
                   msg.role === "user" 
                     ? "bg-primary text-primary-foreground rounded-tr-sm" 
-                    : "bg-muted/50 border border-border/50 text-foreground rounded-tl-sm leading-relaxed"
+                    : "bg-muted/50 border border-border/50 text-foreground rounded-tl-sm leading-relaxed whitespace-pre-wrap"
                 )}>
                   {msg.content}
                 </div>
@@ -118,8 +126,9 @@ export default function AIChatPage() {
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="p-4 border-t border-border/50 bg-background/50">
           <div className="max-w-3xl mx-auto space-y-4">

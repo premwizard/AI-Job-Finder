@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,10 +11,34 @@ import {
   AlertTriangle,
   Lightbulb,
   FileSearch,
-  Eye
+  Eye,
+  Loader2,
+  FileDown
 } from "lucide-react";
 
 export default function ResumePage() {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showViewer, setShowViewer] = useState(false);
+
+  // Mock upload handler for future backend integration
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    e.preventDefault();
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    // Simulate upload and AI processing delay
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setIsUploading(false), 500);
+          return 100;
+        }
+        return prev + 15;
+      });
+    }, 300);
+  };
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -21,10 +48,40 @@ export default function ResumePage() {
             AI-powered insights to optimize your resume for ATS and recruiters.
           </p>
         </div>
-        <Button className="gap-2 bg-primary text-primary-foreground">
-          <UploadCloud className="w-4 h-4" />
-          Upload New Resume
-        </Button>
+        <div className="flex flex-col items-end gap-2">
+          <input 
+            type="file" 
+            id="resume-upload" 
+            className="hidden" 
+            accept=".pdf,.doc,.docx" 
+            onChange={handleUpload} 
+          />
+          <Button 
+            onClick={() => document.getElementById('resume-upload')?.click()}
+            disabled={isUploading} 
+            className="gap-2 bg-primary text-primary-foreground min-w-[180px]"
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Analyzing {uploadProgress}%
+              </>
+            ) : (
+              <>
+                <UploadCloud className="w-4 h-4" />
+                Upload New Resume
+              </>
+            )}
+          </Button>
+          {isUploading && (
+            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden mt-1">
+              <div 
+                className="h-full bg-primary transition-all duration-300" 
+                style={{ width: `${uploadProgress}%` }} 
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -60,10 +117,32 @@ export default function ResumePage() {
                   <p className="text-xs text-muted-foreground">Uploaded 3 days ago • 1.2 MB</p>
                 </div>
               </div>
-              <Button variant="outline" className="w-full gap-2">
+              <Button variant="outline" className="w-full gap-2" onClick={() => setShowViewer(!showViewer)}>
                 <Eye className="w-4 h-4" />
-                View Document
+                {showViewer ? "Hide Document" : "View Document"}
               </Button>
+              <Button variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground">
+                <FileDown className="w-4 h-4" />
+                Download Original
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle className="text-lg">Missing Skills</CardTitle>
+              <CardDescription>Highly requested by your target roles</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="border-red-500/30 text-red-400 bg-red-500/5">Docker</Badge>
+                <Badge variant="outline" className="border-red-500/30 text-red-400 bg-red-500/5">AWS</Badge>
+                <Badge variant="outline" className="border-red-500/30 text-red-400 bg-red-500/5">System Design</Badge>
+                <Badge variant="outline" className="border-red-500/30 text-red-400 bg-red-500/5">CI/CD</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-4">
+                Adding these keywords appropriately can boost your ATS match score by up to 12%.
+              </p>
             </CardContent>
           </Card>
 
@@ -105,6 +184,45 @@ export default function ResumePage() {
 
         {/* Right Column: Insights & Recommendations */}
         <div className="md:col-span-2 space-y-6">
+          {showViewer && (
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden animate-in fade-in slide-in-from-top-4">
+              <CardHeader className="flex flex-row items-center justify-between py-3 border-b bg-muted/20">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                  Resume Viewer (Mock)
+                </CardTitle>
+                <Button variant="ghost" size="sm" onClick={() => setShowViewer(false)}>Close</Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="aspect-[1/1.4] bg-white dark:bg-zinc-100 p-8 m-4 shadow-sm border rounded-sm relative">
+                  {/* Mock PDF Content */}
+                  <div className="space-y-4 text-zinc-800 opacity-60 pointer-events-none">
+                    <div className="border-b-2 border-zinc-300 pb-4 text-center">
+                      <div className="h-6 w-1/3 bg-zinc-400 rounded mx-auto mb-2" />
+                      <div className="h-3 w-1/2 bg-zinc-300 rounded mx-auto" />
+                    </div>
+                    <div className="space-y-2 pt-2">
+                      <div className="h-4 w-1/4 bg-zinc-400 rounded" />
+                      <div className="h-3 w-full bg-zinc-200 rounded" />
+                      <div className="h-3 w-full bg-zinc-200 rounded" />
+                      <div className="h-3 w-3/4 bg-zinc-200 rounded" />
+                    </div>
+                    <div className="space-y-2 pt-4">
+                      <div className="h-4 w-1/4 bg-zinc-400 rounded" />
+                      <div className="h-3 w-full bg-zinc-200 rounded" />
+                      <div className="h-3 w-5/6 bg-zinc-200 rounded" />
+                      <div className="h-3 w-4/6 bg-zinc-200 rounded" />
+                    </div>
+                  </div>
+                  {/* AI Highlight overlay */}
+                  <div className="absolute top-[28%] left-[10%] w-[80%] h-12 bg-yellow-400/20 border-l-4 border-yellow-500 rounded-r flex items-center px-2 cursor-pointer group hover:bg-yellow-400/30 transition-colors">
+                    <span className="text-xs font-bold text-yellow-700 dark:text-yellow-600 opacity-0 group-hover:opacity-100 transition-opacity">AI Tip: Quantify this result</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

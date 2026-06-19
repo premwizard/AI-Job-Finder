@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   ChevronDown
 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 
 const generatedLetter = `Dear Hiring Team at TechNova,
 
@@ -116,10 +115,10 @@ export default function CoverLetterPage() {
             
             <CardContent className="p-0">
               {isEditing ? (
-                <Textarea 
-                  className="min-h-[500px] border-0 focus-visible:ring-0 rounded-none resize-none p-6 text-base leading-relaxed bg-background"
+                <textarea 
+                  className="w-full min-h-[500px] border-0 focus-visible:ring-0 rounded-none resize-none p-6 text-base leading-relaxed bg-background outline-none"
                   value={letterContent}
-                  onChange={(e) => setLetterContent(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setLetterContent(e.target.value)}
                 />
               ) : (
                 <div className="p-8 md:p-12 min-h-[500px] whitespace-pre-wrap text-base leading-relaxed font-serif bg-card text-foreground">

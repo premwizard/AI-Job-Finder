@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -20,8 +22,8 @@ import {
 const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "AI Chat", href: "/chat", icon: MessageSquare },
-  { name: "Skill Gap", href: "/skills", icon: Target },
+  { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
+  { name: "Skill Gap", href: "/skill-gap", icon: Target },
   { name: "Interview Prep", href: "/interview", icon: Users },
   { name: "Cover Letters", href: "/cover-letter", icon: FileText },
   { name: "Resume", href: "/resume", icon: FileSearch },

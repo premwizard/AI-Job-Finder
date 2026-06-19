@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 export default function InterviewPrepPage() {
-  const [selectedJob, setSelectedJob] = useState("TechNova - Senior AI Engineer");
+  const [selectedCompany, setSelectedCompany] = useState("TechNova");
+  const [selectedRole, setSelectedRole] = useState("Senior AI Engineer");
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -36,13 +37,35 @@ export default function InterviewPrepPage() {
       <div className="grid gap-6 md:grid-cols-4">
         {/* Sidebar Configuration */}
         <div className="md:col-span-1 space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Target Role</label>
-            <div className="w-full p-2 border rounded-md bg-card/50 flex items-center justify-between cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors">
-              <span className="text-sm truncate pr-2">{selectedJob}</span>
-              <ChevronDown className="w-4 h-4 shrink-0 opacity-50" />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Company</label>
+              <select 
+                className="w-full p-2 border rounded-md bg-card/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                value={selectedCompany}
+                onChange={(e) => setSelectedCompany(e.target.value)}
+              >
+                <option value="TechNova">TechNova</option>
+                <option value="Google">Google</option>
+                <option value="OpenAI">OpenAI</option>
+                <option value="Stripe">Stripe</option>
+              </select>
             </div>
-            <p className="text-xs text-muted-foreground pt-1">Select from your saved or matched jobs to generate specific questions.</p>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Target Role</label>
+              <select 
+                className="w-full p-2 border rounded-md bg-card/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+              >
+                <option value="Senior AI Engineer">Senior AI Engineer</option>
+                <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                <option value="Data Scientist">Data Scientist</option>
+                <option value="Backend Developer">Backend Developer</option>
+              </select>
+              <p className="text-xs text-muted-foreground pt-1">Questions are tailored to this specific role and company culture.</p>
+            </div>
           </div>
 
           <div className="pt-4 space-y-2">
@@ -71,7 +94,7 @@ export default function InterviewPrepPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="technical" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 p-1">
+                <TabsList className="grid w-full grid-cols-4 mb-6 bg-muted/50 p-1">
                   <TabsTrigger value="technical" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                     <BrainCircuit className="w-4 h-4" /> Technical
                   </TabsTrigger>
@@ -79,7 +102,10 @@ export default function InterviewPrepPage() {
                     <Code2 className="w-4 h-4" /> Coding
                   </TabsTrigger>
                   <TabsTrigger value="hr" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                    <Users className="w-4 h-4" /> HR / Behavioral
+                    <Users className="w-4 h-4" /> HR
+                  </TabsTrigger>
+                  <TabsTrigger value="behavioral" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <Users className="w-4 h-4" /> Behavioral
                   </TabsTrigger>
                 </TabsList>
                 
@@ -101,18 +127,39 @@ export default function InterviewPrepPage() {
                 </TabsContent>
 
                 <TabsContent value="coding" className="space-y-4 outline-none">
-                  <div className="p-8 text-center border-2 border-dashed rounded-lg">
-                    <Code2 className="w-8 h-8 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-semibold mb-2">Algorithm & Data Structures</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Expect LeetCode Medium/Hard questions focused on Arrays, Trees, and DP.
-                    </p>
-                    <Button variant="outline">Practice Coding Environment</Button>
-                  </div>
+                  {codingQuestions.map((q, i) => (
+                    <div key={i} className="p-4 rounded-lg border bg-background/50 hover:border-primary/30 transition-colors group">
+                      <div className="flex justify-between items-start gap-4 mb-2">
+                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">{q.question}</h4>
+                        <Badge variant="secondary" className="whitespace-nowrap bg-muted">
+                          {q.difficulty}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed bg-muted/30 p-3 rounded-md mt-3 border border-border/50">
+                        <span className="font-semibold text-foreground mr-1">Expected Approach:</span>
+                        {q.hint}
+                      </p>
+                      <div className="mt-3 flex justify-end">
+                        <Button variant="outline" size="sm" className="gap-2"><Code2 className="w-4 h-4" /> Practice in IDE</Button>
+                      </div>
+                    </div>
+                  ))}
                 </TabsContent>
 
                 <TabsContent value="hr" className="space-y-4 outline-none">
                   {hrQuestions.map((q, i) => (
+                     <div key={i} className="p-4 rounded-lg border bg-background/50 hover:border-primary/30 transition-colors group">
+                     <h4 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{q.question}</h4>
+                     <p className="text-sm text-muted-foreground leading-relaxed bg-muted/30 p-3 rounded-md mt-2 border border-border/50">
+                       <span className="font-semibold text-foreground mr-1">AI Hint:</span>
+                       {q.hint}
+                     </p>
+                   </div>
+                  ))}
+                </TabsContent>
+
+                <TabsContent value="behavioral" className="space-y-4 outline-none">
+                  {behavioralQuestions.map((q, i) => (
                      <div key={i} className="p-4 rounded-lg border bg-background/50 hover:border-primary/30 transition-colors group">
                      <h4 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{q.question}</h4>
                      <p className="text-sm text-muted-foreground leading-relaxed bg-muted/30 p-3 rounded-md mt-2 border border-border/50">
@@ -153,13 +200,37 @@ const technicalQuestions = [
   }
 ];
 
+const codingQuestions = [
+  {
+    question: "Implement a rate limiter for an API endpoint using Python. Assume the API is heavily accessed concurrently.",
+    difficulty: "Medium",
+    hint: "Consider using the Token Bucket or Leaky Bucket algorithm. A Redis-based approach using sorted sets is expected for distributed systems."
+  },
+  {
+    question: "Given a list of job skills and a user's resume skills, write a function to compute a semantic match score.",
+    difficulty: "Hard",
+    hint: "You shouldn't just do exact string matching. Discuss using word embeddings (like Word2Vec or BERT embeddings) and calculating cosine similarity."
+  }
+];
+
 const hrQuestions = [
+  {
+    question: "Why do you want to join TechNova specifically?",
+    hint: "Mention their recent open-source contributions to the LLM community and align it with your passion for accessible AI."
+  },
+  {
+    question: "What are your salary expectations for this Senior AI Engineer position?",
+    hint: "Research standard market rates in San Francisco ($150k - $200k). State that you are flexible but looking for competitive compensation based on your expertise."
+  }
+];
+
+const behavioralQuestions = [
   {
     question: "Tell me about a time you had to optimize a model for production constraints.",
     hint: "Use the STAR method. Focus on a specific instance where you balanced accuracy vs. latency/throughput."
   },
   {
-    question: "Why do you want to join TechNova specifically?",
-    hint: "Mention their recent open-source contributions to the LLM community and align it with your passion for accessible AI."
+    question: "Describe a situation where you strongly disagreed with an engineering decision made by your team lead. How did you handle it?",
+    hint: "Focus on communication, data-driven arguments, and being willing to commit once a final decision is made (disagree and commit)."
   }
 ];

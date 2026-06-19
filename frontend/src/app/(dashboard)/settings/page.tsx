@@ -9,7 +9,10 @@ import {
   Key, 
   Plug, 
   Moon,
-  Laptop
+  Laptop,
+  CheckCircle2,
+  Mail,
+  Smartphone
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -68,6 +71,87 @@ export default function SettingsPage() {
                   <Laptop className="w-5 h-5" />
                   <span className="font-medium">System</span>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle>Connected Accounts</CardTitle>
+              <CardDescription>Link external accounts for SSO and profile syncing.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded flex items-center justify-center font-bold">G</div>
+                  <div>
+                    <h4 className="font-semibold text-sm">Google</h4>
+                    <p className="text-xs text-muted-foreground">johndoe@example.com</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500" /> Connected
+                </Button>
+              </div>
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-700 text-white rounded flex items-center justify-center font-bold">in</div>
+                  <div>
+                    <h4 className="font-semibold text-sm">LinkedIn</h4>
+                    <p className="text-xs text-muted-foreground">Not connected</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">Connect</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6 outline-none">
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle>Email Preferences</CardTitle>
+              <CardDescription>Control what emails you receive from AI Job Finder.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Weekly Job Matches</h4>
+                    <p className="text-xs text-muted-foreground">Receive a weekly digest of highly matched AI jobs.</p>
+                  </div>
+                </div>
+                <Button variant="secondary" size="sm">Enabled</Button>
+              </div>
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Application Updates</h4>
+                    <p className="text-xs text-muted-foreground">Get notified when an employer views your application.</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">Disabled</Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle>Push Notifications</CardTitle>
+              <CardDescription>Manage browser and mobile notifications.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <Smartphone className="w-5 h-5 text-muted-foreground" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Interview Reminders</h4>
+                    <p className="text-xs text-muted-foreground">Get pinged 30 minutes before a scheduled mock interview.</p>
+                  </div>
+                </div>
+                <Button variant="secondary" size="sm">Enabled</Button>
               </div>
             </CardContent>
           </Card>
