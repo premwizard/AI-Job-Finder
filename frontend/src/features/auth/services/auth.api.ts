@@ -33,3 +33,29 @@ export const getCurrentUser = async (): Promise<UserResponse> => {
 export const logout = async (): Promise<void> => {
   await authApi.post('/logout');
 };
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  otp: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export const forgotPassword = async (data: ForgotPasswordData): Promise<{success: boolean, message: string}> => {
+  const response = await authApi.post('/forgot-password', data);
+  return response.data;
+};
+
+export const verifyResetToken = async (token: string): Promise<{valid: boolean}> => {
+  const response = await authApi.get(`/reset-password/verify?token=${token}`);
+  return response.data;
+};
+
+export const resetPassword = async (data: ResetPasswordData): Promise<{success: boolean, message: string}> => {
+  const response = await authApi.post('/reset-password', data);
+  return response.data;
+};

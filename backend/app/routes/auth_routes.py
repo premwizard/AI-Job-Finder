@@ -25,3 +25,17 @@ def logout():
     # Since we are using stateless JWT, logout is mostly handled on the client side 
     # by deleting the token. We can just return success here.
     return {"success": True, "message": "Logged out successfully"}
+
+from app.schemas.password_reset_schema import ForgotPasswordRequest, ResetPasswordVerifyRequest, ResetPasswordRequest, SuccessResponse, VerifyResponse
+
+@router.post("/forgot-password", response_model=SuccessResponse)
+def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    return auth_controller.forgot_password(db, req)
+
+@router.get("/reset-password/verify", response_model=VerifyResponse)
+def verify_reset_token(token: str, db: Session = Depends(get_db)):
+    return auth_controller.verify_reset_token(db, token)
+
+@router.post("/reset-password", response_model=SuccessResponse)
+def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
+    return auth_controller.reset_password(db, req)
