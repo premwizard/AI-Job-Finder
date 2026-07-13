@@ -1,8 +1,8 @@
-"""Initial migration
+"""Initial Schema from app
 
-Revision ID: bab8d5e696cf
+Revision ID: 7db684a93cd9
 Revises: 
-Create Date: 2026-06-19 19:23:04.868665
+Create Date: 2026-07-13 11:28:02.851727
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bab8d5e696cf'
+revision: str = '7db684a93cd9'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -39,23 +39,22 @@ def upgrade() -> None:
     op.create_index(op.f('ix_jobs_job_hash'), 'jobs', ['job_hash'], unique=True)
     op.create_index(op.f('ix_jobs_job_title'), 'jobs', ['job_title'], unique=False)
     op.create_table('users',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('full_name', sa.String(), nullable=True),
-    sa.Column('email', sa.String(), nullable=True),
-    sa.Column('password_hash', sa.String(), nullable=True),
-    sa.Column('preferred_role', sa.String(), nullable=True),
-    sa.Column('experience', sa.String(), nullable=True),
-    sa.Column('education', sa.String(), nullable=True),
-    sa.Column('work_preference', sa.String(), nullable=True),
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('first_name', sa.String(), nullable=False),
+    sa.Column('last_name', sa.String(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('password_hash', sa.String(), nullable=False),
+    sa.Column('is_verified', sa.Boolean(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
-    op.create_index(op.f('ix_users_full_name'), 'users', ['full_name'], unique=False)
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
     op.create_table('analytics',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(), nullable=True),
     sa.Column('jobs_found', sa.Integer(), nullable=True),
     sa.Column('matched_jobs', sa.Integer(), nullable=True),
     sa.Column('applications_sent', sa.Integer(), nullable=True),
@@ -67,7 +66,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_analytics_id'), 'analytics', ['id'], unique=False)
     op.create_table('applications',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(), nullable=True),
     sa.Column('job_id', sa.Integer(), nullable=True),
     sa.Column('status', sa.Enum('saved', 'applied', 'interview', 'rejected', 'selected', name='applicationstatus'), nullable=True),
     sa.Column('applied_at', sa.DateTime(), nullable=True),
@@ -78,7 +77,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_applications_id'), 'applications', ['id'], unique=False)
     op.create_table('resumes',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(), nullable=True),
     sa.Column('file_url', sa.String(), nullable=True),
     sa.Column('resume_score', sa.Float(), nullable=True),
     sa.Column('ats_score', sa.Float(), nullable=True),
@@ -89,7 +88,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_resumes_id'), 'resumes', ['id'], unique=False)
     op.create_table('saved_jobs',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(), nullable=True),
     sa.Column('job_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['job_id'], ['jobs.id'], ),
@@ -99,19 +98,43 @@ def upgrade() -> None:
     op.create_index(op.f('ix_saved_jobs_id'), 'saved_jobs', ['id'], unique=False)
     op.create_table('skills',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(), nullable=True),
     sa.Column('skill_name', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_skills_id'), 'skills', ['id'], unique=False)
     op.create_index(op.f('ix_skills_skill_name'), 'skills', ['skill_name'], unique=False)
+    op.create_table('user_profiles',
+    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('user_id', sa.String(), nullable=False),
+    sa.Column('current_job_title', sa.String(), nullable=True),
+    sa.Column('preferred_role', sa.String(), nullable=True),
+    sa.Column('years_of_experience', sa.String(), nullable=True),
+    sa.Column('highest_education', sa.String(), nullable=True),
+    sa.Column('current_company', sa.String(), nullable=True),
+    sa.Column('preferred_locations', sa.String(), nullable=True),
+    sa.Column('work_preference', sa.String(), nullable=True),
+    sa.Column('expected_salary', sa.String(), nullable=True),
+    sa.Column('preferred_companies', sa.String(), nullable=True),
+    sa.Column('notice_period', sa.String(), nullable=True),
+    sa.Column('open_to_relocation', sa.Boolean(), nullable=True),
+    sa.Column('job_type', sa.String(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id')
+    )
+    op.create_index(op.f('ix_user_profiles_id'), 'user_profiles', ['id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index(op.f('ix_user_profiles_id'), table_name='user_profiles')
+    op.drop_table('user_profiles')
     op.drop_index(op.f('ix_skills_skill_name'), table_name='skills')
     op.drop_index(op.f('ix_skills_id'), table_name='skills')
     op.drop_table('skills')
@@ -124,7 +147,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_analytics_id'), table_name='analytics')
     op.drop_table('analytics')
     op.drop_index(op.f('ix_users_id'), table_name='users')
-    op.drop_index(op.f('ix_users_full_name'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
     op.drop_index(op.f('ix_jobs_job_title'), table_name='jobs')

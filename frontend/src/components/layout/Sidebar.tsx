@@ -19,6 +19,8 @@ import {
   LogOut
 } from "lucide-react";
 
+import { useAuthStore } from "@/store/auth";
+
 const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
@@ -34,6 +36,7 @@ const sidebarItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const logout = useAuthStore((state) => state.logout);
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card/50 backdrop-blur-sm sticky top-0">
@@ -64,7 +67,11 @@ export function Sidebar() {
         </nav>
       </div>
       <div className="border-t p-4">
-        <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground">
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
+          onClick={() => logout()}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           Logout
         </Button>

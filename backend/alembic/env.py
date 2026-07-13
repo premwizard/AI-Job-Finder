@@ -10,8 +10,8 @@ import sys
 # Add the parent directory to sys.path so we can import src
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database.database import Base, SQLALCHEMY_DATABASE_URL
-from src.models import models
+from app.database.database import Base, SQLALCHEMY_DATABASE_URL
+from app.models import models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
