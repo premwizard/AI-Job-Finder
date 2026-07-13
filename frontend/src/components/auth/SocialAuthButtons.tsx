@@ -14,10 +14,10 @@ export function SocialAuthButtons({ textPrefix = "Continue with" }: SocialAuthBu
     <div className="flex flex-col gap-3 w-full">
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span className="bg-background px-2 text-muted-foreground font-medium">
             Or continue with
           </span>
         </div>
@@ -27,7 +27,7 @@ export function SocialAuthButtons({ textPrefix = "Continue with" }: SocialAuthBu
         <Button 
           variant="outline" 
           type="button" 
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 h-10 shadow-sm transition-all hover:bg-muted"
           onClick={() => handleLogin("google")}
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ export function SocialAuthButtons({ textPrefix = "Continue with" }: SocialAuthBu
         <Button 
           variant="outline" 
           type="button" 
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 h-10 shadow-sm transition-all hover:bg-muted"
           onClick={() => handleLogin("github")}
         >
           <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -51,17 +51,19 @@ export function SocialAuthButtons({ textPrefix = "Continue with" }: SocialAuthBu
           GitHub
         </Button>
 
-        <Button 
-          variant="outline" 
-          type="button" 
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleLogin("linkedin")}
-        >
-          <svg className="h-5 w-5" fill="#0A66C2" viewBox="0 0 24 24">
-            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-          </svg>
-          LinkedIn
-        </Button>
+        <div className="md:col-span-2 flex justify-center">
+          <Button 
+            variant="outline" 
+            type="button" 
+            className="w-full md:w-[calc(50%-0.375rem)] flex items-center justify-center gap-2 h-10 shadow-sm transition-all hover:bg-muted"
+            onClick={() => handleLogin("linkedin")}
+          >
+            <svg className="h-5 w-5" fill="#0A66C2" viewBox="0 0 24 24">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            LinkedIn
+          </Button>
+        </div>
       </div>
     </div>
   );

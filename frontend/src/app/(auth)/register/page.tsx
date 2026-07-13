@@ -13,6 +13,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
+import { AuthLayout } from "@/components/auth/AuthLayout";
+import { Check, X } from "lucide-react";
 
 const registerSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -85,38 +87,56 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight">Create an account</CardTitle>
-          <CardDescription>
-            Enter your information to get started with AI Job Finder.
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md dark:bg-red-900/30">
-                {error}
-              </div>
-            )}
+    <AuthLayout>
+      <div className="w-full">
+        <div className="flex flex-col space-y-2 text-center mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight">Create an account</h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your details to get started with AI Job Finder
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {error && (
+            <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 rounded-md animate-in fade-in slide-in-from-top-2">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name</Label>
-                <Input id="first_name" {...registerField("first_name")} />
-                {errors.first_name && <p className="text-xs text-red-500">{errors.first_name.message}</p>}
+                <Input 
+                  id="first_name" 
+                  className="h-11 transition-all focus-visible:ring-blue-500"
+                  placeholder="John"
+                  {...registerField("first_name")} 
+                />
+                {errors.first_name && <p className="text-xs text-destructive animate-in fade-in">{errors.first_name.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last_name">Last Name</Label>
-                <Input id="last_name" {...registerField("last_name")} />
-                {errors.last_name && <p className="text-xs text-red-500">{errors.last_name.message}</p>}
+                <Input 
+                  id="last_name" 
+                  className="h-11 transition-all focus-visible:ring-blue-500"
+                  placeholder="Doe"
+                  {...registerField("last_name")} 
+                />
+                {errors.last_name && <p className="text-xs text-destructive animate-in fade-in">{errors.last_name.message}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...registerField("email")} />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                className="h-11 transition-all focus-visible:ring-blue-500"
+                {...registerField("email")} 
+              />
+              {errors.email && <p className="text-xs text-destructive animate-in fade-in">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -125,29 +145,55 @@ export default function RegisterPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="Create a strong password"
+                  className="h-11 pr-10 transition-all focus-visible:ring-blue-500"
                   {...registerField("password")}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-2.5 text-gray-500"
+                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              
+              {/* Strength Indicator */}
               {passwordValue && (
-                <div className="flex gap-1 mt-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1 w-full rounded-full ${
-                        i < strength ? getStrengthColor() : "bg-gray-200 dark:bg-gray-700"
-                      }`}
-                    />
-                  ))}
+                <div className="animate-in fade-in slide-in-from-top-1">
+                  <div className="flex gap-1 mt-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 w-full rounded-full transition-all duration-300 ${
+                          i < strength ? getStrengthColor() : "bg-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Requirements Checklist */}
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      {passwordValue.length >= 8 ? <Check className="w-3 h-3 text-green-500" /> : <X className="w-3 h-3 text-muted-foreground" />}
+                      <span className={passwordValue.length >= 8 ? "text-foreground" : ""}>8+ characters</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {/[A-Z]/.test(passwordValue) ? <Check className="w-3 h-3 text-green-500" /> : <X className="w-3 h-3 text-muted-foreground" />}
+                      <span className={/[A-Z]/.test(passwordValue) ? "text-foreground" : ""}>Uppercase letter</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {/[a-z]/.test(passwordValue) ? <Check className="w-3 h-3 text-green-500" /> : <X className="w-3 h-3 text-muted-foreground" />}
+                      <span className={/[a-z]/.test(passwordValue) ? "text-foreground" : ""}>Lowercase letter</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {/[0-9]/.test(passwordValue) ? <Check className="w-3 h-3 text-green-500" /> : <X className="w-3 h-3 text-muted-foreground" />}
+                      <span className={/[0-9]/.test(passwordValue) ? "text-foreground" : ""}>Number</span>
+                    </div>
+                  </div>
                 </div>
               )}
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-destructive animate-in fade-in">{errors.password.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -155,27 +201,31 @@ export default function RegisterPage() {
               <Input
                 id="confirm_password"
                 type={showPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                className="h-11 transition-all focus-visible:ring-blue-500"
                 {...registerField("confirm_password")}
               />
-              {errors.confirm_password && <p className="text-xs text-red-500">{errors.confirm_password.message}</p>}
+              {errors.confirm_password && <p className="text-xs text-destructive animate-in fade-in">{errors.confirm_password.message}</p>}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create account
-            </Button>
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline">
-                Login
-              </Link>
-            </div>
-            
-            <SocialAuthButtons />
-          </CardFooter>
+          </div>
+
+          <Button type="submit" className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md" disabled={loading}>
+            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+            Create Account
+          </Button>
         </form>
-      </Card>
-    </div>
+
+        <div className="mt-6">
+          <SocialAuthButtons />
+        </div>
+
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-foreground hover:text-blue-600 hover:underline transition-colors">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </AuthLayout>
   );
 }

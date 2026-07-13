@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -76,31 +77,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold tracking-tight">Login</CardTitle>
-          <CardDescription>
-            Enter your email and password to access your account.
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md dark:bg-red-900/30">
-                {error}
-              </div>
-            )}
+    <AuthLayout>
+      <div className="w-full">
+        <div className="flex flex-col space-y-2 text-center mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
+          <p className="text-sm text-muted-foreground">
+            Enter your credentials to access your account
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {error && (
+            <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 rounded-md animate-in fade-in slide-in-from-top-2">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="name@example.com" 
+                className="h-11 transition-all focus-visible:ring-blue-500"
+                {...register("email")} 
+              />
+              {errors.email && <p className="text-xs text-destructive animate-in fade-in">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+                <Link href="/forgot-password" className="text-xs font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -108,47 +117,51 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="h-11 pr-10 transition-all focus-visible:ring-blue-500"
                   {...register("password")}
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-2.5 text-gray-500"
+                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+              {errors.password && <p className="text-xs text-destructive animate-in fade-in">{errors.password.message}</p>}
             </div>
+          </div>
 
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                {...register("rememberMe")}
-              />
-              <Label htmlFor="rememberMe" className="text-sm font-normal">
-                Remember me
-              </Label>
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login
-            </Button>
-            <div className="text-center text-sm">
-              Don't have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline">
-                Register
-              </Link>
-            </div>
-            
-            <SocialAuthButtons />
-          </CardFooter>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              className="h-4 w-4 rounded border-input text-blue-600 focus:ring-blue-500 bg-background accent-blue-600 cursor-pointer"
+              {...register("rememberMe")}
+            />
+            <Label htmlFor="rememberMe" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+              Remember me for 30 days
+            </Label>
+          </div>
+
+          <Button type="submit" className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md" disabled={loading}>
+            {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+            Sign In
+          </Button>
         </form>
-      </Card>
-    </div>
+
+        <div className="mt-6">
+          <SocialAuthButtons />
+        </div>
+
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/register" className="font-medium text-foreground hover:text-blue-600 hover:underline transition-colors">
+            Create account
+          </Link>
+        </div>
+      </div>
+    </AuthLayout>
   );
 }
