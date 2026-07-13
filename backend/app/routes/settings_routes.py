@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.schemas.change_password_schema import ChangePasswordRequest, VerifyPasswordChangeRequest, SuccessResponse
-from app.controllers import settings_controller
+from app.schemas.delete_account_schema import DeleteAccountRequestSchema, VerifyDeleteOTPSchema, ExecuteDeleteSchema
+from app.controllers import settings_controller, delete_account_controller
 from app.middleware.auth_middleware import get_current_user
 from app.models.models import User
 
@@ -15,3 +16,20 @@ def request_password_change(req: ChangePasswordRequest, current_user: User = Dep
 @router.post("/change-password/verify", response_model=SuccessResponse)
 def verify_password_change(req: VerifyPasswordChangeRequest, request: Request, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return settings_controller.verify_password_change(db, current_user, req, request)
+
+# --- Delete Account ---
+
+from app.schemas.delete_account_schema import SuccessResponse as DeleteSuccessResponse
+
+@router.post("/delete-account/request", response_model=DeleteSuccessResponse)
+def request_account_deletion(req: DeleteAccountRequestSchema, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return delete_account_controller.request_account_deletion(db, current_user, req)
+
+@router.post("/delete-account/verify", response_model=DeleteSuccessResponse)
+def verify_deletion_otp(req: VerifyDeleteOTPSchema, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return delete_account_controller.verify_deletion_otp(db, current_user, req)
+
+@router.delete("/delete-account", response_model=DeleteSuccessResponse)
+def execute_account_deletion(req: ExecuteDeleteSchema, request: Request, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return delete_account_controller.execute_account_deletion(db, current_user, req, request)
+

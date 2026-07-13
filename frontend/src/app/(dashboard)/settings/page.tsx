@@ -15,6 +15,7 @@ import {
   Smartphone
 } from "lucide-react";
 import { ChangePasswordCard } from "@/components/settings/ChangePasswordCard";
+import { DeleteAccountFlow } from "@/components/settings/DeleteAccountFlow";
 
 export default function SettingsPage() {
   return (
@@ -165,15 +166,14 @@ export default function SettingsPage() {
               </CardHeader>
             </Card>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-70 border-destructive/20">
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div>
-                  <CardTitle className="text-base text-destructive">Delete Account</CardTitle>
-                  <CardDescription>Permanently delete your account and all data.</CardDescription>
-                </div>
-                <div className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Coming Soon</div>
-              </CardHeader>
-            </Card>
+            {/* Danger Zone */}
+            <div className="mt-2 space-y-3">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-destructive uppercase tracking-wider">Danger Zone</h3>
+                <div className="flex-1 h-px bg-destructive/20" />
+              </div>
+              <DeleteAccountFlow />
+            </div>
           </div>
         </TabsContent>
 

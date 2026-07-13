@@ -56,6 +56,9 @@ def login_user(db: Session, req: LoginRequest, request: Request, response: Respo
         
     if not user.is_active:
         raise HTTPException(status_code=400, detail="User is inactive")
+
+    if user.is_deleted:
+        raise HTTPException(status_code=403, detail="This account has been deleted")
         
     access_token = auth_service.create_access_token(
         data={"sub": user.email},

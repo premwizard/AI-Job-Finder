@@ -39,3 +39,26 @@ export const verifyPasswordChange = async (
   const response = await settingsApi.post('/change-password/verify', data);
   return response.data;
 };
+
+// --- Delete Account ---
+
+export const requestAccountDeletion = async (
+  current_password: string,
+): Promise<{ success: boolean; message: string }> => {
+  const response = await settingsApi.post('/delete-account/request', { current_password });
+  return response.data;
+};
+
+export const verifyDeletionOtp = async (
+  otp: string,
+): Promise<{ success: boolean; message: string }> => {
+  const response = await settingsApi.post('/delete-account/verify', { otp });
+  return response.data;
+};
+
+export const executeAccountDeletion = async (
+  confirmation: string,
+): Promise<{ success: boolean; message: string }> => {
+  const response = await settingsApi.delete('/delete-account', { data: { confirmation } });
+  return response.data;
+};

@@ -24,6 +24,8 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     is_verified = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
+    is_deleted = Column(Boolean, default=False)
+    deleted_at = Column(DateTime, nullable=True)
     verified_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -185,6 +187,20 @@ class PasswordChangeRequest(Base):
     new_password_hash = Column(String, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     attempts = Column(Integer, default=0)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+
+class AccountDeletionRequest(Base):
+    __tablename__ = "account_deletion_requests"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    otp_hash = Column(String, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    attempts = Column(Integer, default=0)
+    otp_verified = Column(Boolean, default=False)  # True after step 3 succeeds
     used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
