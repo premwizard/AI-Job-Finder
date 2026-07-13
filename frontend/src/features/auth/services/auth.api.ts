@@ -5,6 +5,7 @@ const API_URL = 'http://localhost:8000/api/auth';
 
 const authApi = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
 });
 
 authApi.interceptors.request.use((config) => {
@@ -14,6 +15,64 @@ authApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+authApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (originalRequest.url === '/login' || originalRequest.url === '/refresh') {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise(function(resolve, reject) {
+          failedQueue.push({resolve, reject})
+        }).then(token => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return authApi(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const { data } = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
+        localStorage.setItem('auth_token', data.access_token);
+        authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+        originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`;
+        processQueue(null, data.access_token);
+        return authApi(originalRequest);
+      } catch (err) {
+        processQueue(err, null);
+        localStorage.removeItem('auth_token');
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
   const response = await authApi.post<AuthResponse>('/register', data);
@@ -27,6 +86,11 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
   const response = await authApi.get<UserResponse>('/me');
+  return response.data;
+};
+
+export const refreshToken = async (): Promise<AuthResponse> => {
+  const response = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
   return response.data;
 };
 

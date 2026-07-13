@@ -89,6 +89,7 @@ def login_user(db: Session, req: LoginRequest, request: Request, response: Respo
     }
     if req.remember_me:
         cookie_kwargs['max_age'] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+        cookie_kwargs['expires'] = expires_at.strftime('%a, %d %b %Y %H:%M:%S GMT')
     
     response.set_cookie(**cookie_kwargs)
     
@@ -145,6 +146,7 @@ def refresh_access_token(db: Session, request: Request, response: Response) -> T
     
     if days_left > 1:
         cookie_kwargs['max_age'] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+        cookie_kwargs['expires'] = new_expires_at.strftime('%a, %d %b %Y %H:%M:%S GMT')
         
     response.set_cookie(**cookie_kwargs)
     
