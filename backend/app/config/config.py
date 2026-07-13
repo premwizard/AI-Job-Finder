@@ -58,3 +58,8 @@ RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", EMAIL)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 STATE_FILE = "seen_jobs.json"
+
+# --- AUTHENTICATION ---
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-super-secret-key')
+ALGORITHM = 'HS256'
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
