@@ -5,7 +5,7 @@ from app.schemas.auth_schema import RegisterRequest, LoginRequest, RegisterRespo
 from app.schemas.password_reset_schema import ForgotPasswordRequest, ResetPasswordVerifyRequest, ResetPasswordRequest, SuccessResponse, VerifyResponse
 from app.repositories import auth_repository, password_reset_repository
 from app.services import auth_service, email_service
-from app.models.models import User, PasswordResetToken
+from app.models.models import User, PasswordResetToken, EmailVerificationToken
 from app.utils.token import generate_secure_token, hash_token, hash_otp, verify_otp
 from app.utils.otp import generate_otp
 from app.config.config import ACCESS_TOKEN_EXPIRE_MINUTES
@@ -257,3 +257,49 @@ def reset_password(db: Session, req: ResetPasswordRequest) -> SuccessResponse:
     password_reset_repository.delete_token(db, record)
     
     return SuccessResponse(message="Password updated successfully.")
+
+from app.schemas.email_verification_schema import VerificationStatusResponse
+from app.repositories import email_verification_repository
+
+def send_verification_email(db: Session, user: User) -> SuccessResponse:
+    if user.is_verified:
+        raise HTTPException(status_code=400, detail="Email is already verified")
+        
+    # Check cooldown (60 seconds)
+    existing_tokens = db.query(EmailVerificationToken).filter(
+        EmailVerificationToken.user_id == user.id,
+        EmailVerificationToken.used == False
+    ).all()
+    
+    for t in existing_tokens:
+        if t.created_at > datetime.utcnow() - timedelta(seconds=60):
+            return SuccessResponse(message="Verification email sent.") # Silently throttle
+            
+    raw_token = generate_secure_token()
+    token_hash = hash_token(raw_token)
+    expires_at = datetime.utcnow() + timedelta(hours=24)
+    
+    email_verification_repository.create_verification_token(db, user.id, token_hash, expires_at)
+    
+    verification_link = f"http://localhost:3000/verify-email?token={raw_token}"
+    email_service.send_verification_email(user.email, verification_link)
+    
+    return SuccessResponse(message="Verification email sent.")
+
+def verify_email(db: Session, token: str) -> SuccessResponse:
+    token_hash = hash_token(token)
+    record = email_verification_repository.get_token_by_hash(db, token_hash)
+    
+    if not record:
+        raise HTTPException(status_code=400, detail="Invalid token")
+        
+    if record.used or record.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="This verification link is invalid or has expired")
+        
+    email_verification_repository.verify_user_email(db, record.user_id)
+    email_verification_repository.mark_token_used(db, record.id)
+    
+    return SuccessResponse(message="Email verified successfully.")
+
+def get_verification_status(user: User) -> VerificationStatusResponse:
+    return VerificationStatusResponse(is_verified=user.is_verified)

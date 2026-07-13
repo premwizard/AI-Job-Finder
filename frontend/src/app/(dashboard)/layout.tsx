@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/layout/Sidebar";
+import VerificationBanner from "@/components/auth/VerificationBanner";
 
 export default function DashboardLayout({
   children,
@@ -20,6 +21,7 @@ export default function DashboardLayout({
           </div>
         </header>
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+          <VerificationBanner />
           {children}
         </main>
       </div>

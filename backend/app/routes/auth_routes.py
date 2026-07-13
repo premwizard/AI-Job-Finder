@@ -42,3 +42,17 @@ def verify_reset_token(token: str, db: Session = Depends(get_db)):
 @router.post("/reset-password", response_model=SuccessResponse)
 def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
     return auth_controller.reset_password(db, req)
+
+from app.schemas.email_verification_schema import VerificationStatusResponse
+
+@router.post("/send-verification-email", response_model=SuccessResponse)
+def send_verification_email(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return auth_controller.send_verification_email(db, current_user)
+
+@router.get("/verify-email", response_model=SuccessResponse)
+def verify_email(token: str, db: Session = Depends(get_db)):
+    return auth_controller.verify_email(db, token)
+
+@router.get("/verification-status", response_model=VerificationStatusResponse)
+def get_verification_status(current_user: User = Depends(get_current_user)):
+    return auth_controller.get_verification_status(current_user)

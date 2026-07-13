@@ -123,3 +123,19 @@ export const resetPassword = async (data: ResetPasswordData): Promise<{ success:
   const response = await authApi.post('/reset-password', data);
   return response.data;
 };
+
+export const sendVerificationEmail = async (): Promise<{ success: boolean, message: string }> => {
+  const response = await authApi.post('/send-verification-email');
+  return response.data;
+};
+
+export const verifyEmail = async (token: string): Promise<{ success: boolean, message: string }> => {
+  // Use regular axios to avoid interceptor issues, or authApi. Since it's public, regular axios is fine, but authApi works too.
+  const response = await axios.get(`${API_URL}/verify-email?token=${token}`);
+  return response.data;
+};
+
+export const getVerificationStatus = async (): Promise<{ is_verified: boolean }> => {
+  const response = await authApi.get('/verification-status');
+  return response.data;
+};

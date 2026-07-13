@@ -34,9 +34,15 @@ const sidebarItems = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
+import { useRestrictedFeature } from "@/hooks/useRestrictedFeature";
+import VerificationDialog from "@/components/auth/VerificationDialog";
+import { BadgeCheck, AlertCircle } from "lucide-react";
+
 export function Sidebar() {
   const pathname = usePathname();
   const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+  const { isVerified, setShowVerificationDialog, showVerificationDialog } = useRestrictedFeature();
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card/50 backdrop-blur-sm sticky top-0">
@@ -46,6 +52,28 @@ export function Sidebar() {
           <span>AI Job Finder</span>
         </Link>
       </div>
+      
+      {user && (
+        <div className="px-4 py-3 border-b border-border/50">
+          <div className="text-sm font-medium truncate">{user.first_name} {user.last_name}</div>
+          <div className="text-xs text-muted-foreground truncate mb-2">{user.email}</div>
+          {isVerified ? (
+            <div className="flex items-center text-xs font-medium text-green-600 dark:text-green-500">
+              <BadgeCheck className="mr-1 h-3.5 w-3.5" />
+              Verified Account
+            </div>
+          ) : (
+            <button 
+              onClick={() => setShowVerificationDialog(true)}
+              className="flex items-center text-xs font-medium text-amber-600 dark:text-amber-500 hover:underline cursor-pointer"
+            >
+              <AlertCircle className="mr-1 h-3.5 w-3.5" />
+              Not Verified - Click to fix
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto py-4">
         <nav className="grid gap-1 px-2">
           {sidebarItems.map((item, index) => {
@@ -76,6 +104,7 @@ export function Sidebar() {
           Logout
         </Button>
       </div>
+      <VerificationDialog open={showVerificationDialog} onOpenChange={setShowVerificationDialog} />
     </div>
   );
 }
