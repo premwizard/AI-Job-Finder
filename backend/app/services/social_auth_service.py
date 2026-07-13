@@ -22,14 +22,7 @@ class SocialAuthService:
                 "userinfo_url": "https://api.github.com/user",
                 "scopes": "read:user user:email",
             },
-            AuthProvider.microsoft: {
-                "client_id": config.MICROSOFT_CLIENT_ID,
-                "client_secret": config.MICROSOFT_CLIENT_SECRET,
-                "auth_url": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-                "token_url": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-                "userinfo_url": "https://graph.microsoft.com/v1.0/me",
-                "scopes": "User.Read",
-            },
+
             AuthProvider.linkedin: {
                 "client_id": config.LINKEDIN_CLIENT_ID,
                 "client_secret": config.LINKEDIN_CLIENT_SECRET,
@@ -50,7 +43,7 @@ class SocialAuthService:
         return provider_config
 
     def get_redirect_uri(self, provider: AuthProvider) -> str:
-        return f"{config.FRONTEND_URL}/api/auth/{provider.value}/callback"
+        return f"{config.BACKEND_URL}/api/auth/{provider.value}/callback"
         
     def get_authorization_url(self, provider: AuthProvider, state: str = "random_state_string") -> str:
         provider_config = self.get_provider_config(provider)
@@ -138,12 +131,7 @@ class SocialAuthService:
             normalized_data["first_name"] = name_parts[0]
             normalized_data["last_name"] = name_parts[1] if len(name_parts) > 1 else ""
             
-        elif provider == AuthProvider.microsoft:
-            normalized_data["id"] = user_data.get("id")
-            normalized_data["email"] = user_data.get("mail") or user_data.get("userPrincipalName")
-            normalized_data["first_name"] = user_data.get("givenName", "")
-            normalized_data["last_name"] = user_data.get("surname", "")
-            
+
         elif provider == AuthProvider.linkedin:
             normalized_data["id"] = user_data.get("sub")
             normalized_data["email"] = user_data.get("email")

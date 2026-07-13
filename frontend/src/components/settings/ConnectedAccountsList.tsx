@@ -100,7 +100,6 @@ export function ConnectedAccountsList() {
       <CardContent>
         {renderProvider("Google", "google", "G", "bg-red-100 text-red-600")}
         {renderProvider("GitHub", "github", "gh", "bg-gray-800 text-white")}
-        {renderProvider("Microsoft", "microsoft", "M", "bg-blue-100 text-blue-600")}
         {renderProvider("LinkedIn", "linkedin", "in", "bg-blue-700 text-white")}
       </CardContent>
     </Card>

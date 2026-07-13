@@ -50,20 +50,7 @@ export function SocialAuthButtons({ textPrefix = "Continue with" }: SocialAuthBu
           </svg>
           GitHub
         </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
-          className="w-full flex items-center justify-center gap-2"
-          onClick={() => handleLogin("microsoft")}
-        >
-          <svg className="h-4 w-4" viewBox="0 0 21 21">
-            <path fill="#f25022" d="M0 0h10v10H0z"/>
-            <path fill="#7fba00" d="M11 0h10v10H11z"/>
-            <path fill="#00a4ef" d="M0 11h10v10H0z"/>
-            <path fill="#ffb900" d="M11 11h10v10H11z"/>
-          </svg>
-          Microsoft
-        </Button>
+
         <Button 
           variant="outline" 
           type="button" 

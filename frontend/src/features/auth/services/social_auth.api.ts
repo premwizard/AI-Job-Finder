@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8000/api";
 
-export type AuthProvider = "email" | "google" | "github" | "microsoft" | "linkedin";
+export type AuthProvider = "email" | "google" | "github" | "linkedin";
 
 export interface ConnectedAccountResponse {
   id: string;
