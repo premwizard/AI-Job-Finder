@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { toast as sonnerToast } from "sonner";
 
+interface ToastOptions {
+  title: string;
+  description?: string;
+  variant?: "default" | "destructive";
+}
+
+/**
+ * Wrapper around sonner's toast API that matches the shadcn/ui useToast interface.
+ * This allows components written against the useToast pattern to work seamlessly
+ * with sonner's global toast rendering.
+ */
 export function useToast() {
-  const [toasts, setToasts] = useState<any[]>([]);
-
-  const toast = ({ title, description, variant = "default" }: { title: string; description?: string; variant?: "default" | "destructive" }) => {
-    // Fallback to browser alert for now
+  const toast = ({ title, description, variant }: ToastOptions) => {
     if (variant === "destructive") {
-      alert(`Error: ${title}\n${description || ""}`);
+      sonnerToast.error(title, { description });
     } else {
-      alert(`${title}\n${description || ""}`);
+      sonnerToast.success(title, { description });
     }
   };
 
-  return { toast, toasts };
+  return { toast };
 }

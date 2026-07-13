@@ -33,6 +33,13 @@ def delete_refresh_token(db: Session, db_token: RefreshToken):
     db.delete(db_token)
     db.commit()
 
+def get_active_refresh_tokens_by_user(db: Session, user_id: str) -> list[RefreshToken]:
+    return db.query(RefreshToken).filter(
+        RefreshToken.user_id == user_id,
+        RefreshToken.revoked == False,
+        RefreshToken.expires_at > datetime.utcnow()
+    ).all()
+
 def revoke_all_user_tokens(db: Session, user_id: str):
     db.query(RefreshToken).filter(RefreshToken.user_id == user_id).update({"revoked": True})
     db.commit()
