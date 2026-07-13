@@ -19,7 +19,7 @@ def login(req: LoginRequest, request: Request, response: Response, db: Session =
     return auth_controller.login_user(db, req, request, response)
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
-    return auth_controller.get_current_user_profile(current_user)
+    return current_user
 
 @router.post("/refresh", response_model=TokenResponse)
 def refresh_token(request: Request, response: Response, db: Session = Depends(get_db)):
@@ -56,3 +56,4 @@ def verify_email(token: str, db: Session = Depends(get_db)):
 @router.get("/verification-status", response_model=VerificationStatusResponse)
 def get_verification_status(current_user: User = Depends(get_current_user)):
     return auth_controller.get_verification_status(current_user)
+    

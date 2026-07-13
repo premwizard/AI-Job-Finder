@@ -16,7 +16,7 @@ function VerifyEmailContent() {
   
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
-  const refreshUser = useAuthStore((state) => state.refreshUser);
+  const checkAuthentication = useAuthStore((state) => state.checkAuthentication);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ function VerifyEmailContent() {
         setStatus("success");
         // Re-fetch user profile if authenticated to update is_verified state globally
         if (isAuthenticated) {
-          refreshUser().catch(console.error);
+          checkAuthentication().catch(console.error);
         }
       })
       .catch((err: any) => {
@@ -48,7 +48,7 @@ function VerifyEmailContent() {
     return () => {
       isMounted = false;
     };
-  }, [token, isAuthenticated, refreshUser]);
+  }, [token, isAuthenticated, checkAuthentication]);
 
   return (
     <Card className="w-full">

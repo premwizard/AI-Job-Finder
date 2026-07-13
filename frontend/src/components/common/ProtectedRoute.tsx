@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const loading = useAuthStore((state) => state.loading);
-  const refreshUser = useAuthStore((state) => state.refreshUser);
+  const checkAuthentication = useAuthStore((state) => state.checkAuthentication);
   const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
   const router = useRouter();
   const pathname = usePathname();
@@ -17,12 +17,12 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     const initAuth = async () => {
       if (token && !isAuthenticated) {
-        await refreshUser();
+        await checkAuthentication();
       }
       setIsInitializing(false);
     };
     initAuth();
-  }, [token, isAuthenticated, refreshUser]);
+  }, [token, isAuthenticated, checkAuthentication]);
 
   useEffect(() => {
     if (!isInitializing && !loading && !isAuthenticated) {

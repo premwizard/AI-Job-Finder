@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { RegisterRequest, LoginRequest, AuthResponse, UserResponse } from '../types/auth.types';
 
-const API_URL = 'http://localhost:8000/api/auth';
+const API_URL = '/api/auth';
 
-const authApi = axios.create({
+export const authApi = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
@@ -65,7 +65,6 @@ authApi.interceptors.response.use(
         return authApi(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem('auth_token');
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

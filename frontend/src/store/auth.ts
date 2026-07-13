@@ -11,7 +11,6 @@ interface AuthState {
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
-  refreshUser: () => Promise<void>;
   checkAuthentication: () => Promise<void>;
 }
 
@@ -21,7 +20,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      loading: false,
+      loading: true, // Set to true to prevent premature redirects on hydration
 
       login: async (data: LoginRequest) => {
         set({ loading: true });
@@ -64,41 +63,46 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      refreshUser: async () => {
-        const token = localStorage.getItem('auth_token');
-        if (!token) return;
-        set({ loading: true });
-        try {
-          const user = await authService.getCurrentUser();
-          set({ user, isAuthenticated: true, loading: false });
-        } catch (error) {
-          localStorage.removeItem('auth_token');
-          set({ user: null, token: null, isAuthenticated: false, loading: false });
-        }
-      },
-
       checkAuthentication: async () => {
         set({ loading: true });
         try {
           let token = localStorage.getItem('auth_token');
           if (!token) {
-            // Try to silently refresh using the HttpOnly cookie
-            const data = await authService.refreshToken();
-            if (data.access_token) {
-              token = data.access_token;
-              localStorage.setItem('auth_token', token);
-              set({ token, isAuthenticated: true });
+            // Try to silently refresh using the HttpOnly cookie via Next.js proxy
+            try {
+              const data = await authService.refreshToken();
+              if (data.access_token) {
+                token = data.access_token;
+                localStorage.setItem('auth_token', token);
+                set({ token, isAuthenticated: true });
+              }
+            } catch (refreshError: any) {
+              // If refresh fails, it means there is no valid session. We should clean up.
+              if (refreshError?.response?.status === 401) {
+                localStorage.removeItem('auth_token');
+                set({ user: null, token: null, isAuthenticated: false, loading: false });
+                return;
+              }
             }
           }
+          
           if (token) {
             const user = await authService.getCurrentUser();
             set({ user, isAuthenticated: true, loading: false });
           } else {
             set({ user: null, isAuthenticated: false, loading: false });
           }
-        } catch (error) {
-          localStorage.removeItem('auth_token');
-          set({ user: null, token: null, isAuthenticated: false, loading: false });
+        } catch (error: any) {
+          console.error("Auth initialization failed:", error);
+          
+          // Only clear session and logout if we get an explicit 401/403 meaning unauthorized.
+          // For network errors (500, timeout), we retain the session so we don't aggressively log users out.
+          if (error?.response?.status === 401 || error?.response?.status === 403) {
+             localStorage.removeItem('auth_token');
+             set({ user: null, token: null, isAuthenticated: false, loading: false });
+          } else {
+             set({ loading: false });
+          }
         }
       },
     }),

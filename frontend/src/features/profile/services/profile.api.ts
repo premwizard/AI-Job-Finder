@@ -1,62 +1,55 @@
-import axios from "axios";
+import { authApi } from "@/features/auth/services/auth.api";
 
-// Setup a basic axios instance with the auth token
-const api = axios.create({
-  baseURL: "/api/profile",
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("auth_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+const PROFILE_URL = "/api/profile";
 
 // GET Full Profile
 export const getFullProfile = async () => {
-  const response = await api.get("");
+  const response = await authApi.get(PROFILE_URL);
   return response.data;
 };
 
 // PUT Single Objects
 export const updatePersonalInfo = async (data: any) => {
-  const response = await api.put("/personal", data);
+  const response = await authApi.put(`${PROFILE_URL}/personal`, data);
   return response.data;
 };
 
 export const updateProfessionalSummary = async (data: any) => {
-  const response = await api.put("/summary", data);
+  const response = await authApi.put(`${PROFILE_URL}/summary`, data);
   return response.data;
 };
 
 export const updateCareerPreferences = async (data: any) => {
-  const response = await api.put("/career-preferences", data);
+  const response = await authApi.put(`${PROFILE_URL}/career-preferences`, data);
   return response.data;
 };
 
 export const updateSocialProfiles = async (data: any) => {
-  const response = await api.put("/social", data);
+  const response = await authApi.put(`${PROFILE_URL}/social`, data);
   return response.data;
 };
 
 export const updateAIPreferences = async (data: any) => {
-  const response = await api.put("/ai-preferences", data);
+  const response = await authApi.put(`${PROFILE_URL}/ai-preferences`, data);
   return response.data;
 };
 
 // Generic Lists (Placeholder for now until endpoints are created in next phase)
-export const addListItem = async (endpoint: str, data: any) => {
-  const response = await api.post(endpoint, data);
+export const addListItem = async (endpoint: string, data: any) => {
+  // e.g. endpoint = "/api/profile/skills" -> we need full url if not provided
+  const url = endpoint.startsWith("http") ? endpoint : endpoint;
+  const response = await authApi.post(url, data);
   return response.data;
 };
 
-export const updateListItem = async (endpoint: str, id: string, data: any) => {
-  const response = await api.put(`${endpoint}/${id}`, data);
+export const updateListItem = async (endpoint: string, id: string, data: any) => {
+  const url = endpoint.startsWith("http") ? endpoint : endpoint;
+  const response = await authApi.put(`${url}/${id}`, data);
   return response.data;
 };
 
-export const deleteListItem = async (endpoint: str, id: string) => {
-  const response = await api.delete(`${endpoint}/${id}`);
+export const deleteListItem = async (endpoint: string, id: string) => {
+  const url = endpoint.startsWith("http") ? endpoint : endpoint;
+  const response = await authApi.delete(`${url}/${id}`);
   return response.data;
 };
