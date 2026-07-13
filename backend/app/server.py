@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.api.routers import analytics, resume, saved_jobs, users, applications
-from app.routes import auth_routes, jobs_routes, profile_routes
+from app.routes import auth_routes, jobs_routes, profile_routes, settings_routes
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -29,6 +29,7 @@ app.include_router(auth_routes.router)
 app.include_router(users.router)
 app.include_router(jobs_routes.router)
 app.include_router(profile_routes.router)
+app.include_router(settings_routes.router)
 app.include_router(analytics.router)
 app.include_router(resume.router)
 app.include_router(saved_jobs.router)

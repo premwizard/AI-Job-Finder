@@ -31,9 +31,12 @@ def request_password_change(db: Session, current_user: User, req: ChangePassword
     otp_hash = hash_otp(raw_otp)
     expires_at = datetime.utcnow() + timedelta(minutes=10)
     
+    new_password_hash = auth_service.get_password_hash(req.new_password)
+    
     new_request = PasswordChangeRequest(
         user_id=current_user.id,
         otp_hash=otp_hash,
+        new_password_hash=new_password_hash,
         expires_at=expires_at,
         attempts=0,
         used=False
@@ -66,7 +69,31 @@ def verify_password_change(db: Session, current_user: User, req: VerifyPasswordC
         password_change_repository.update_request(db, change_request)
         raise HTTPException(status_code=400, detail="Invalid verification code")
         
-    # Validation passed. Wait! We need to know what the new password is. 
-    # BUT the user entered it in the first step.
-    # We should have stored the new password hash in the change request!
-    pass
+    # Validation passed. Update password.
+    current_user.password_hash = change_request.new_password_hash
+    current_user.updated_at = datetime.utcnow()
+    auth_repository.update_user(db, current_user)
+    
+    # Invalidate all other active sessions
+    # We find all refresh tokens for this user
+    all_user_tokens = refresh_token_repository.get_active_refresh_tokens_by_user(db, current_user.id)
+    current_cookie_token = request.cookies.get("refresh_token")
+    
+    # We want to revoke all tokens EXCEPT the one matching the current cookie
+    if current_cookie_token:
+        # We need to hash it to compare with db tokens
+        from app.utils.token import hash_token
+        current_hash = hash_token(current_cookie_token)
+        for t in all_user_tokens:
+            if t.token_hash != current_hash:
+                refresh_token_repository.revoke_refresh_token(db, t)
+    else:
+        # If no cookie (which shouldn't happen for authenticated endpoints usually, 
+        # but just in case), revoke them all
+        for t in all_user_tokens:
+            refresh_token_repository.revoke_refresh_token(db, t)
+            
+    # Delete the request
+    password_change_repository.delete_request(db, change_request)
+    
+    return SuccessResponse(success=True, message="Password updated successfully.")
