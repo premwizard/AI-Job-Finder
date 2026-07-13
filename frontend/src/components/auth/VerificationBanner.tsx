@@ -18,7 +18,7 @@ export default function VerificationBanner() {
 
   return (
     <>
-      <Alert variant="warning" className="mb-6 border-amber-500/50 bg-amber-50/50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300">
+      <Alert className="mb-6 border-amber-500/50 bg-amber-50/50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200">
         <AlertCircle className="h-4 w-4 stroke-amber-600 dark:stroke-amber-500" />
         <AlertTitle className="text-amber-800 dark:text-amber-400 font-semibold">
           Verification Required

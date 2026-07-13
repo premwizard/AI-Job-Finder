@@ -28,7 +28,9 @@ export const useAuthStore = create<AuthState>()(
         try {
           const res = await authService.login(data);
           // Assuming response has access_token and user (as per backend TokenResponse)
-          localStorage.setItem('auth_token', res.access_token);
+          if (res.access_token) {
+            localStorage.setItem('auth_token', res.access_token);
+          }
           set({ user: res.user, token: res.access_token, isAuthenticated: true, loading: false });
         } catch (error) {
           set({ loading: false });
@@ -40,7 +42,9 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
         try {
           const res = await authService.register(data);
-          localStorage.setItem('auth_token', res.token);
+          if (res.token) {
+            localStorage.setItem('auth_token', res.token);
+          }
           set({ user: res.user, token: res.token, isAuthenticated: true, loading: false });
         } catch (error) {
           set({ loading: false });
@@ -80,9 +84,11 @@ export const useAuthStore = create<AuthState>()(
           if (!token) {
             // Try to silently refresh using the HttpOnly cookie
             const data = await authService.refreshToken();
-            token = data.access_token;
-            localStorage.setItem('auth_token', token);
-            set({ token, isAuthenticated: true });
+            if (data.access_token) {
+              token = data.access_token;
+              localStorage.setItem('auth_token', token);
+              set({ token, isAuthenticated: true });
+            }
           }
           if (token) {
             const user = await authService.getCurrentUser();

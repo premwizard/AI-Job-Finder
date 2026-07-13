@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm as useHookForm } from "react-hook-form";
@@ -33,7 +33,7 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex justify-center">
-            <Button asChild className="w-full">
+            <Button className="w-full">
               <Link href="/forgot-password">Request New Link</Link>
             </Button>
           </CardFooter>
@@ -183,8 +183,8 @@ export default function ResetPasswordPage() {
                   Please sign in with your new password.
                 </p>
               </div>
-              <Button asChild className="w-full" size="lg">
-                <Link href="/login">Sign In</Link>
+              <Button className="w-full" size="lg">
+                <Link href="/login">Return to Login</Link>
               </Button>
             </div>
           ) : (
@@ -273,5 +273,17 @@ export default function ResetPasswordPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

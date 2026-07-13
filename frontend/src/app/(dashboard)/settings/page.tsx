@@ -14,6 +14,7 @@ import {
   Mail,
   Smartphone
 } from "lucide-react";
+import { ChangePasswordCard } from "@/components/settings/ChangePasswordCard";
 
 export default function SettingsPage() {
   return (
@@ -26,9 +27,12 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="account" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 bg-muted/50 p-1">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 bg-muted/50 p-1">
           <TabsTrigger value="account" className="gap-2">
             <Shield className="w-4 h-4" /> Account
+          </TabsTrigger>
+          <TabsTrigger value="security" className="gap-2">
+            <Key className="w-4 h-4" /> Security
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="w-4 h-4" /> Notifications
@@ -105,6 +109,72 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-6 outline-none">
+          <ChangePasswordCard />
+
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardHeader>
+              <CardTitle>Email Verification Status</CardTitle>
+              <CardDescription>Status of your registered email address.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 text-green-600 rounded flex items-center justify-center font-bold">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-sm">Email Verified</h4>
+                    <p className="text-xs text-muted-foreground">Your email is verified and secure.</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-70">
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div>
+                  <CardTitle className="text-base">Active Sessions</CardTitle>
+                  <CardDescription>Manage your active logins across devices.</CardDescription>
+                </div>
+                <div className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Coming Soon</div>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-70">
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div>
+                  <CardTitle className="text-base">Login History</CardTitle>
+                  <CardDescription>Review recent login activity and locations.</CardDescription>
+                </div>
+                <div className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Coming Soon</div>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-70">
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div>
+                  <CardTitle className="text-base">Two-Factor Authentication</CardTitle>
+                  <CardDescription>Add an extra layer of security to your account.</CardDescription>
+                </div>
+                <div className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Coming Soon</div>
+              </CardHeader>
+            </Card>
+
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 opacity-70 border-destructive/20">
+              <CardHeader className="flex flex-row items-start justify-between pb-2">
+                <div>
+                  <CardTitle className="text-base text-destructive">Delete Account</CardTitle>
+                  <CardDescription>Permanently delete your account and all data.</CardDescription>
+                </div>
+                <div className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Coming Soon</div>
+              </CardHeader>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6 outline-none">

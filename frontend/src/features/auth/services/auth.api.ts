@@ -56,10 +56,12 @@ authApi.interceptors.response.use(
 
       try {
         const { data } = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
-        localStorage.setItem('auth_token', data.access_token);
-        authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
-        originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`;
-        processQueue(null, data.access_token);
+        if (data.access_token) {
+          localStorage.setItem('auth_token', data.access_token);
+          authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+          originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`;
+          processQueue(null, data.access_token);
+        }
         return authApi(originalRequest);
       } catch (err) {
         processQueue(err, null);
