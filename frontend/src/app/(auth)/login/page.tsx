@@ -45,6 +45,7 @@ export default function LoginPage() {
       await login({
         email: data.email,
         password: data.password,
+        remember_me: data.rememberMe,
       });
       router.push("/dashboard");
     } catch (err: any) {

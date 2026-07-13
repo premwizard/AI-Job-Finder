@@ -12,6 +12,7 @@ interface AuthState {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  checkAuthentication: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -66,6 +67,29 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = await authService.getCurrentUser();
           set({ user, isAuthenticated: true, loading: false });
+        } catch (error) {
+          localStorage.removeItem('auth_token');
+          set({ user: null, token: null, isAuthenticated: false, loading: false });
+        }
+      },
+
+      checkAuthentication: async () => {
+        set({ loading: true });
+        try {
+          let token = localStorage.getItem('auth_token');
+          if (!token) {
+            // Try to silently refresh using the HttpOnly cookie
+            const data = await authService.refreshToken();
+            token = data.access_token;
+            localStorage.setItem('auth_token', token);
+            set({ token, isAuthenticated: true });
+          }
+          if (token) {
+            const user = await authService.getCurrentUser();
+            set({ user, isAuthenticated: true, loading: false });
+          } else {
+            set({ user: null, isAuthenticated: false, loading: false });
+          }
         } catch (error) {
           localStorage.removeItem('auth_token');
           set({ user: null, token: null, isAuthenticated: false, loading: false });

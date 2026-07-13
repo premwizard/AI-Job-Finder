@@ -41,7 +41,12 @@ def register_user(db: Session, req: RegisterRequest) -> RegisterResponse:
     
     return RegisterResponse(user=saved_user, token=access_token)
 
-def login_user(db: Session, req: LoginRequest) -> TokenResponse:
+from fastapi import Request, Response
+from app.schemas.refresh_token_schema import RefreshTokenCreate
+from app.repositories import refresh_token_repository
+from app.config.config import REFRESH_TOKEN_EXPIRE_DAYS
+
+def login_user(db: Session, req: LoginRequest, request: Request, response: Response) -> TokenResponse:
     user = auth_repository.get_user_by_email(db, req.email)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -57,7 +62,104 @@ def login_user(db: Session, req: LoginRequest) -> TokenResponse:
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     
+    # Generate Refresh Token
+    raw_refresh_token = generate_secure_token()
+    token_hash = hash_token(raw_refresh_token)
+    
+    expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    
+    rt_create = RefreshTokenCreate(
+        user_id=user.id,
+        token_hash=token_hash,
+        device_name=request.headers.get('User-Agent', '')[:200],
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get('User-Agent', '')[:500],
+        expires_at=expires_at
+    )
+    refresh_token_repository.create_refresh_token(db, rt_create)
+    
+    # Set Cookie
+    cookie_kwargs = {
+        'key': 'refresh_token',
+        'value': raw_refresh_token,
+        'httponly': True,
+        'secure': False,  # Should be True in production with HTTPS
+        'samesite': 'lax',
+        'path': '/api/auth/refresh'
+    }
+    if req.remember_me:
+        cookie_kwargs['max_age'] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+    
+    response.set_cookie(**cookie_kwargs)
+    
     return TokenResponse(access_token=access_token, user=user)
+
+def refresh_access_token(db: Session, request: Request, response: Response) -> TokenResponse:
+    refresh_token = request.cookies.get('refresh_token')
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token missing")
+        
+    token_hash = hash_token(refresh_token)
+    db_token = refresh_token_repository.get_refresh_token_by_hash(db, token_hash)
+    
+    if not db_token or db_token.revoked or db_token.expires_at < datetime.utcnow():
+        response.delete_cookie('refresh_token', path='/api/auth/refresh')
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+        
+    user = auth_repository.get_user_by_id(db, db_token.user_id)
+    if not user or not user.is_active:
+        raise HTTPException(status_code=401, detail="User not found or inactive")
+        
+    # Rotate refresh token
+    refresh_token_repository.revoke_refresh_token(db, db_token)
+    
+    new_raw_refresh_token = generate_secure_token()
+    new_token_hash = hash_token(new_raw_refresh_token)
+    new_expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    
+    rt_create = RefreshTokenCreate(
+        user_id=user.id,
+        token_hash=new_token_hash,
+        device_name=request.headers.get('User-Agent', '')[:200],
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get('User-Agent', '')[:500],
+        expires_at=new_expires_at
+    )
+    refresh_token_repository.create_refresh_token(db, rt_create)
+    
+    access_token = auth_service.create_access_token(
+        data={"sub": user.email},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    
+    days_left = (db_token.expires_at - datetime.utcnow()).days
+    
+    cookie_kwargs = {
+        'key': 'refresh_token',
+        'value': new_raw_refresh_token,
+        'httponly': True,
+        'secure': False,
+        'samesite': 'lax',
+        'path': '/api/auth/refresh'
+    }
+    
+    if days_left > 1:
+        cookie_kwargs['max_age'] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+        
+    response.set_cookie(**cookie_kwargs)
+    
+    return TokenResponse(access_token=access_token, user=user)
+
+def logout_user(db: Session, request: Request, response: Response):
+    refresh_token = request.cookies.get('refresh_token')
+    if refresh_token:
+        token_hash = hash_token(refresh_token)
+        db_token = refresh_token_repository.get_refresh_token_by_hash(db, token_hash)
+        if db_token:
+            refresh_token_repository.revoke_refresh_token(db, db_token)
+            
+    response.delete_cookie('refresh_token', path='/api/auth/refresh')
+    return {"success": True, "message": "Logged out successfully"}
 
 def get_current_user_profile(user: User):
     return user
