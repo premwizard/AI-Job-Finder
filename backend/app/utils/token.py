@@ -1,8 +1,6 @@
 import secrets
 import hashlib
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 def generate_secure_token() -> str:
     """Generate a URL-safe secure token."""
@@ -14,8 +12,12 @@ def hash_token(token: str) -> str:
 
 def hash_otp(otp: str) -> str:
     """Hash an OTP using bcrypt for security against brute-force."""
-    return pwd_context.hash(otp)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(otp.encode('utf-8'), salt).decode('utf-8')
 
 def verify_otp(plain_otp: str, hashed_otp: str) -> bool:
     """Verify a plain OTP against a bcrypt hashed value."""
-    return pwd_context.verify(plain_otp, hashed_otp)
+    try:
+        return bcrypt.checkpw(plain_otp.encode('utf-8'), hashed_otp.encode('utf-8'))
+    except Exception:
+        return False

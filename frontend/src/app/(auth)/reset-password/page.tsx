@@ -9,7 +9,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { verifyResetToken, resetPassword } from "@/features/auth/services/auth.api";
 import { useAuthStore } from "@/store/auth";
 import { BrainCircuit, Loader2, CheckCircle2, XCircle, Eye, EyeOff } from "lucide-react";
@@ -188,104 +188,87 @@ export default function ResetPasswordPage() {
               </Button>
             </div>
           ) : (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                <FormField
-                  control={form.control}
-                  name="otp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>6-Digit Verification Code</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="000000" 
-                          maxLength={6}
-                          className="text-center tracking-[0.5em] font-mono text-lg"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="otp">6-Digit Verification Code</Label>
+                <Input 
+                  id="otp"
+                  placeholder="000000" 
+                  maxLength={6}
+                  className="text-center tracking-[0.5em] font-mono text-lg"
+                  {...form.register("otp")} 
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="new_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder="••••••••" 
-                            {...field} 
-                          />
-                          <button
-                            type="button"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            onClick={() => setShowPassword(!showPassword)}
-                            tabIndex={-1}
-                          >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
-                        </div>
-                      </FormControl>
-                      
-                      {/* Password Strength Indicator */}
-                      <div className="flex gap-1 h-1.5 mt-2 mb-1">
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <div 
-                            key={level} 
-                            className={cn(
-                              "h-full flex-1 rounded-full transition-colors duration-300",
-                              strengthScore >= level ? getStrengthColor(strengthScore) : "bg-slate-200 dark:bg-slate-700"
-                            )}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mb-2">
-                        Must contain 8+ characters, uppercase, lowercase, number, and special character.
-                      </p>
-                      
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirm_password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type={showPassword ? "text" : "password"} 
-                          placeholder="••••••••" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {error && (
-                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive font-medium text-center">
-                    {error}
-                  </div>
+                {form.formState.errors.otp && (
+                  <p className="text-sm font-medium text-destructive">{form.formState.errors.otp.message}</p>
                 )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="new_password">New Password</Label>
+                <div className="relative">
+                  <Input 
+                    id="new_password"
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    {...form.register("new_password")} 
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 
-                <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  Change Password
-                </Button>
-              </form>
-            </Form>
+                {/* Password Strength Indicator */}
+                <div className="flex gap-1 h-1.5 mt-2 mb-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <div 
+                      key={level} 
+                      className={cn(
+                        "h-full flex-1 rounded-full transition-colors duration-300",
+                        strengthScore >= level ? getStrengthColor(strengthScore) : "bg-slate-200 dark:bg-slate-700"
+                      )}
+                    />
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-2">
+                  Must contain 8+ characters, uppercase, lowercase, number, and special character.
+                </p>
+                
+                {form.formState.errors.new_password && (
+                  <p className="text-sm font-medium text-destructive">{form.formState.errors.new_password.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm_password">Confirm New Password</Label>
+                <Input 
+                  id="confirm_password"
+                  type={showPassword ? "text" : "password"} 
+                  placeholder="••••••••" 
+                  {...form.register("confirm_password")} 
+                />
+                {form.formState.errors.confirm_password && (
+                  <p className="text-sm font-medium text-destructive">{form.formState.errors.confirm_password.message}</p>
+                )}
+              </div>
+              
+              {error && (
+                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive font-medium text-center">
+                  {error}
+                </div>
+              )}
+              
+              <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Change Password
+              </Button>
+            </form>
           )}
         </CardContent>
       </Card>

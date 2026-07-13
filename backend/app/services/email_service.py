@@ -4,11 +4,12 @@ from email.mime.multipart import MIMEMultipart
 from app.config.config import EMAIL, EMAIL_PASSWORD, SMTP_SERVER, SMTP_PORT
 
 def send_password_reset_email(to_email: str, reset_link: str, otp: str):
+    # Always print for development and debugging
+    print(f"[DEV] Reset Link: {reset_link}")
+    print(f"[DEV] OTP: {otp}")
+
     if not EMAIL or not EMAIL_PASSWORD:
         print("Email configuration is missing. Cannot send email.")
-        # For development, you can print the OTP and link
-        print(f"[DEV] Reset Link: {reset_link}")
-        print(f"[DEV] OTP: {otp}")
         return
 
     subject = "AI Job Finder - Password Reset Request"

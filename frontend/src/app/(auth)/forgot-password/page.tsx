@@ -9,7 +9,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { forgotPassword } from "@/features/auth/services/auth.api";
 import { BrainCircuit, Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
 
@@ -82,41 +82,34 @@ export default function ForgotPasswordPage() {
               </p>
             </div>
           ) : (
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="name@example.com" 
-                          type="email" 
-                          autoComplete="email" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input 
+                  id="email"
+                  placeholder="name@example.com" 
+                  type="email" 
+                  autoComplete="email" 
+                  {...form.register("email")} 
                 />
-                
-                {error && (
-                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive font-medium text-center">
-                    {error}
-                  </div>
+                {form.formState.errors.email && (
+                  <p className="text-sm font-medium text-destructive">{form.formState.errors.email.message}</p>
                 )}
-                
-                <Button type="submit" className="w-full" disabled={isLoading || countdown > 0}>
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  {countdown > 0 ? `Resend available in ${countdown}s` : "Send Recovery Email"}
-                </Button>
-              </form>
-            </Form>
+              </div>
+              
+              {error && (
+                <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive font-medium text-center">
+                  {error}
+                </div>
+              )}
+              
+              <Button type="submit" className="w-full" disabled={isLoading || countdown > 0}>
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {countdown > 0 ? `Resend available in ${countdown}s` : "Send Recovery Email"}
+              </Button>
+            </form>
           )}
         </CardContent>
         <CardFooter className="flex justify-center border-t p-4 bg-muted/20">
