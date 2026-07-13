@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 
 const registerSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -170,6 +171,8 @@ export default function RegisterPage() {
                 Login
               </Link>
             </div>
+            
+            <SocialAuthButtons />
           </CardFooter>
         </form>
       </Card>

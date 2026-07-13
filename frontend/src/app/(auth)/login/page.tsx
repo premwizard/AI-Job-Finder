@@ -12,6 +12,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -23,10 +26,29 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
+  const checkAuthentication = useAuthStore((state) => state.checkAuthentication);
   const loading = useAuthStore((state) => state.loading);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Handle social auth redirect
+    const urlError = searchParams.get("error");
+    if (urlError) {
+      setError(urlError);
+    }
+    
+    const accessToken = searchParams.get("access_token");
+    if (accessToken) {
+      // Set the token and check auth which will fetch user and update store
+      localStorage.setItem("auth_token", accessToken);
+      checkAuthentication().then(() => {
+        router.replace("/dashboard");
+      });
+    }
+  }, [searchParams, checkAuthentication, router]);
 
   const {
     register,
@@ -122,6 +144,8 @@ export default function LoginPage() {
                 Register
               </Link>
             </div>
+            
+            <SocialAuthButtons />
           </CardFooter>
         </form>
       </Card>

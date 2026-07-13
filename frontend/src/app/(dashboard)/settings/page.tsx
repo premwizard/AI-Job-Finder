@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { ChangePasswordCard } from "@/components/settings/ChangePasswordCard";
 import { DeleteAccountFlow } from "@/components/settings/DeleteAccountFlow";
+import { ConnectedAccountsList } from "@/components/settings/ConnectedAccountsList";
 
 export default function SettingsPage() {
   return (
@@ -80,36 +81,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-            <CardHeader>
-              <CardTitle>Connected Accounts</CardTitle>
-              <CardDescription>Link external accounts for SSO and profile syncing.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded flex items-center justify-center font-bold">G</div>
-                  <div>
-                    <h4 className="font-semibold text-sm">Google</h4>
-                    <p className="text-xs text-muted-foreground">johndoe@example.com</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" /> Connected
-                </Button>
-              </div>
-              <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-700 text-white rounded flex items-center justify-center font-bold">in</div>
-                  <div>
-                    <h4 className="font-semibold text-sm">LinkedIn</h4>
-                    <p className="text-xs text-muted-foreground">Not connected</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm">Connect</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ConnectedAccountsList />
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6 outline-none">

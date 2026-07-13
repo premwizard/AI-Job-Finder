@@ -5,7 +5,11 @@ from app.schemas.change_password_schema import ChangePasswordRequest, VerifyPass
 from app.schemas.delete_account_schema import DeleteAccountRequestSchema, VerifyDeleteOTPSchema, ExecuteDeleteSchema
 from app.controllers import settings_controller, delete_account_controller
 from app.middleware.auth_middleware import get_current_user
-from app.models.models import User
+from app.models.models import User, AuthProvider
+from app.schemas.social_auth_schema import ConnectedAccountResponse
+from app.repositories.social_auth_repository import SocialAuthRepository
+from typing import List
+from fastapi import HTTPException
 
 router = APIRouter(prefix="/api/settings", tags=["Settings"])
 
@@ -33,3 +37,26 @@ def verify_deletion_otp(req: VerifyDeleteOTPSchema, current_user: User = Depends
 def execute_account_deletion(req: ExecuteDeleteSchema, request: Request, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return delete_account_controller.execute_account_deletion(db, current_user, req, request)
 
+# --- Connected Accounts ---
+social_auth_repo = SocialAuthRepository()
+
+@router.get("/connected-accounts", response_model=List[ConnectedAccountResponse])
+def get_connected_accounts(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return social_auth_repo.get_accounts_by_user(db, current_user.id)
+
+@router.delete("/connected-accounts/{provider}")
+def disconnect_account(provider: AuthProvider, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    accounts = social_auth_repo.get_accounts_by_user(db, current_user.id)
+    
+    if len(accounts) == 0:
+        raise HTTPException(status_code=400, detail="No connected accounts found")
+        
+    # Prevent disconnecting the last available login method if they don't have a password
+    if current_user.password_hash is None and len(accounts) == 1 and accounts[0].provider == provider:
+        raise HTTPException(status_code=400, detail="Cannot disconnect the only available login method. Please set a password first.")
+        
+    success = social_auth_repo.delete_connected_account(db, current_user.id, provider)
+    if not success:
+        raise HTTPException(status_code=404, detail="Connected account not found")
+        
+    return {"message": "Account disconnected successfully"}

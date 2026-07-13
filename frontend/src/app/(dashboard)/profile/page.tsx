@@ -57,9 +57,13 @@ export default function ProfilePage() {
                 <Label>Last Name</Label>
                 <Input {...register("last_name")} />
               </div>
-              <div className="space-y-2 col-span-2">
+              <div className="space-y-2 col-span-2 md:col-span-1">
                 <Label>Email</Label>
                 <Input {...register("email")} disabled />
+              </div>
+              <div className="space-y-2 col-span-2 md:col-span-1">
+                <Label>Primary Login Method</Label>
+                <Input value={(user as any)?.auth_provider || "email"} className="capitalize" disabled />
               </div>
             </CardContent>
           </Card>

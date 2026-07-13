@@ -11,6 +11,13 @@ class ApplicationStatus(str, enum.Enum):
     rejected = "rejected"
     selected = "selected"
 
+class AuthProvider(str, enum.Enum):
+    email = "email"
+    google = "google"
+    github = "github"
+    microsoft = "microsoft"
+    linkedin = "linkedin"
+
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -21,8 +28,9 @@ class User(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    password_hash = Column(String, nullable=True)
     is_verified = Column(Boolean, default=False)
+    auth_provider = Column(Enum(AuthProvider), default=AuthProvider.email)
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
@@ -36,6 +44,7 @@ class User(Base):
     saved_jobs = relationship("SavedJob", back_populates="user")
     applications = relationship("Application", back_populates="user")
     analytics = relationship("Analytics", back_populates="user", uselist=False)
+    connected_accounts = relationship("ConnectedAccount", back_populates="user")
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
@@ -205,3 +214,15 @@ class AccountDeletionRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
+
+class ConnectedAccount(Base):
+    __tablename__ = "connected_accounts"
+
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    provider = Column(Enum(AuthProvider), nullable=False)
+    provider_user_id = Column(String, nullable=False, index=True)
+    provider_email = Column(String, nullable=True)
+    connected_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="connected_accounts")
