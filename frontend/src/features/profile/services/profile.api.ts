@@ -1,6 +1,6 @@
 import { authApi } from "@/features/auth/services/auth.api";
 
-const PROFILE_URL = "/api/profile";
+const PROFILE_URL = "/profile";
 
 // GET Full Profile
 export const getFullProfile = async () => {

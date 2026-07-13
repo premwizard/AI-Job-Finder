@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { RegisterRequest, LoginRequest, AuthResponse, UserResponse } from '../types/auth.types';
 
-const API_URL = '/api/auth';
+const API_URL = '/api';
 
 export const authApi = axios.create({
   baseURL: API_URL,
@@ -36,7 +36,7 @@ authApi.interceptors.response.use(
     const originalRequest = error.config;
     
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (originalRequest.url === '/login' || originalRequest.url === '/refresh') {
+      if (originalRequest.url === '/auth/login' || originalRequest.url === '/auth/refresh') {
         return Promise.reject(error);
       }
 
@@ -55,7 +55,7 @@ authApi.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
+        const { data } = await axios.post<AuthResponse>(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
         if (data.access_token) {
           localStorage.setItem('auth_token', data.access_token);
           authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
@@ -76,27 +76,27 @@ authApi.interceptors.response.use(
 );
 
 export const register = async (data: RegisterRequest): Promise<AuthResponse> => {
-  const response = await authApi.post<AuthResponse>('/register', data);
+  const response = await authApi.post<AuthResponse>('/auth/register', data);
   return response.data;
 };
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
-  const response = await authApi.post<AuthResponse>('/login', data);
+  const response = await authApi.post<AuthResponse>('/auth/login', data);
   return response.data;
 };
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
-  const response = await authApi.get<UserResponse>('/me');
+  const response = await authApi.get<UserResponse>('/auth/me');
   return response.data;
 };
 
 export const refreshToken = async (): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/refresh`, {}, { withCredentials: true });
+  const response = await axios.post<AuthResponse>(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
   return response.data;
 };
 
 export const logout = async (): Promise<void> => {
-  await authApi.post('/logout');
+  await authApi.post('/auth/logout');
 };
 
 export interface ForgotPasswordData {
@@ -111,32 +111,32 @@ export interface ResetPasswordData {
 }
 
 export const forgotPassword = async (data: ForgotPasswordData): Promise<{ success: boolean, message: string }> => {
-  const response = await authApi.post('/forgot-password', data);
+  const response = await authApi.post('/auth/forgot-password', data);
   return response.data;
 };
 
 export const verifyResetToken = async (token: string): Promise<{ valid: boolean }> => {
-  const response = await authApi.get(`/reset-password/verify?token=${token}`);
+  const response = await authApi.get(`/auth/reset-password/verify?token=${token}`);
   return response.data;
 };
 
 export const resetPassword = async (data: ResetPasswordData): Promise<{ success: boolean, message: string }> => {
-  const response = await authApi.post('/reset-password', data);
+  const response = await authApi.post('/auth/reset-password', data);
   return response.data;
 };
 
 export const sendVerificationEmail = async (): Promise<{ success: boolean, message: string }> => {
-  const response = await authApi.post('/send-verification-email');
+  const response = await authApi.post('/auth/send-verification-email');
   return response.data;
 };
 
 export const verifyEmail = async (token: string): Promise<{ success: boolean, message: string }> => {
   // Use regular axios to avoid interceptor issues, or authApi. Since it's public, regular axios is fine, but authApi works too.
-  const response = await axios.get(`${API_URL}/verify-email?token=${token}`);
+  const response = await axios.get(`${API_URL}/auth/verify-email?token=${token}`);
   return response.data;
 };
 
 export const getVerificationStatus = async (): Promise<{ is_verified: boolean }> => {
-  const response = await authApi.get('/verification-status');
+  const response = await authApi.get('/auth/verification-status');
   return response.data;
 };
