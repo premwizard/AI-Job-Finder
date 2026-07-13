@@ -34,28 +34,34 @@ authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (originalRequest.url === '/auth/login' || originalRequest.url === '/auth/refresh') {
-        return Promise.reject(error);
-      }
 
+    // Only attempt token refresh on 401, and never for auth endpoints themselves
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      originalRequest.url !== '/auth/login' &&
+      originalRequest.url !== '/auth/refresh'
+    ) {
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
-          failedQueue.push({resolve, reject})
-        }).then(token => {
-          originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          return authApi(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return authApi(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        const { data } = await axios.post<AuthResponse>(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
+        const { data } = await axios.post<AuthResponse>(
+          `${API_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
         if (data.access_token) {
           localStorage.setItem('auth_token', data.access_token);
           authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
@@ -63,14 +69,16 @@ authApi.interceptors.response.use(
           processQueue(null, data.access_token);
         }
         return authApi(originalRequest);
-      } catch (err) {
-        processQueue(err, null);
-        return Promise.reject(err);
+      } catch (refreshErr: any) {
+        processQueue(refreshErr, null);
+        // Refresh failed (404 = endpoint missing, 401 = no valid session) — clear local session
+        localStorage.removeItem('auth_token');
+        return Promise.reject(refreshErr);
       } finally {
         isRefreshing = false;
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -81,22 +89,33 @@ export const register = async (data: RegisterRequest): Promise<AuthResponse> => 
 };
 
 export const login = async (data: LoginRequest): Promise<AuthResponse> => {
-  const response = await authApi.post<AuthResponse>('/auth/login', data);
+  // Backend uses OAuth2PasswordRequestForm which requires form-data, not JSON
+  const formData = new URLSearchParams();
+  formData.append('username', data.email);
+  formData.append('password', data.password);
+  const response = await authApi.post<AuthResponse>('/auth/login', formData, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  });
   return response.data;
 };
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
-  const response = await authApi.get<UserResponse>('/auth/me');
+  const response = await authApi.get<UserResponse>('/users/me');
   return response.data;
 };
 
 export const refreshToken = async (): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
-  return response.data;
+  // This backend does not implement a refresh endpoint — always reject so callers treat it as no session
+  return Promise.reject({ response: { status: 401 } });
 };
 
 export const logout = async (): Promise<void> => {
-  await authApi.post('/auth/logout');
+  // Best-effort: ignore errors if logout endpoint doesn't exist
+  try {
+    await authApi.post('/auth/logout');
+  } catch {
+    // noop
+  }
 };
 
 export interface ForgotPasswordData {

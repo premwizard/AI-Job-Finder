@@ -1,17 +1,22 @@
 export interface UserResponse {
-  id: string;
-  first_name: string;
-  last_name: string;
+  id: number;
   email: string;
-  is_verified: boolean;
-  is_active: boolean;
+  full_name: string;
+  preferred_role?: string | null;
+  experience?: string | null;
+  education?: string | null;
+  work_preference?: string | null;
+  created_at: string;
 }
 
 export interface AuthResponse {
-  success: boolean;
-  access_token?: string; // from login
-  token?: string; // from register (standardizing both could be good but we map it in the store)
-  user: UserResponse;
+  access_token: string;
+  token_type: string;
+  // user is only present if the backend returns it (e.g. after register in some implementations)
+  user?: UserResponse;
+  // legacy alias used by some endpoints
+  token?: string;
+  success?: boolean;
 }
 
 export interface LoginRequest {

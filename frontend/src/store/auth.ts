@@ -26,11 +26,12 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
         try {
           const res = await authService.login(data);
-          // Assuming response has access_token and user (as per backend TokenResponse)
           if (res.access_token) {
             localStorage.setItem('auth_token', res.access_token);
           }
-          set({ user: res.user, token: res.access_token, isAuthenticated: true, loading: false });
+          // Backend login returns only {access_token, token_type} — fetch user separately
+          const user = await authService.getCurrentUser();
+          set({ user, token: res.access_token, isAuthenticated: true, loading: false });
         } catch (error) {
           set({ loading: false });
           throw error;
@@ -41,10 +42,14 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true });
         try {
           const res = await authService.register(data);
-          if (res.token) {
-            localStorage.setItem('auth_token', res.token);
+          // Register may return a user or just a token depending on backend version
+          const token = res.access_token ?? res.token;
+          if (token) {
+            localStorage.setItem('auth_token', token);
           }
-          set({ user: res.user, token: res.token, isAuthenticated: true, loading: false });
+          // Fetch user separately to stay consistent
+          const user = token ? await authService.getCurrentUser() : (res.user ?? null);
+          set({ user, token: token ?? null, isAuthenticated: !!token, loading: false });
         } catch (error) {
           set({ loading: false });
           throw error;
