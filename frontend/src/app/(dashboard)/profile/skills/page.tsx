@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getFullProfile } from "@/features/profile/services/profile.api";
+import { getFullProfile, addListItem, deleteListItem } from "@/features/profile/services/profile.api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Plus, X } from "lucide-react";
@@ -28,28 +28,24 @@ export default function SkillsPage() {
 
   const skills = profile?.skills || [];
 
-  // Placeholder mutation for adding a skill (Needs backend list endpoint)
   const addMutation = useMutation({
     mutationFn: async (skillData: any) => {
-      // return addListItem("/api/profile/skills", skillData);
-      return new Promise(resolve => setTimeout(resolve, 500));
+      return addListItem("/profile/skills", skillData);
     },
     onSuccess: () => {
-      toast.success("Skill added (UI Simulation).");
+      toast.success("Skill added.");
       setNewSkill("");
-      // queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     }
   });
 
-  // Placeholder mutation for deleting a skill
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      // return deleteListItem("/api/profile/skills", id.toString());
-      return new Promise(resolve => setTimeout(resolve, 500));
+      return deleteListItem("/profile/skills", id.toString());
     },
     onSuccess: () => {
-      toast.success("Skill removed (UI Simulation).");
-      // queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Skill removed.");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     }
   });
 

@@ -4,7 +4,7 @@ from app.database.database import get_db
 from app.schemas import profile_schemas
 from app.services.profile_service import ProfileService
 from app.middleware.auth_middleware import get_current_user
-from app.models.models import User
+from app.models.models import User, Skill, Experience, Education, Certification, Project
 
 router = APIRouter(prefix="/api/profile", tags=["Profile"])
 
@@ -57,3 +57,133 @@ def update_ai_preferences(
     current_user: User = Depends(get_current_user)
 ):
     return service.update_ai_preferences(current_user.id, req)
+
+# --- Skills ---
+@router.post("/skills", response_model=profile_schemas.SkillResponse, status_code=status.HTTP_201_CREATED)
+def add_skill(
+    req: profile_schemas.SkillCreate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._create_item(Skill, current_user.id, req)
+
+@router.put("/skills/{item_id}", response_model=profile_schemas.SkillResponse)
+def update_skill(
+    item_id: int,
+    req: profile_schemas.SkillUpdate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._update_item(Skill, item_id, current_user.id, req)
+
+@router.delete("/skills/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_skill(
+    item_id: int,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    service._delete_item(Skill, item_id, current_user.id)
+
+# --- Experience ---
+@router.post("/experience", response_model=profile_schemas.ExperienceResponse, status_code=status.HTTP_201_CREATED)
+def add_experience(
+    req: profile_schemas.ExperienceCreate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._create_item(Experience, current_user.id, req)
+
+@router.put("/experience/{item_id}", response_model=profile_schemas.ExperienceResponse)
+def update_experience(
+    item_id: int,
+    req: profile_schemas.ExperienceUpdate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._update_item(Experience, item_id, current_user.id, req)
+
+@router.delete("/experience/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_experience(
+    item_id: int,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    service._delete_item(Experience, item_id, current_user.id)
+
+# --- Education ---
+@router.post("/education", response_model=profile_schemas.EducationResponse, status_code=status.HTTP_201_CREATED)
+def add_education(
+    req: profile_schemas.EducationCreate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._create_item(Education, current_user.id, req)
+
+@router.put("/education/{item_id}", response_model=profile_schemas.EducationResponse)
+def update_education(
+    item_id: int,
+    req: profile_schemas.EducationUpdate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._update_item(Education, item_id, current_user.id, req)
+
+@router.delete("/education/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_education(
+    item_id: int,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    service._delete_item(Education, item_id, current_user.id)
+
+# --- Certifications ---
+@router.post("/certifications", response_model=profile_schemas.CertificationResponse, status_code=status.HTTP_201_CREATED)
+def add_certification(
+    req: profile_schemas.CertificationCreate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._create_item(Certification, current_user.id, req)
+
+@router.put("/certifications/{item_id}", response_model=profile_schemas.CertificationResponse)
+def update_certification(
+    item_id: int,
+    req: profile_schemas.CertificationUpdate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._update_item(Certification, item_id, current_user.id, req)
+
+@router.delete("/certifications/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_certification(
+    item_id: int,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    service._delete_item(Certification, item_id, current_user.id)
+
+# --- Projects ---
+@router.post("/projects", response_model=profile_schemas.ProjectResponse, status_code=status.HTTP_201_CREATED)
+def add_project(
+    req: profile_schemas.ProjectCreate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._create_item(Project, current_user.id, req)
+
+@router.put("/projects/{item_id}", response_model=profile_schemas.ProjectResponse)
+def update_project(
+    item_id: int,
+    req: profile_schemas.ProjectUpdate,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    return service._update_item(Project, item_id, current_user.id, req)
+
+@router.delete("/projects/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project(
+    item_id: int,
+    service: ProfileService = Depends(get_profile_service), 
+    current_user: User = Depends(get_current_user)
+):
+    service._delete_item(Project, item_id, current_user.id)
