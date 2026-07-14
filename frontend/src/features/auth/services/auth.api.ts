@@ -16,69 +16,14 @@ authApi.interceptors.request.use((config) => {
   return config;
 });
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(prom => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
 authApi.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    // Only attempt token refresh on 401, and never for auth endpoints themselves
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      originalRequest.url !== '/auth/login' &&
-      originalRequest.url !== '/auth/refresh'
-    ) {
-      if (isRefreshing) {
-        return new Promise(function (resolve, reject) {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            return authApi(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        const { data } = await axios.post<AuthResponse>(
-          `${API_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-        if (data.access_token) {
-          localStorage.setItem('auth_token', data.access_token);
-          authApi.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
-          originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`;
-          processQueue(null, data.access_token);
-        }
-        return authApi(originalRequest);
-      } catch (refreshErr: any) {
-        processQueue(refreshErr, null);
-        // Refresh failed (404 = endpoint missing, 401 = no valid session) — clear local session
-        localStorage.removeItem('auth_token');
-        return Promise.reject(refreshErr);
-      } finally {
-        isRefreshing = false;
-      }
+    // The backend has no token-refresh endpoint.
+    // On 401, clear the stale local token so the user is redirected to login.
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token');
     }
-
     return Promise.reject(error);
   }
 );
