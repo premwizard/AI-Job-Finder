@@ -20,7 +20,7 @@ function VerifyEmailContent() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (!token) {
+    if (!token) { // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
       setErrorMessage("No verification token provided.");
       return;

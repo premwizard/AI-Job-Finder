@@ -1,15 +1,17 @@
 import os
 import sys
 
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Ensure the backend directory is in the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # These routers already carry their full /api/* prefix — include directly on app
-from app.routes import auth_routes, profile_routes, settings_routes, social_auth_routes
-from src.api.routers import analytics, applications, jobs, resume, saved_jobs, users
+from app.routes import (auth_routes, profile_routes, settings_routes,
+                        social_auth_routes)
+from src.api.routers import (analytics, applications, jobs, resume, saved_jobs,
+                             users)
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -25,7 +27,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 # Include Routers with /api prefix (src-layer routers without their own /api prefix)

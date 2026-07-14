@@ -297,7 +297,7 @@ export function DeleteAccountFlow() {
               onKeyDown={(e) => e.key === "Enter" && handleOtpSubmit()}
             />
             <div className="text-center text-sm">
-              <span className="text-muted-foreground">Didn't receive it? </span>
+              <span className="text-muted-foreground">Didn&apos;t receive it? </span>
               <button
                 type="button"
                 onClick={handleResendOtp}

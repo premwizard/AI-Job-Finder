@@ -4,7 +4,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Dict, List
 
-from src.config import EMAIL, EMAIL_PASSWORD, RECEIVER_EMAIL, SMTP_PORT, SMTP_SERVER
+from src.config import (EMAIL, EMAIL_PASSWORD, RECEIVER_EMAIL, SMTP_PORT,
+                        SMTP_SERVER)
 
 
 def send_job_email(jobs: List[Dict]):

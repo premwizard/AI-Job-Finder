@@ -5,20 +5,13 @@ from app.controllers import auth_controller
 from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
 from app.models.models import User
-from app.schemas.auth_schema import (
-    LoginRequest,
-    RegisterRequest,
-    RegisterResponse,
-    TokenResponse,
-    UserResponse,
-)
-from app.schemas.password_reset_schema import (
-    ForgotPasswordRequest,
-    ResetPasswordRequest,
-    SuccessResponse,
-    VerifyResponse,
-)
+from app.schemas.auth_schema import (LoginRequest, RegisterRequest,
+                                     RegisterResponse, TokenResponse,
+                                     UserResponse)
 from app.schemas.email_verification_schema import VerificationStatusResponse
+from app.schemas.password_reset_schema import (ForgotPasswordRequest,
+                                               ResetPasswordRequest,
+                                               SuccessResponse, VerifyResponse)
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
@@ -26,7 +19,6 @@ router = APIRouter(prefix="/api/auth", tags=["Auth"])
 @router.post("/register", response_model=RegisterResponse)
 def register(req: RegisterRequest, db: Session = Depends(get_db)):
     return auth_controller.register_user(db, req)
-
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -54,7 +46,6 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db)):
     return auth_controller.logout_user(db, request, response)
 
 
-
 @router.post("/forgot-password", response_model=SuccessResponse)
 def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     return auth_controller.forgot_password(db, req)
@@ -68,7 +59,6 @@ def verify_reset_token(token: str, db: Session = Depends(get_db)):
 @router.post("/reset-password", response_model=SuccessResponse)
 def reset_password(req: ResetPasswordRequest, db: Session = Depends(get_db)):
     return auth_controller.reset_password(db, req)
-
 
 
 @router.post("/send-verification-email", response_model=SuccessResponse)

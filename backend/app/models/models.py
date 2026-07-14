@@ -2,17 +2,8 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    Enum,
-    Float,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-)
+from sqlalchemy import (Boolean, Column, DateTime, Enum, Float, ForeignKey,
+                        Integer, String, Text)
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
@@ -32,8 +23,6 @@ class AuthProvider(str, enum.Enum):
     github = "github"
     microsoft = "microsoft"
     linkedin = "linkedin"
-
-
 
 
 class User(Base):

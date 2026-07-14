@@ -137,7 +137,7 @@ export default function SavedJobsPage() {
             </CardContent>
           </Card>
         )}) : (
-          <p className="text-muted-foreground">You haven't saved any jobs yet.</p>
+          <p className="text-muted-foreground">You haven&apos;t saved any jobs yet.</p>
         )}
       </div>
     </div>

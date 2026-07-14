@@ -7,13 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 # Ensure the backend directory is in the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.routes import (
-    auth_routes,
-    jobs_routes,
-    profile_routes,
-    settings_routes,
-    social_auth_routes,
-)
+from app.routes import (auth_routes, jobs_routes, profile_routes,
+                        settings_routes, social_auth_routes)
 from src.api.routers import analytics, applications, resume, saved_jobs, users
 
 app = FastAPI(

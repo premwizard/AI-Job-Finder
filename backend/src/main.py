@@ -4,15 +4,9 @@ import sys
 # Add project root to python path if not running from root
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.config import (
-    ACCEPT_EXPERIENCE,
-    ACCEPT_LOCATIONS,
-    ACCEPT_ROLES,
-    EMAIL,
-    EMAIL_PASSWORD,
-    MAX_JOBS_PER_EMAIL,
-    RECEIVER_EMAIL,
-)
+from src.config import (ACCEPT_EXPERIENCE, ACCEPT_LOCATIONS, ACCEPT_ROLES,
+                        EMAIL, EMAIL_PASSWORD, MAX_JOBS_PER_EMAIL,
+                        RECEIVER_EMAIL)
 from src.database.database import SessionLocal
 from src.filters.job_filter import score_job
 from src.models import models

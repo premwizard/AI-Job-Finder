@@ -5,13 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.controllers.jobs_controller import get_job as ctrl_get_job
 from app.controllers.jobs_controller import get_jobs as ctrl_get_jobs
-from app.controllers.jobs_controller import (
-    get_recommended_jobs as ctrl_get_recommended_jobs,
-)
+from app.controllers.jobs_controller import \
+    get_recommended_jobs as ctrl_get_recommended_jobs
 from app.database.database import get_db
-from app.middleware.auth_middleware import (
-    get_current_user,
-)  # Need to check if it's core.security or api.deps
+from app.middleware.auth_middleware import \
+    get_current_user  # Need to check if it's core.security or api.deps
 from app.models import models
 from app.schemas import schemas
 

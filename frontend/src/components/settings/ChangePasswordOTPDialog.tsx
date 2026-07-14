@@ -44,7 +44,7 @@ export function ChangePasswordOTPDialog({
 
   // Reset state when dialog opens
   useEffect(() => {
-    if (open) {
+    if (open) { // eslint-disable-next-line react-hooks/set-state-in-effect
       setOtp("");
       setCountdown(60);
       setLoading(false);
@@ -110,7 +110,7 @@ export function ChangePasswordOTPDialog({
             </Button>
             
             <div className="text-center text-sm">
-              <span className="text-muted-foreground">Didn't receive the code? </span>
+              <span className="text-muted-foreground">Didn&apos;t receive the code? </span>
               <button
                 type="button"
                 onClick={handleResend}

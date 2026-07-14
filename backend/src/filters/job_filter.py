@@ -1,14 +1,8 @@
 from typing import Dict
 
-from src.config import (
-    ACCEPT_EXPERIENCE,
-    ACCEPT_LOCATIONS,
-    ACCEPT_ROLES,
-    REJECT_DOMAINS,
-    REJECT_EXPERIENCE,
-    REJECT_LOCATIONS,
-    SCORE_THRESHOLD,
-)
+from src.config import (ACCEPT_EXPERIENCE, ACCEPT_LOCATIONS, ACCEPT_ROLES,
+                        REJECT_DOMAINS, REJECT_EXPERIENCE, REJECT_LOCATIONS,
+                        SCORE_THRESHOLD)
 
 
 def score_job(job: Dict) -> Dict:

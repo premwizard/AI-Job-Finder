@@ -37,7 +37,7 @@ export default function LoginPage() {
   useEffect(() => {
     // Handle social auth redirect
     const urlError = searchParams.get("error");
-    if (urlError) {
+    if (urlError) { // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(urlError);
     }
     
@@ -156,7 +156,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="font-medium text-foreground hover:text-blue-600 hover:underline transition-colors">
             Create account
           </Link>
