@@ -13,7 +13,8 @@ export interface ConnectedAccountResponse {
 }
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+  // Must match the key used everywhere else in the app
+  const token = localStorage.getItem("auth_token");
   return {
     Authorization: `Bearer ${token}`,
   };

@@ -6,9 +6,9 @@ import os
 # Ensure the backend directory is in the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.api.routers import jobs, analytics, resume, saved_jobs, auth, users, applications
-# Profile router lives in app/ and already carries the full /api/profile prefix
-from app.routes import profile_routes
+from src.api.routers import jobs, analytics, resume, saved_jobs, users, applications
+# These routers already carry their full /api/* prefix — include directly on app
+from app.routes import profile_routes, auth_routes, social_auth_routes, settings_routes
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -27,9 +27,9 @@ app.add_middleware(
 
 from fastapi import APIRouter
 
-# Include Routers with /api prefix
+# Include Routers with /api prefix (src-layer routers without their own /api prefix)
 api_router = APIRouter(prefix="/api")
-api_router.include_router(auth.router)
+# Note: auth is intentionally excluded here — served by app.routes.auth_routes below
 api_router.include_router(users.router)
 api_router.include_router(jobs.router)
 api_router.include_router(analytics.router)
@@ -39,9 +39,17 @@ api_router.include_router(applications.router)
 
 app.include_router(api_router)
 
-# Profile router has its own /api/profile prefix, include directly on app
+# These routers each carry their own full /api/* prefix — include directly on app
 app.include_router(profile_routes.router)
+app.include_router(auth_routes.router)       # /api/auth/* (register, login, verify-email, etc.)
+app.include_router(social_auth_routes.router) # /api/auth/{provider} OAuth redirect flow
+app.include_router(settings_routes.router)    # /api/settings/*
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the AI Job Finder API"}
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    from fastapi import Response
+    return Response(content=b"", media_type="image/x-icon", status_code=204)
