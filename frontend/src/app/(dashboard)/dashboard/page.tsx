@@ -65,7 +65,7 @@ export default function DashboardPage() {
       {/* Welcome Card */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Hello, {user?.full_name?.split(' ')[0] || 'User'} 👋</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Hello, {user?.first_name || 'User'} 👋</h2>
           <p className="text-muted-foreground mt-1 flex items-center gap-2">
             <BrainCircuit className="w-4 h-4 text-primary" />
             Your AI Career Assistant is active and analyzing the job market.

@@ -1,12 +1,20 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
 from app.models.models import (
-    User, UserProfile, Skill, Experience, Education, 
-    Certification, Project, CareerPreference, SocialProfile, 
-    AIPreference, Resume
+    AIPreference,
+    CareerPreference,
+    Certification,
+    Education,
+    Experience,
+    Project,
+    Resume,
+    Skill,
+    SocialProfile,
+    UserProfile,
 )
 from app.schemas import profile_schemas
-from fastapi import HTTPException, status
-from typing import List
+
 
 class ProfileService:
     def __init__(self, db: Session):
@@ -16,7 +24,9 @@ class ProfileService:
         score = 0
         total_sections = 11
 
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if profile:
             # Personal Info (max 1/11)
             if profile.headline and profile.phone_number:
@@ -25,28 +35,53 @@ class ProfileService:
             if profile.professional_summary and profile.current_job_title:
                 score += 1
 
-        if self.db.query(Skill).filter(Skill.user_id == user_id).first(): score += 1
-        if self.db.query(Experience).filter(Experience.user_id == user_id).first(): score += 1
-        if self.db.query(Education).filter(Education.user_id == user_id).first(): score += 1
-        if self.db.query(Certification).filter(Certification.user_id == user_id).first(): score += 1
-        if self.db.query(Project).filter(Project.user_id == user_id).first(): score += 1
-        
-        pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
-        if pref and pref.preferred_roles: score += 1
-        
-        social = self.db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
-        if social and (social.linkedin_url or social.github_url): score += 1
-        
-        ai_pref = self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
-        if ai_pref and ai_pref.career_objectives: score += 1
-        
-        if self.db.query(Resume).filter(Resume.user_id == user_id).first(): score += 1
-        
+        if self.db.query(Skill).filter(Skill.user_id == user_id).first():
+            score += 1
+        if self.db.query(Experience).filter(Experience.user_id == user_id).first():
+            score += 1
+        if self.db.query(Education).filter(Education.user_id == user_id).first():
+            score += 1
+        if (
+            self.db.query(Certification)
+            .filter(Certification.user_id == user_id)
+            .first()
+        ):
+            score += 1
+        if self.db.query(Project).filter(Project.user_id == user_id).first():
+            score += 1
+
+        pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
+        if pref and pref.preferred_roles:
+            score += 1
+
+        social = (
+            self.db.query(SocialProfile)
+            .filter(SocialProfile.user_id == user_id)
+            .first()
+        )
+        if social and (social.linkedin_url or social.github_url):
+            score += 1
+
+        ai_pref = (
+            self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
+        if ai_pref and ai_pref.career_objectives:
+            score += 1
+
+        if self.db.query(Resume).filter(Resume.user_id == user_id).first():
+            score += 1
+
         return int((score / total_sections) * 100)
 
     def get_full_profile(self, user_id: str) -> profile_schemas.FullProfileResponse:
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
+
         # Ensure a base profile exists
         if not profile:
             profile = UserProfile(user_id=user_id)
@@ -56,39 +91,93 @@ class ProfileService:
 
         # Get all related models
         skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
-        experiences = self.db.query(Experience).filter(Experience.user_id == user_id).order_by(Experience.start_date.desc()).all()
-        educations = self.db.query(Education).filter(Education.user_id == user_id).order_by(Education.start_date.desc()).all()
-        certifications = self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        experiences = (
+            self.db.query(Experience)
+            .filter(Experience.user_id == user_id)
+            .order_by(Experience.start_date.desc())
+            .all()
+        )
+        educations = (
+            self.db.query(Education)
+            .filter(Education.user_id == user_id)
+            .order_by(Education.start_date.desc())
+            .all()
+        )
+        certifications = (
+            self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        )
         projects = self.db.query(Project).filter(Project.user_id == user_id).all()
-        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
-        social_prof = self.db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
-        ai_pref = self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        career_pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
+        social_prof = (
+            self.db.query(SocialProfile)
+            .filter(SocialProfile.user_id == user_id)
+            .first()
+        )
+        ai_pref = (
+            self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
         resumes = self.db.query(Resume).filter(Resume.user_id == user_id).all()
 
         completion = self.calculate_completion_percentage(user_id)
 
         # Map UserProfile to PersonalInfo and ProfessionalSummary
-        personal_info = profile_schemas.PersonalInfoResponse(**profile.__dict__) if profile else None
-        prof_summary = profile_schemas.ProfessionalSummaryResponse(**profile.__dict__) if profile else None
+        personal_info = (
+            profile_schemas.PersonalInfoResponse(**profile.__dict__)
+            if profile
+            else None
+        )
+        prof_summary = (
+            profile_schemas.ProfessionalSummaryResponse(**profile.__dict__)
+            if profile
+            else None
+        )
 
         return profile_schemas.FullProfileResponse(
             completion_percentage=completion,
             personal_info=personal_info,
             professional_summary=prof_summary,
             skills=[profile_schemas.SkillResponse.model_validate(s) for s in skills],
-            experiences=[profile_schemas.ExperienceResponse.model_validate(e) for e in experiences],
-            educations=[profile_schemas.EducationResponse.model_validate(e) for e in educations],
-            certifications=[profile_schemas.CertificationResponse.model_validate(c) for c in certifications],
-            projects=[profile_schemas.ProjectResponse.model_validate(p) for p in projects],
-            career_preferences=profile_schemas.CareerPreferenceResponse(**career_pref.__dict__) if career_pref else None,
-            social_profiles=profile_schemas.SocialProfileResponse(**social_prof.__dict__) if social_prof else None,
-            ai_preferences=profile_schemas.AIPreferenceResponse(**ai_pref.__dict__) if ai_pref else None,
-            resumes=[profile_schemas.ResumeResponse.model_validate(r) for r in resumes]
+            experiences=[
+                profile_schemas.ExperienceResponse.model_validate(e)
+                for e in experiences
+            ],
+            educations=[
+                profile_schemas.EducationResponse.model_validate(e) for e in educations
+            ],
+            certifications=[
+                profile_schemas.CertificationResponse.model_validate(c)
+                for c in certifications
+            ],
+            projects=[
+                profile_schemas.ProjectResponse.model_validate(p) for p in projects
+            ],
+            career_preferences=profile_schemas.CareerPreferenceResponse(
+                **career_pref.__dict__
+            )
+            if career_pref
+            else None,
+            social_profiles=profile_schemas.SocialProfileResponse(
+                **social_prof.__dict__
+            )
+            if social_prof
+            else None,
+            ai_preferences=profile_schemas.AIPreferenceResponse(**ai_pref.__dict__)
+            if ai_pref
+            else None,
+            resumes=[profile_schemas.ResumeResponse.model_validate(r) for r in resumes],
         )
 
     # --- Update Methods (Single Entities) ---
-    def update_personal_info(self, user_id: str, data: profile_schemas.PersonalInfoUpdate):
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    def update_personal_info(
+        self, user_id: str, data: profile_schemas.PersonalInfoUpdate
+    ):
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
@@ -98,8 +187,12 @@ class ProfileService:
         self.db.refresh(profile)
         return profile_schemas.PersonalInfoResponse(**profile.__dict__)
 
-    def update_professional_summary(self, user_id: str, data: profile_schemas.ProfessionalSummaryUpdate):
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    def update_professional_summary(
+        self, user_id: str, data: profile_schemas.ProfessionalSummaryUpdate
+    ):
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
@@ -109,8 +202,14 @@ class ProfileService:
         self.db.refresh(profile)
         return profile_schemas.ProfessionalSummaryResponse(**profile.__dict__)
 
-    def update_career_preferences(self, user_id: str, data: profile_schemas.CareerPreferenceUpdate):
-        pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+    def update_career_preferences(
+        self, user_id: str, data: profile_schemas.CareerPreferenceUpdate
+    ):
+        pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
         if not pref:
             pref = CareerPreference(user_id=user_id)
             self.db.add(pref)
@@ -120,8 +219,14 @@ class ProfileService:
         self.db.refresh(pref)
         return profile_schemas.CareerPreferenceResponse(**pref.__dict__)
 
-    def update_social_profiles(self, user_id: str, data: profile_schemas.SocialProfileUpdate):
-        social = self.db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
+    def update_social_profiles(
+        self, user_id: str, data: profile_schemas.SocialProfileUpdate
+    ):
+        social = (
+            self.db.query(SocialProfile)
+            .filter(SocialProfile.user_id == user_id)
+            .first()
+        )
         if not social:
             social = SocialProfile(user_id=user_id)
             self.db.add(social)
@@ -131,8 +236,12 @@ class ProfileService:
         self.db.refresh(social)
         return profile_schemas.SocialProfileResponse(**social.__dict__)
 
-    def update_ai_preferences(self, user_id: str, data: profile_schemas.AIPreferenceUpdate):
-        pref = self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+    def update_ai_preferences(
+        self, user_id: str, data: profile_schemas.AIPreferenceUpdate
+    ):
+        pref = (
+            self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
         if not pref:
             pref = AIPreference(user_id=user_id)
             self.db.add(pref)
@@ -149,9 +258,13 @@ class ProfileService:
         self.db.commit()
         self.db.refresh(item)
         return item
-        
+
     def _update_item(self, model_class, item_id, user_id, data):
-        item = self.db.query(model_class).filter(model_class.id == item_id, model_class.user_id == user_id).first()
+        item = (
+            self.db.query(model_class)
+            .filter(model_class.id == item_id, model_class.user_id == user_id)
+            .first()
+        )
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
         for key, value in data.model_dump(exclude_unset=True).items():
@@ -159,9 +272,13 @@ class ProfileService:
         self.db.commit()
         self.db.refresh(item)
         return item
-        
+
     def _delete_item(self, model_class, item_id, user_id):
-        item = self.db.query(model_class).filter(model_class.id == item_id, model_class.user_id == user_id).first()
+        item = (
+            self.db.query(model_class)
+            .filter(model_class.id == item_id, model_class.user_id == user_id)
+            .first()
+        )
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
         self.db.delete(item)

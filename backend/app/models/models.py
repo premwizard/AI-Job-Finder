@@ -1,8 +1,22 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime, Text, Enum
-from sqlalchemy.orm import relationship
-from app.database.database import Base
-from datetime import datetime
 import enum
+import uuid
+from datetime import datetime
+
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import relationship
+
+from app.database.database import Base
+
 
 class ApplicationStatus(str, enum.Enum):
     saved = "saved"
@@ -11,6 +25,7 @@ class ApplicationStatus(str, enum.Enum):
     rejected = "rejected"
     selected = "selected"
 
+
 class AuthProvider(str, enum.Enum):
     email = "email"
     google = "google"
@@ -18,8 +33,8 @@ class AuthProvider(str, enum.Enum):
     microsoft = "microsoft"
     linkedin = "linkedin"
 
-import uuid
-from sqlalchemy.dialects.postgresql import UUID
+
+
 
 class User(Base):
     __tablename__ = "users"
@@ -37,7 +52,7 @@ class User(Base):
     verified_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     skills = relationship("Skill", back_populates="user")
     resumes = relationship("Resume", back_populates="user")
@@ -46,12 +61,13 @@ class User(Base):
     analytics = relationship("Analytics", back_populates="user", uselist=False)
     connected_accounts = relationship("ConnectedAccount", back_populates="user")
 
+
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
-    
+
     # Personal Information
     profile_picture_url = Column(String, nullable=True)
     cover_banner_url = Column(String, nullable=True)
@@ -62,8 +78,8 @@ class UserProfile(Base):
     state = Column(String, nullable=True)
     city = Column(String, nullable=True)
     time_zone = Column(String, nullable=True)
-    languages = Column(String, nullable=True) # Comma separated
-    
+    languages = Column(String, nullable=True)  # Comma separated
+
     # Professional Summary
     current_job_title = Column(String, nullable=True)
     current_company = Column(String, nullable=True)
@@ -81,6 +97,7 @@ class UserProfile(Base):
 
     user = relationship("User", back_populates="profile")
 
+
 class Skill(Base):
     __tablename__ = "skills"
 
@@ -88,10 +105,11 @@ class Skill(Base):
     user_id = Column(String, ForeignKey("users.id"))
     skill_name = Column(String, index=True)
     category = Column(String, nullable=True)
-    level = Column(String, nullable=True) # Beginner, Intermediate, Expert
+    level = Column(String, nullable=True)  # Beginner, Intermediate, Expert
     years_of_experience = Column(Integer, nullable=True)
 
     user = relationship("User", back_populates="skills")
+
 
 class Resume(Base):
     __tablename__ = "resumes"
@@ -100,19 +118,20 @@ class Resume(Base):
     user_id = Column(String, ForeignKey("users.id"))
     file_url = Column(String)
     file_name = Column(String, nullable=True)
-    file_size = Column(Integer, nullable=True) # in bytes
+    file_size = Column(Integer, nullable=True)  # in bytes
     version = Column(Integer, default=1)
-    
+
     # Metadata and Parsing
     resume_score = Column(Float, nullable=True)
     ats_score = Column(Float, nullable=True)
-    parsing_status = Column(String, default="pending") # pending, completed, failed
+    parsing_status = Column(String, default="pending")  # pending, completed, failed
     ai_summary = Column(Text, nullable=True)
-    
+
     uploaded_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="resumes")
+
 
 class Job(Base):
     __tablename__ = "jobs"
@@ -131,6 +150,7 @@ class Job(Base):
     saved_by = relationship("SavedJob", back_populates="job")
     applications = relationship("Application", back_populates="job")
 
+
 class SavedJob(Base):
     __tablename__ = "saved_jobs"
 
@@ -141,6 +161,7 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
     job = relationship("Job", back_populates="saved_by")
+
 
 class Application(Base):
     __tablename__ = "applications"
@@ -154,6 +175,7 @@ class Application(Base):
     user = relationship("User", back_populates="applications")
     job = relationship("Job", back_populates="applications")
 
+
 class Analytics(Base):
     __tablename__ = "analytics"
 
@@ -165,6 +187,7 @@ class Analytics(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="analytics")
+
 
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
@@ -179,6 +202,7 @@ class PasswordResetToken(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
+
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
@@ -196,6 +220,7 @@ class RefreshToken(Base):
 
     user = relationship("User")
 
+
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
 
@@ -207,6 +232,7 @@ class EmailVerificationToken(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
+
 
 class PasswordChangeRequest(Base):
     __tablename__ = "password_change_requests"
@@ -222,6 +248,7 @@ class PasswordChangeRequest(Base):
 
     user = relationship("User")
 
+
 class AccountDeletionRequest(Base):
     __tablename__ = "account_deletion_requests"
 
@@ -235,6 +262,7 @@ class AccountDeletionRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
+
 
 class ConnectedAccount(Base):
     __tablename__ = "connected_accounts"
@@ -251,9 +279,10 @@ class ConnectedAccount(Base):
 
 # --- Career Profile Models ---
 
+
 class Experience(Base):
     __tablename__ = "experiences"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     company_name = Column(String, nullable=False)
@@ -265,15 +294,16 @@ class Experience(Base):
     end_date = Column(DateTime, nullable=True)
     is_current = Column(Boolean, default=False)
     description = Column(Text, nullable=True)
-    achievements = Column(Text, nullable=True) # JSON or Text
-    technologies = Column(String, nullable=True) # Comma separated
+    achievements = Column(Text, nullable=True)  # JSON or Text
+    technologies = Column(String, nullable=True)  # Comma separated
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
+
 
 class Education(Base):
     __tablename__ = "educations"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     institution = Column(String, nullable=False)
@@ -289,9 +319,10 @@ class Education(Base):
 
     user = relationship("User")
 
+
 class Certification(Base):
     __tablename__ = "certifications"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
@@ -305,9 +336,10 @@ class Certification(Base):
 
     user = relationship("User")
 
+
 class Project(Base):
     __tablename__ = "projects"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
@@ -328,15 +360,18 @@ class Project(Base):
 
     user = relationship("User")
 
+
 class CareerPreference(Base):
     __tablename__ = "career_preferences"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     preferred_roles = Column(String, nullable=True)
     preferred_industries = Column(String, nullable=True)
     preferred_locations = Column(String, nullable=True)
-    work_setup = Column(String, nullable=True) # Remote, Hybrid, Onsite (comma separated)
+    work_setup = Column(
+        String, nullable=True
+    )  # Remote, Hybrid, Onsite (comma separated)
     expected_salary = Column(String, nullable=True)
     preferred_currency = Column(String, nullable=True)
     employment_types = Column(String, nullable=True)
@@ -350,9 +385,10 @@ class CareerPreference(Base):
 
     user = relationship("User")
 
+
 class SocialProfile(Base):
     __tablename__ = "social_profiles"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     github_url = Column(String, nullable=True)
@@ -370,9 +406,10 @@ class SocialProfile(Base):
 
     user = relationship("User")
 
+
 class AIPreference(Base):
     __tablename__ = "ai_preferences"
-    
+
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     dream_companies = Column(String, nullable=True)

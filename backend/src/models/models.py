@@ -1,8 +1,11 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, DateTime, Text, Enum
-from sqlalchemy.orm import relationship
-from src.database.database import Base
-from datetime import datetime
 import enum
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import relationship
+
+from src.database.database import Base
+
 
 class ApplicationStatus(str, enum.Enum):
     saved = "saved"
@@ -10,6 +13,7 @@ class ApplicationStatus(str, enum.Enum):
     interview = "interview"
     rejected = "rejected"
     selected = "selected"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -30,6 +34,7 @@ class User(Base):
     applications = relationship("Application", back_populates="user")
     analytics = relationship("Analytics", back_populates="user", uselist=False)
 
+
 class Skill(Base):
     __tablename__ = "skills"
 
@@ -38,6 +43,7 @@ class Skill(Base):
     skill_name = Column(String, index=True)
 
     user = relationship("User", back_populates="skills")
+
 
 class Resume(Base):
     __tablename__ = "resumes"
@@ -50,6 +56,7 @@ class Resume(Base):
     uploaded_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="resumes")
+
 
 class Job(Base):
     __tablename__ = "jobs"
@@ -68,6 +75,7 @@ class Job(Base):
     saved_by = relationship("SavedJob", back_populates="job")
     applications = relationship("Application", back_populates="job")
 
+
 class SavedJob(Base):
     __tablename__ = "saved_jobs"
 
@@ -78,6 +86,7 @@ class SavedJob(Base):
 
     user = relationship("User", back_populates="saved_jobs")
     job = relationship("Job", back_populates="saved_by")
+
 
 class Application(Base):
     __tablename__ = "applications"
@@ -90,6 +99,7 @@ class Application(Base):
 
     user = relationship("User", back_populates="applications")
     job = relationship("Job", back_populates="applications")
+
 
 class Analytics(Base):
     __tablename__ = "analytics"

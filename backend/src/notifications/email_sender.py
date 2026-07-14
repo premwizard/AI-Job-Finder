@@ -1,9 +1,11 @@
 import smtplib
+from collections import defaultdict
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from typing import List, Dict
-from collections import defaultdict
-from src.config import EMAIL, EMAIL_PASSWORD, RECEIVER_EMAIL, SMTP_SERVER, SMTP_PORT
+from typing import Dict, List
+
+from src.config import EMAIL, EMAIL_PASSWORD, RECEIVER_EMAIL, SMTP_PORT, SMTP_SERVER
+
 
 def send_job_email(jobs: List[Dict]):
     if not jobs:
@@ -12,22 +14,26 @@ def send_job_email(jobs: List[Dict]):
 
     # Validate that secrets exist
     if not EMAIL or not EMAIL_PASSWORD:
-        print("ERROR: Email credentials missing! Please set EMAIL and EMAIL_PASSWORD secrets in GitHub Actions.")
-        return
-    
-    if not RECEIVER_EMAIL:
-        print("ERROR: RECEIVER_EMAIL is missing (and EMAIL is also empty). Cannot send email.")
+        print(
+            "ERROR: Email credentials missing! Please set EMAIL and EMAIL_PASSWORD secrets in GitHub Actions."
+        )
         return
 
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = f"AI Job Finder: {len(jobs)} New Fresher Jobs Today!"
-    msg['From'] = EMAIL
-    msg['To'] = RECEIVER_EMAIL
-    
+    if not RECEIVER_EMAIL:
+        print(
+            "ERROR: RECEIVER_EMAIL is missing (and EMAIL is also empty). Cannot send email."
+        )
+        return
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = f"AI Job Finder: {len(jobs)} New Fresher Jobs Today!"
+    msg["From"] = EMAIL
+    msg["To"] = RECEIVER_EMAIL
+
     # Group jobs by category
     grouped_jobs = defaultdict(list)
     for job in jobs:
-        cat = job.get('category', 'Other')
+        cat = job.get("category", "Other")
         grouped_jobs[cat].append(job)
 
     # Create HTML content
@@ -55,17 +61,17 @@ def send_job_email(jobs: List[Dict]):
 
     for category, cat_jobs in sorted(grouped_jobs.items()):
         # Sort jobs within category by highest score
-        cat_jobs.sort(key=lambda x: x.get('score', 0), reverse=True)
-        
+        cat_jobs.sort(key=lambda x: x.get("score", 0), reverse=True)
+
         html_content += f"<h3 class='category'>{category} ({len(cat_jobs)})</h3>\n"
         for job in cat_jobs:
-            score = job.get('score', 0)
+            score = job.get("score", 0)
             html_content += f"""
               <div class="job-card">
-                <p class="job-title">{job['role']} <span style="color: #28a745; font-size: 14px;">[Score: {score}]</span></p>
-                <p class="company">🏢 {job['company']} <span style="font-size: 12px; color: #888;">(via {job['source']})</span></p>
-                <p class="details">📍 {job['location']} | 📅 {job['date_posted']}</p>
-                <a href="{job['apply_link']}" class="apply-btn">Apply Now</a>
+                <p class="job-title">{job["role"]} <span style="color: #28a745; font-size: 14px;">[Score: {score}]</span></p>
+                <p class="company">🏢 {job["company"]} <span style="font-size: 12px; color: #888;">(via {job["source"]})</span></p>
+                <p class="details">📍 {job["location"]} | 📅 {job["date_posted"]}</p>
+                <a href="{job["apply_link"]}" class="apply-btn">Apply Now</a>
               </div>
             """
 
@@ -78,7 +84,7 @@ def send_job_email(jobs: List[Dict]):
     </html>
     """
 
-    msg.attach(MIMEText(html_content, 'html'))
+    msg.attach(MIMEText(html_content, "html"))
 
     try:
         # Use port 587 and starttls for standard Gmail SMTP security
@@ -92,20 +98,21 @@ def send_job_email(jobs: List[Dict]):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+
 def send_weekly_email(weekly_stats: List[Dict]):
     if not EMAIL or not EMAIL_PASSWORD or not RECEIVER_EMAIL:
         print("ERROR: Email credentials missing. Cannot send weekly summary.")
         return
 
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = f"AI Job Finder: Weekly Analytics Report"
-    msg['From'] = EMAIL
-    msg['To'] = RECEIVER_EMAIL
-    
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "AI Job Finder: Weekly Analytics Report"
+    msg["From"] = EMAIL
+    msg["To"] = RECEIVER_EMAIL
+
     total_raw = sum(day.get("raw_jobs", 0) for day in weekly_stats)
     total_new = sum(day.get("new_jobs", 0) for day in weekly_stats)
     days_run = len(weekly_stats)
-    
+
     html_content = f"""
     <html>
       <head>
@@ -146,7 +153,7 @@ def send_weekly_email(weekly_stats: List[Dict]):
     </html>
     """
 
-    msg.attach(MIMEText(html_content, 'html'))
+    msg.attach(MIMEText(html_content, "html"))
 
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)

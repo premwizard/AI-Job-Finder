@@ -1,12 +1,16 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, EmailStr
+
 from app.models.models import ApplicationStatus
+
 
 # Common generic properties
 class BaseSchema(BaseModel):
     class Config:
         from_attributes = True
+
 
 # --- User Schemas ---
 class UserBase(BaseSchema):
@@ -17,30 +21,38 @@ class UserBase(BaseSchema):
     education: Optional[str] = None
     work_preference: Optional[str] = None
 
+
 class UserCreate(UserBase):
     password: str
+
 
 class UserResponse(UserBase):
     id: int
     created_at: datetime
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     email: Optional[str] = None
+
 
 # --- Skill Schemas ---
 class SkillBase(BaseSchema):
     skill_name: str
 
+
 class SkillCreate(SkillBase):
     pass
+
 
 class SkillResponse(SkillBase):
     id: int
     user_id: int
+
 
 # --- Resume Schemas ---
 class ResumeBase(BaseSchema):
@@ -48,10 +60,12 @@ class ResumeBase(BaseSchema):
     resume_score: Optional[float] = None
     ats_score: Optional[float] = None
 
+
 class ResumeResponse(ResumeBase):
     id: int
     user_id: int
     uploaded_at: datetime
+
 
 # --- Job Schemas ---
 class JobBase(BaseSchema):
@@ -64,12 +78,15 @@ class JobBase(BaseSchema):
     job_url: str
     job_hash: Optional[str] = None
 
+
 class JobResponse(JobBase):
     id: int
     created_at: datetime
 
+
 class JobDetailResponse(JobResponse):
     pass
+
 
 # --- SavedJob Schemas ---
 class SavedJobResponse(BaseSchema):
@@ -79,9 +96,11 @@ class SavedJobResponse(BaseSchema):
     created_at: datetime
     job: JobResponse
 
+
 # --- Application Schemas ---
 class ApplicationBase(BaseSchema):
     status: ApplicationStatus = ApplicationStatus.applied
+
 
 class ApplicationResponse(ApplicationBase):
     id: int
@@ -89,6 +108,7 @@ class ApplicationResponse(ApplicationBase):
     job_id: int
     applied_at: datetime
     job: JobResponse
+
 
 # --- Analytics Schemas ---
 class AnalyticsResponse(BaseSchema):

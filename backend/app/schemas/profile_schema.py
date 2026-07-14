@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel
+
 
 class UserProfileBase(BaseModel):
     current_job_title: Optional[str] = None
@@ -16,11 +18,14 @@ class UserProfileBase(BaseModel):
     open_to_relocation: Optional[bool] = False
     job_type: Optional[str] = None
 
+
 class UserProfileCreate(UserProfileBase):
     pass
 
+
 class UserProfileUpdate(UserProfileBase):
     pass
+
 
 class UserProfileResponse(UserProfileBase):
     id: str

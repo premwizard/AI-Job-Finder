@@ -45,7 +45,7 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
 };
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
-  const response = await authApi.get<UserResponse>('/users/me');
+  const response = await authApi.get<UserResponse>('/auth/me');
   return response.data;
 };
 

@@ -1,22 +1,17 @@
-import json
-import os
-from typing import List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List
 
-from app.config import ACCEPT_ROLES, ACCEPT_LOCATIONS, ACCEPT_EXPERIENCE, MAX_JOBS_PER_EMAIL
-from app.scraper.remotive import RemotiveScraper
-from app.scraper.arbeitnow import ArbeitnowScraper
-from app.scraper.remoteok import RemoteOKScraper
-from app.scraper.themuse import TheMuseScraper
-from app.storage.state_manager import load_seen_jobs, save_seen_jobs, get_job_hashes
 from app.filters.job_filter import score_job
 
+from app.config import ACCEPT_EXPERIENCE, ACCEPT_LOCATIONS, ACCEPT_ROLES
+from app.scraper.arbeitnow import ArbeitnowScraper
+from app.scraper.remoteok import RemoteOKScraper
+from app.scraper.remotive import RemotiveScraper
+from app.storage.state_manager import get_job_hashes, load_seen_jobs, save_seen_jobs
+
 # We use a subset of scrapers for speed in synchronous API requests
-ACTIVE_SCRAPERS = [
-    RemotiveScraper(),
-    ArbeitnowScraper(),
-    RemoteOKScraper()
-]
+ACTIVE_SCRAPERS = [RemotiveScraper(), ArbeitnowScraper(), RemoteOKScraper()]
+
 
 def fetch_jobs(limit: int = 20) -> List[Dict[str, Any]]:
     seen_jobs = load_seen_jobs()
@@ -31,8 +26,8 @@ def fetch_jobs(limit: int = 20) -> List[Dict[str, Any]]:
                 if not score_result["accepted"]:
                     continue
 
-                job['category'] = score_result['category']
-                job['score'] = score_result['score']
+                job["category"] = score_result["category"]
+                job["score"] = score_result["score"]
 
                 job_hashes = get_job_hashes(job)
                 is_duplicate = any(h in seen_jobs for h in job_hashes)
@@ -42,19 +37,20 @@ def fetch_jobs(limit: int = 20) -> List[Dict[str, Any]]:
                 # Add to seen
                 for h in job_hashes:
                     seen_jobs[h] = today_str
-                
+
                 new_jobs.append(job)
 
                 if len(new_jobs) >= limit:
                     break
         except Exception as e:
             print(f"Scraper error {scraper.source_name}: {e}")
-            
+
         if len(new_jobs) >= limit:
             break
-            
+
     save_seen_jobs(seen_jobs)
     return new_jobs
+
 
 def get_job_by_id(job_id: str) -> Dict[str, Any]:
     # Mocking single job fetch for now since we don't store full jobs in DB
@@ -65,8 +61,9 @@ def get_job_by_id(job_id: str) -> Dict[str, Any]:
         "url": "https://example.com/job",
         "source": "MockSource",
         "score": 95,
-        "description": "This is a detailed job description..."
+        "description": "This is a detailed job description...",
     }
+
 
 def get_recommended_jobs() -> List[Dict[str, Any]]:
     # Mock recommended jobs based on profile

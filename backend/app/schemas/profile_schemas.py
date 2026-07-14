@@ -1,6 +1,8 @@
-from pydantic import BaseModel, HttpUrl, Field
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel
+
 
 # --- Personal Information ---
 class PersonalInfoUpdate(BaseModel):
@@ -15,8 +17,10 @@ class PersonalInfoUpdate(BaseModel):
     time_zone: Optional[str] = None
     languages: Optional[str] = None
 
+
 class PersonalInfoResponse(PersonalInfoUpdate):
     pass
+
 
 # --- Professional Summary ---
 class ProfessionalSummaryUpdate(BaseModel):
@@ -31,8 +35,10 @@ class ProfessionalSummaryUpdate(BaseModel):
     notice_period: Optional[str] = None
     professional_summary: Optional[str] = None
 
+
 class ProfessionalSummaryResponse(ProfessionalSummaryUpdate):
     pass
+
 
 # --- Skills ---
 class SkillCreate(BaseModel):
@@ -41,17 +47,20 @@ class SkillCreate(BaseModel):
     level: Optional[str] = None
     years_of_experience: Optional[int] = None
 
+
 class SkillUpdate(BaseModel):
     skill_name: Optional[str] = None
     category: Optional[str] = None
     level: Optional[str] = None
     years_of_experience: Optional[int] = None
 
+
 class SkillResponse(SkillCreate):
     id: int
 
     class Config:
         from_attributes = True
+
 
 # --- Experience ---
 class ExperienceCreate(BaseModel):
@@ -67,9 +76,11 @@ class ExperienceCreate(BaseModel):
     achievements: Optional[str] = None
     technologies: Optional[str] = None
 
+
 class ExperienceUpdate(ExperienceCreate):
     company_name: Optional[str] = None
     role: Optional[str] = None
+
 
 class ExperienceResponse(ExperienceCreate):
     id: str
@@ -77,6 +88,7 @@ class ExperienceResponse(ExperienceCreate):
 
     class Config:
         from_attributes = True
+
 
 # --- Education ---
 class EducationCreate(BaseModel):
@@ -90,9 +102,11 @@ class EducationCreate(BaseModel):
     activities: Optional[str] = None
     achievements: Optional[str] = None
 
+
 class EducationUpdate(EducationCreate):
     institution: Optional[str] = None
     degree: Optional[str] = None
+
 
 class EducationResponse(EducationCreate):
     id: str
@@ -100,6 +114,7 @@ class EducationResponse(EducationCreate):
 
     class Config:
         from_attributes = True
+
 
 # --- Certifications ---
 class CertificationCreate(BaseModel):
@@ -111,9 +126,11 @@ class CertificationCreate(BaseModel):
     verification_url: Optional[str] = None
     certificate_image_url: Optional[str] = None
 
+
 class CertificationUpdate(CertificationCreate):
     name: Optional[str] = None
     issuer: Optional[str] = None
+
 
 class CertificationResponse(CertificationCreate):
     id: str
@@ -121,6 +138,7 @@ class CertificationResponse(CertificationCreate):
 
     class Config:
         from_attributes = True
+
 
 # --- Projects ---
 class ProjectCreate(BaseModel):
@@ -139,8 +157,10 @@ class ProjectCreate(BaseModel):
     challenges: Optional[str] = None
     achievements: Optional[str] = None
 
+
 class ProjectUpdate(ProjectCreate):
     name: Optional[str] = None
+
 
 class ProjectResponse(ProjectCreate):
     id: str
@@ -148,6 +168,7 @@ class ProjectResponse(ProjectCreate):
 
     class Config:
         from_attributes = True
+
 
 # --- Career Preferences ---
 class CareerPreferenceUpdate(BaseModel):
@@ -165,8 +186,10 @@ class CareerPreferenceUpdate(BaseModel):
     preferred_shift: Optional[str] = None
     availability: Optional[str] = None
 
+
 class CareerPreferenceResponse(CareerPreferenceUpdate):
     pass
+
 
 # --- Social Profiles ---
 class SocialProfileUpdate(BaseModel):
@@ -182,8 +205,10 @@ class SocialProfileUpdate(BaseModel):
     youtube_url: Optional[str] = None
     twitter_url: Optional[str] = None
 
+
 class SocialProfileResponse(SocialProfileUpdate):
     pass
+
 
 # --- AI Preferences ---
 class AIPreferenceUpdate(BaseModel):
@@ -199,8 +224,10 @@ class AIPreferenceUpdate(BaseModel):
     job_search_frequency: Optional[str] = None
     career_growth_priorities: Optional[str] = None
 
+
 class AIPreferenceResponse(AIPreferenceUpdate):
     pass
+
 
 # --- Resume Metadata ---
 class ResumeResponse(BaseModel):
@@ -218,6 +245,7 @@ class ResumeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 # --- Comprehensive Profile Response ---
 class FullProfileResponse(BaseModel):

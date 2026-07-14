@@ -1,7 +1,9 @@
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from app.config.config import EMAIL, EMAIL_PASSWORD, SMTP_SERVER, SMTP_PORT
+from email.mime.text import MIMEText
+
+from app.config.config import EMAIL, EMAIL_PASSWORD, SMTP_PORT, SMTP_SERVER
+
 
 def send_password_reset_email(to_email: str, reset_link: str, otp: str):
     # Always print for development and debugging
@@ -13,7 +15,7 @@ def send_password_reset_email(to_email: str, reset_link: str, otp: str):
         return
 
     subject = "AI Job Finder - Password Reset Request"
-    
+
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -39,14 +41,14 @@ def send_password_reset_email(to_email: str, reset_link: str, otp: str):
       </body>
     </html>
     """
-    
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"AI Job Finder <{EMAIL}>"
     msg["To"] = to_email
-    
+
     msg.attach(MIMEText(html_content, "html"))
-    
+
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
@@ -55,6 +57,7 @@ def send_password_reset_email(to_email: str, reset_link: str, otp: str):
         server.quit()
     except Exception as e:
         print(f"Failed to send email to {to_email}: {str(e)}")
+
 
 def send_verification_email(to_email: str, verification_link: str):
     # Always print for development and debugging
@@ -65,7 +68,7 @@ def send_verification_email(to_email: str, verification_link: str):
         return
 
     subject = "AI Job Finder - Verify Your Email Address"
-    
+
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -86,14 +89,14 @@ def send_verification_email(to_email: str, verification_link: str):
       </body>
     </html>
     """
-    
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"AI Job Finder <{EMAIL}>"
     msg["To"] = to_email
-    
+
     msg.attach(MIMEText(html_content, "html"))
-    
+
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
@@ -103,6 +106,7 @@ def send_verification_email(to_email: str, verification_link: str):
     except Exception as e:
         print(f"Failed to send verification email to {to_email}: {str(e)}")
 
+
 def send_password_change_otp_email(to_email: str, otp: str):
     print(f"[DEV] Password Change OTP: {otp}")
 
@@ -111,7 +115,7 @@ def send_password_change_otp_email(to_email: str, otp: str):
         return
 
     subject = "AI Job Finder - Confirm Password Change"
-    
+
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -134,14 +138,14 @@ def send_password_change_otp_email(to_email: str, otp: str):
       </body>
     </html>
     """
-    
+
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = f"AI Job Finder <{EMAIL}>"
     msg["To"] = to_email
-    
+
     msg.attach(MIMEText(html_content, "html"))
-    
+
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
@@ -150,6 +154,7 @@ def send_password_change_otp_email(to_email: str, otp: str):
         server.quit()
     except Exception as e:
         print(f"Failed to send password change email to {to_email}: {str(e)}")
+
 
 def send_account_deletion_otp_email(to_email: str, otp: str):
     print(f"[DEV] Account Deletion OTP: {otp}")

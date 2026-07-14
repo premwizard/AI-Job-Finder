@@ -16,34 +16,69 @@ ACCEPT_ROLES: List[str] = [
     "AI Developer",
     "Data Engineer",
     "Junior Developer",
-    "Associate Developer"
+    "Associate Developer",
 ]
 
 REJECT_DOMAINS: List[str] = [
-    "iOS", "Android", "Mobile", "DevOps", "SRE", "QA", "Embedded"
+    "iOS",
+    "Android",
+    "Mobile",
+    "DevOps",
+    "SRE",
+    "QA",
+    "Embedded",
 ]
 
 ACCEPT_EXPERIENCE: List[str] = [
-    "Internship", "Fresher", "Entry Level", "Junior", "Graduate", "Associate", "0-2 years", "0-1 years"
+    "Internship",
+    "Fresher",
+    "Entry Level",
+    "Junior",
+    "Graduate",
+    "Associate",
+    "0-2 years",
+    "0-1 years",
 ]
 
 REJECT_EXPERIENCE: List[str] = [
-    "Senior", "Staff", "Principal", "Lead", "Manager", "Director", "Architect", 
-    "3+ years", "4+ years", "5+ years", "6+ years", "7+ years", "8+ years", "10+ years", "3+", "4+", "5+"
+    "Senior",
+    "Staff",
+    "Principal",
+    "Lead",
+    "Manager",
+    "Director",
+    "Architect",
+    "3+ years",
+    "4+ years",
+    "5+ years",
+    "6+ years",
+    "7+ years",
+    "8+ years",
+    "10+ years",
+    "3+",
+    "4+",
+    "5+",
 ]
 
-ACCEPT_LOCATIONS: List[str] = [
-    "India", "coimbatore", "Remote"
-]
+ACCEPT_LOCATIONS: List[str] = ["India", "coimbatore", "Remote"]
 
 REJECT_LOCATIONS: List[str] = [
-    "USA only", "Brazil only", "Germany only", "Europe only", "Americas only"
+    "USA only",
+    "Brazil only",
+    "Germany only",
+    "Europe only",
+    "Americas only",
 ]
 
 # --- SCRAPER CONFIGURATION ---
 
 TARGET_COMPANIES: List[str] = [
-    "openai", "anthropic", "huggingface", "scaleai", "cohere", "midjourney"
+    "openai",
+    "anthropic",
+    "huggingface",
+    "scaleai",
+    "cohere",
+    "midjourney",
 ]
 
 MAX_JOBS_PER_EMAIL = 100

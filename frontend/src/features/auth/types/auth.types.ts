@@ -1,12 +1,16 @@
 export interface UserResponse {
-  id: number;
+  id: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  full_name: string;
+  is_verified?: boolean;
+  is_active?: boolean;
+  full_name?: string;
   preferred_role?: string | null;
   experience?: string | null;
   education?: string | null;
   work_preference?: string | null;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface AuthResponse {
