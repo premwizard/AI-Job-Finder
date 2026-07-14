@@ -12,7 +12,7 @@ class SocialAuthService:
                 "client_id": config.GOOGLE_CLIENT_ID,
                 "client_secret": config.GOOGLE_CLIENT_SECRET,
                 "auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
-                "token_url": "https://oauth2.googleapis.com/token",
+                "token_url": "https://oauth2.googleapis.com/token",  # nosec B105
                 "userinfo_url": "https://www.googleapis.com/oauth2/v2/userinfo",
                 "scopes": "email profile",
             },
@@ -20,7 +20,7 @@ class SocialAuthService:
                 "client_id": config.GITHUB_CLIENT_ID,
                 "client_secret": config.GITHUB_CLIENT_SECRET,
                 "auth_url": "https://github.com/login/oauth/authorize",
-                "token_url": "https://github.com/login/oauth/access_token",
+                "token_url": "https://github.com/login/oauth/access_token",  # nosec B105
                 "userinfo_url": "https://api.github.com/user",
                 "scopes": "read:user user:email",
             },
@@ -28,7 +28,7 @@ class SocialAuthService:
                 "client_id": config.LINKEDIN_CLIENT_ID,
                 "client_secret": config.LINKEDIN_CLIENT_SECRET,
                 "auth_url": "https://www.linkedin.com/oauth/v2/authorization",
-                "token_url": "https://www.linkedin.com/oauth/v2/accessToken",
+                "token_url": "https://www.linkedin.com/oauth/v2/accessToken",  # nosec B105
                 "userinfo_url": "https://api.linkedin.com/v2/userinfo",
                 "scopes": "openid profile email",
             },
@@ -83,7 +83,7 @@ class SocialAuthService:
 
         headers = {"Accept": "application/json"}
         response = requests.post(
-            provider_config["token_url"], data=data, headers=headers
+            provider_config["token_url"], data=data, headers=headers, timeout=10
         )
 
         if response.status_code != 200:
@@ -105,7 +105,7 @@ class SocialAuthService:
             "Accept": "application/json",
         }
 
-        response = requests.get(provider_config["userinfo_url"], headers=headers)
+        response = requests.get(provider_config["userinfo_url"], headers=headers, timeout=10)
 
         if response.status_code != 200:
             raise HTTPException(
@@ -130,7 +130,7 @@ class SocialAuthService:
             if not email:
                 # Fetch emails specifically
                 emails_response = requests.get(
-                    "https://api.github.com/user/emails", headers=headers
+                    "https://api.github.com/user/emails", headers=headers, timeout=10
                 )
                 if emails_response.status_code == 200:
                     emails = emails_response.json()
