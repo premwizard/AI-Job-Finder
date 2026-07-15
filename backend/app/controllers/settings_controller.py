@@ -4,11 +4,16 @@ from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.models.models import PasswordChangeRequest, User
-from app.repositories import (auth_repository, password_change_repository,
-                              refresh_token_repository)
-from app.schemas.change_password_schema import (ChangePasswordRequest,
-                                                SuccessResponse,
-                                                VerifyPasswordChangeRequest)
+from app.repositories import (
+    auth_repository,
+    password_change_repository,
+    refresh_token_repository,
+)
+from app.schemas.change_password_schema import (
+    ChangePasswordRequest,
+    SuccessResponse,
+    VerifyPasswordChangeRequest,
+)
 from app.services import auth_service, email_service
 from app.utils.otp import generate_otp
 from app.utils.token import hash_otp, verify_otp

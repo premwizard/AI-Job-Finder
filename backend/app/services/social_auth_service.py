@@ -105,7 +105,9 @@ class SocialAuthService:
             "Accept": "application/json",
         }
 
-        response = requests.get(provider_config["userinfo_url"], headers=headers, timeout=10)
+        response = requests.get(
+            provider_config["userinfo_url"], headers=headers, timeout=10
+        )
 
         if response.status_code != 200:
             raise HTTPException(

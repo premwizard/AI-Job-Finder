@@ -6,8 +6,7 @@ from app.filters.job_filter import score_job
 from app.scraper.arbeitnow import ArbeitnowScraper
 from app.scraper.remoteok import RemoteOKScraper
 from app.scraper.remotive import RemotiveScraper
-from app.storage.state_manager import (get_job_hashes, load_seen_jobs,
-                                       save_seen_jobs)
+from app.storage.state_manager import get_job_hashes, load_seen_jobs, save_seen_jobs
 
 # We use a subset of scrapers for speed in synchronous API requests
 ACTIVE_SCRAPERS = [RemotiveScraper(), ArbeitnowScraper(), RemoteOKScraper()]

@@ -3,23 +3,31 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException, Request, Response
 from sqlalchemy.orm import Session
 
-from app.config.config import (ACCESS_TOKEN_EXPIRE_MINUTES,
-                               REFRESH_TOKEN_EXPIRE_DAYS)
+from app.config.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
 from app.models.models import EmailVerificationToken, PasswordResetToken, User
-from app.repositories import (auth_repository, email_verification_repository,
-                              password_reset_repository,
-                              refresh_token_repository)
-from app.schemas.auth_schema import (LoginRequest, RegisterRequest,
-                                     RegisterResponse, TokenResponse)
+from app.repositories import (
+    auth_repository,
+    email_verification_repository,
+    password_reset_repository,
+    refresh_token_repository,
+)
+from app.schemas.auth_schema import (
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+    TokenResponse,
+)
 from app.schemas.email_verification_schema import VerificationStatusResponse
-from app.schemas.password_reset_schema import (ForgotPasswordRequest,
-                                               ResetPasswordRequest,
-                                               SuccessResponse, VerifyResponse)
+from app.schemas.password_reset_schema import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    SuccessResponse,
+    VerifyResponse,
+)
 from app.schemas.refresh_token_schema import RefreshTokenCreate
 from app.services import auth_service, email_service
 from app.utils.otp import generate_otp
-from app.utils.token import (generate_secure_token, hash_otp, hash_token,
-                             verify_otp)
+from app.utils.token import generate_secure_token, hash_otp, hash_token, verify_otp
 
 
 def register_user(db: Session, req: RegisterRequest) -> RegisterResponse:

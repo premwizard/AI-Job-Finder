@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
-from app.models.models import (Certification, Education, Experience, Project,
-                               Skill, User)
+from app.models.models import Certification, Education, Experience, Project, Skill, User
 from app.schemas import profile_schemas
 from app.services.profile_service import ProfileService
 

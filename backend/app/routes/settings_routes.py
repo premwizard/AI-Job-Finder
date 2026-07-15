@@ -8,13 +8,16 @@ from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
 from app.models.models import AuthProvider, User
 from app.repositories.social_auth_repository import SocialAuthRepository
-from app.schemas.change_password_schema import (ChangePasswordRequest,
-                                                SuccessResponse,
-                                                VerifyPasswordChangeRequest)
-from app.schemas.delete_account_schema import (DeleteAccountRequestSchema,
-                                               ExecuteDeleteSchema)
-from app.schemas.delete_account_schema import \
-    SuccessResponse as DeleteSuccessResponse
+from app.schemas.change_password_schema import (
+    ChangePasswordRequest,
+    SuccessResponse,
+    VerifyPasswordChangeRequest,
+)
+from app.schemas.delete_account_schema import (
+    DeleteAccountRequestSchema,
+    ExecuteDeleteSchema,
+)
+from app.schemas.delete_account_schema import SuccessResponse as DeleteSuccessResponse
 from app.schemas.delete_account_schema import VerifyDeleteOTPSchema
 from app.schemas.social_auth_schema import ConnectedAccountResponse
 

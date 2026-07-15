@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 import bcrypt
 from jose import jwt
 
-from app.config.config import (ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM,
-                               SECRET_KEY)
+from app.config.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

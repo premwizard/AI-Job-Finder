@@ -2,8 +2,11 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models import models
-from app.repositories.jobs_repository import (get_job_by_id, get_recent_jobs,
-                                              get_recommended_jobs_for_role)
+from app.repositories.jobs_repository import (
+    get_job_by_id,
+    get_recent_jobs,
+    get_recommended_jobs_for_role,
+)
 
 
 def get_jobs(db: Session):

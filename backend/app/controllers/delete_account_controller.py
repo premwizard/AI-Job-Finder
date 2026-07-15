@@ -5,12 +5,17 @@ from fastapi import HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.models.models import AccountDeletionRequest, User
-from app.repositories import (auth_repository, delete_account_repository,
-                              refresh_token_repository)
-from app.schemas.delete_account_schema import (DeleteAccountRequestSchema,
-                                               ExecuteDeleteSchema,
-                                               SuccessResponse,
-                                               VerifyDeleteOTPSchema)
+from app.repositories import (
+    auth_repository,
+    delete_account_repository,
+    refresh_token_repository,
+)
+from app.schemas.delete_account_schema import (
+    DeleteAccountRequestSchema,
+    ExecuteDeleteSchema,
+    SuccessResponse,
+    VerifyDeleteOTPSchema,
+)
 from app.services import auth_service, email_service
 from app.utils.otp import generate_otp
 from app.utils.token import hash_otp, verify_otp

@@ -5,13 +5,20 @@ from app.controllers import auth_controller
 from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
 from app.models.models import User
-from app.schemas.auth_schema import (LoginRequest, RegisterRequest,
-                                     RegisterResponse, TokenResponse,
-                                     UserResponse)
+from app.schemas.auth_schema import (
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+    TokenResponse,
+    UserResponse,
+)
 from app.schemas.email_verification_schema import VerificationStatusResponse
-from app.schemas.password_reset_schema import (ForgotPasswordRequest,
-                                               ResetPasswordRequest,
-                                               SuccessResponse, VerifyResponse)
+from app.schemas.password_reset_schema import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    SuccessResponse,
+    VerifyResponse,
+)
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 

@@ -1,9 +1,18 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.models.models import (AIPreference, CareerPreference, Certification,
-                               Education, Experience, Project, Resume, Skill,
-                               SocialProfile, UserProfile)
+from app.models.models import (
+    AIPreference,
+    CareerPreference,
+    Certification,
+    Education,
+    Experience,
+    Project,
+    Resume,
+    Skill,
+    SocialProfile,
+    UserProfile,
+)
 from app.schemas import profile_schemas
 
 
