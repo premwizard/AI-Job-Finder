@@ -60,3 +60,9 @@ def favicon():
     from fastapi import Response
 
     return Response(content=b"", media_type="image/x-icon", status_code=204)
+
+from fastapi.staticfiles import StaticFiles
+
+# Ensure the uploads directory exists
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")

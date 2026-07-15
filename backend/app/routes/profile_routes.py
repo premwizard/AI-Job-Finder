@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
@@ -20,6 +20,40 @@ def get_full_profile(
     current_user: User = Depends(get_current_user),
 ):
     return service.get_full_profile(current_user.id)
+
+
+@router.get("/completion", response_model=profile_schemas.ProfileCompletionResponse)
+def get_profile_completion(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.calculate_completion_percentage(current_user.id)
+
+
+@router.get("/strength", response_model=profile_schemas.ProfileStrengthResponse)
+def get_profile_strength(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_profile_strength(current_user.id)
+
+
+@router.post("/avatar", response_model=profile_schemas.ImageUploadResponse)
+def upload_avatar(
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.upload_avatar(current_user.id, file)
+
+
+@router.post("/banner", response_model=profile_schemas.ImageUploadResponse)
+def upload_banner(
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.upload_banner(current_user.id, file)
 
 
 @router.put("/personal", response_model=profile_schemas.PersonalInfoResponse)

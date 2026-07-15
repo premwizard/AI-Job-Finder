@@ -4,13 +4,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
   User, Briefcase, GraduationCap, Award, FolderGit2, FileText, 
-  Settings2, Share2, Sparkles, BookOpen
+  Settings2, Share2, Sparkles, BookOpen, LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfileProgress } from "@/components/profile/ProfileProgress";
 
 const NAV_ITEMS = [
-  { href: "/profile", label: "Personal Info", icon: User },
+  { href: "/profile", label: "Overview", icon: LayoutDashboard },
+  { href: "/profile/personal", label: "Personal Info", icon: User },
   { href: "/profile/summary", label: "Professional Summary", icon: BookOpen },
   { href: "/profile/skills", label: "Skills", icon: Sparkles },
   { href: "/profile/experience", label: "Work Experience", icon: Briefcase },

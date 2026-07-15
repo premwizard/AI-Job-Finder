@@ -261,3 +261,16 @@ class FullProfileResponse(BaseModel):
     social_profiles: Optional[SocialProfileResponse] = None
     ai_preferences: Optional[AIPreferenceResponse] = None
     resumes: List[ResumeResponse] = []
+
+# --- Career Profile Overview ---
+class ProfileStrengthResponse(BaseModel):
+    score: int
+    category: str
+    explanation: str
+
+class ProfileCompletionResponse(BaseModel):
+    completion_percentage: int
+    missing_sections: List[str]
+
+class ImageUploadResponse(BaseModel):
+    url: str

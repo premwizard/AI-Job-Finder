@@ -8,6 +8,34 @@ export const getFullProfile = async () => {
   return response.data;
 };
 
+export const getProfileCompletion = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/completion`);
+  return response.data;
+};
+
+export const getProfileStrength = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/strength`);
+  return response.data;
+};
+
+export const uploadAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/avatar`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const uploadBanner = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/banner`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
 // PUT Single Objects
 export const updatePersonalInfo = async (data: any) => {
   const response = await authApi.put(`${PROFILE_URL}/personal`, data);

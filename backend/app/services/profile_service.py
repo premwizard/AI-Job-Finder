@@ -1,4 +1,7 @@
-from fastapi import HTTPException
+import os
+import shutil
+import uuid
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.models.models import (
@@ -20,35 +23,55 @@ class ProfileService:
     def __init__(self, db: Session):
         self.db = db
 
-    def calculate_completion_percentage(self, user_id: str) -> int:
+    def calculate_completion_percentage(self, user_id: str) -> profile_schemas.ProfileCompletionResponse:
         score = 0
         total_sections = 11
+        missing_sections = []
 
         profile = (
             self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
         )
         if profile:
-            # Personal Info (max 1/11)
             if profile.headline and profile.phone_number:
                 score += 1
-            # Professional Summary (max 1/11)
+            else:
+                missing_sections.append("Complete Personal Info")
             if profile.professional_summary and profile.current_job_title:
                 score += 1
+            else:
+                missing_sections.append("Add Professional Summary")
+        else:
+            missing_sections.append("Complete Personal Info")
+            missing_sections.append("Add Professional Summary")
 
         if self.db.query(Skill).filter(Skill.user_id == user_id).first():
             score += 1
+        else:
+            missing_sections.append("Add Skills")
+
         if self.db.query(Experience).filter(Experience.user_id == user_id).first():
             score += 1
+        else:
+            missing_sections.append("Add Work Experience")
+
         if self.db.query(Education).filter(Education.user_id == user_id).first():
             score += 1
+        else:
+            missing_sections.append("Add Education")
+
         if (
             self.db.query(Certification)
             .filter(Certification.user_id == user_id)
             .first()
         ):
             score += 1
+        else:
+            missing_sections.append("Add Certifications")
+
         if self.db.query(Project).filter(Project.user_id == user_id).first():
             score += 1
+        else:
+            missing_sections.append("Add Projects")
 
         pref = (
             self.db.query(CareerPreference)
@@ -57,6 +80,8 @@ class ProfileService:
         )
         if pref and pref.preferred_roles:
             score += 1
+        else:
+            missing_sections.append("Set Career Preferences")
 
         social = (
             self.db.query(SocialProfile)
@@ -65,17 +90,27 @@ class ProfileService:
         )
         if social and (social.linkedin_url or social.github_url):
             score += 1
+        else:
+            missing_sections.append("Link Social Profiles")
 
         ai_pref = (
             self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
         )
         if ai_pref and ai_pref.career_objectives:
             score += 1
+        else:
+            missing_sections.append("Set AI Preferences")
 
         if self.db.query(Resume).filter(Resume.user_id == user_id).first():
             score += 1
+        else:
+            missing_sections.append("Upload Resume")
 
-        return int((score / total_sections) * 100)
+        percentage = int((score / total_sections) * 100)
+        return profile_schemas.ProfileCompletionResponse(
+            completion_percentage=percentage,
+            missing_sections=missing_sections
+        )
 
     def get_full_profile(self, user_id: str) -> profile_schemas.FullProfileResponse:
         profile = (
@@ -122,7 +157,7 @@ class ProfileService:
         )
         resumes = self.db.query(Resume).filter(Resume.user_id == user_id).all()
 
-        completion = self.calculate_completion_percentage(user_id)
+        completion_response = self.calculate_completion_percentage(user_id)
 
         # Map UserProfile to PersonalInfo and ProfessionalSummary
         personal_info = (
@@ -137,7 +172,7 @@ class ProfileService:
         )
 
         return profile_schemas.FullProfileResponse(
-            completion_percentage=completion,
+            completion_percentage=completion_response.completion_percentage,
             personal_info=personal_info,
             professional_summary=prof_summary,
             skills=[profile_schemas.SkillResponse.model_validate(s) for s in skills],
@@ -170,6 +205,62 @@ class ProfileService:
             else None,
             resumes=[profile_schemas.ResumeResponse.model_validate(r) for r in resumes],
         )
+
+    def get_profile_strength(self, user_id: str) -> profile_schemas.ProfileStrengthResponse:
+        completion_response = self.calculate_completion_percentage(user_id)
+        score = completion_response.completion_percentage
+        
+        if score < 30:
+            category = "Beginner"
+            explanation = "Your profile is just getting started. Add more details to stand out."
+        elif score < 60:
+            category = "Intermediate"
+            explanation = "You're making good progress. Complete more sections to improve visibility."
+        elif score < 85:
+            category = "Strong"
+            explanation = "Your profile is looking great and is highly visible to recruiters."
+        else:
+            category = "Excellent"
+            explanation = "Outstanding! Your profile is fully optimized for top opportunities."
+            
+        return profile_schemas.ProfileStrengthResponse(
+            score=score,
+            category=category,
+            explanation=explanation
+        )
+
+    def _save_upload_file(self, file: UploadFile, sub_folder: str) -> str:
+        upload_dir = os.path.join("uploads", sub_folder)
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        file_ext = os.path.splitext(file.filename)[1] if file.filename else ".png"
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        return f"/uploads/{sub_folder}/{unique_filename}"
+
+    def upload_avatar(self, user_id: str, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+        url = self._save_upload_file(file, "avatars")
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        if not profile:
+            profile = UserProfile(user_id=user_id)
+            self.db.add(profile)
+        profile.profile_picture_url = url
+        self.db.commit()
+        return profile_schemas.ImageUploadResponse(url=url)
+
+    def upload_banner(self, user_id: str, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+        url = self._save_upload_file(file, "banners")
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        if not profile:
+            profile = UserProfile(user_id=user_id)
+            self.db.add(profile)
+        profile.cover_banner_url = url
+        self.db.commit()
+        return profile_schemas.ImageUploadResponse(url=url)
 
     # --- Update Methods (Single Entities) ---
     def update_personal_info(

@@ -43,6 +43,11 @@ app.include_router(resume.router)
 app.include_router(saved_jobs.router)
 app.include_router(applications.router)
 
+from fastapi.staticfiles import StaticFiles
+
+# Ensure the uploads directory exists
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/")
 def read_root():
