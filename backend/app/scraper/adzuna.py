@@ -16,12 +16,12 @@ class AdzunaScraper(BaseScraper):
     def scrape(
         self, roles: List[str], locations: List[str], experience_levels: List[str]
     ) -> List[Dict]:
-        jobs = []
+        jobs: List[Dict] = []
         if not ADZUNA_APP_ID or not ADZUNA_APP_KEY:
             print("Skipping Adzuna Scraper: Missing ADZUNA_APP_ID or ADZUNA_APP_KEY.")
             return jobs
 
-        params = {
+        params: Dict[str, str | int] = {
             "app_id": ADZUNA_APP_ID,
             "app_key": ADZUNA_APP_KEY,
             "results_per_page": 50,

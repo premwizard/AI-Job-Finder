@@ -15,7 +15,7 @@ class RemotiveScraper(BaseScraper):
         self, roles: List[str], locations: List[str], experience_levels: List[str]
     ) -> List[Dict]:
         jobs = []
-        params = {"category": "software-dev", "limit": 150}
+        params: Dict[str, str | int] = {"category": "software-dev", "limit": 150}
 
         try:
             response = requests.get(self.api_url, params=params, timeout=15)

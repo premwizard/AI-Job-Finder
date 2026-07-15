@@ -15,7 +15,7 @@ class TheMuseScraper(BaseScraper):
         self, roles: List[str], locations: List[str], experience_levels: List[str]
     ) -> List[Dict]:
         jobs = []
-        params = {"page": 1, "category": "Software Engineer"}
+        params: Dict[str, str | int] = {"page": 1, "category": "Software Engineer"}
 
         try:
             response = requests.get(self.api_url, params=params, timeout=15)

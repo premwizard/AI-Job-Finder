@@ -78,8 +78,8 @@ class ExperienceCreate(BaseModel):
 
 
 class ExperienceUpdate(ExperienceCreate):
-    company_name: Optional[str] = None
-    role: Optional[str] = None
+    company_name: Optional[str] = None  # type: ignore[assignment]
+    role: Optional[str] = None  # type: ignore[assignment]
 
 
 class ExperienceResponse(ExperienceCreate):
@@ -104,8 +104,8 @@ class EducationCreate(BaseModel):
 
 
 class EducationUpdate(EducationCreate):
-    institution: Optional[str] = None
-    degree: Optional[str] = None
+    institution: Optional[str] = None  # type: ignore[assignment]
+    degree: Optional[str] = None  # type: ignore[assignment]
 
 
 class EducationResponse(EducationCreate):
@@ -128,8 +128,8 @@ class CertificationCreate(BaseModel):
 
 
 class CertificationUpdate(CertificationCreate):
-    name: Optional[str] = None
-    issuer: Optional[str] = None
+    name: Optional[str] = None  # type: ignore[assignment]
+    issuer: Optional[str] = None  # type: ignore[assignment]
 
 
 class CertificationResponse(CertificationCreate):
@@ -159,7 +159,7 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectUpdate(ProjectCreate):
-    name: Optional[str] = None
+    name: Optional[str] = None  # type: ignore[assignment]
 
 
 class ProjectResponse(ProjectCreate):

@@ -2,3 +2,4 @@
 explicit_package_bases = true
 namespace_packages = true
 ignore_missing_imports = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
