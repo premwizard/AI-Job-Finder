@@ -12,7 +12,7 @@ def create_request(
     return request
 
 
-def get_active_request_by_user(db: Session, user_id: str) -> PasswordChangeRequest:
+def get_active_request_by_user(db: Session, user_id: str) -> PasswordChangeRequest | None:
     return (
         db.query(PasswordChangeRequest)
         .filter(

@@ -24,7 +24,7 @@ def create_verification_token(
     return db_token
 
 
-def get_token_by_hash(db: Session, token_hash: str) -> EmailVerificationToken:
+def get_token_by_hash(db: Session, token_hash: str) -> EmailVerificationToken | None:
     return (
         db.query(EmailVerificationToken)
         .filter(EmailVerificationToken.token_hash == token_hash)

@@ -1,5 +1,6 @@
 import enum
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -18,15 +19,15 @@ class ApplicationStatus(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, index=True)
-    email = Column(String, unique=True, index=True)
-    password_hash = Column(String)
-    preferred_role = Column(String, nullable=True)
-    experience = Column(String, nullable=True)
-    education = Column(String, nullable=True)
-    work_preference = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    full_name: Any = Column(String, index=True)
+    email: Any = Column(String, unique=True, index=True)
+    password_hash: Any = Column(String)
+    preferred_role: Any = Column(String, nullable=True)
+    experience: Any = Column(String, nullable=True)
+    education: Any = Column(String, nullable=True)
+    work_preference: Any = Column(String, nullable=True)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     skills = relationship("Skill", back_populates="user")
     resumes = relationship("Resume", back_populates="user")
@@ -38,9 +39,9 @@ class User(Base):
 class Skill(Base):
     __tablename__ = "skills"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    skill_name = Column(String, index=True)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(Integer, ForeignKey("users.id"))
+    skill_name: Any = Column(String, index=True)
 
     user = relationship("User", back_populates="skills")
 
@@ -48,12 +49,12 @@ class Skill(Base):
 class Resume(Base):
     __tablename__ = "resumes"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    file_url = Column(String)
-    resume_score = Column(Float, nullable=True)
-    ats_score = Column(Float, nullable=True)
-    uploaded_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(Integer, ForeignKey("users.id"))
+    file_url: Any = Column(String)
+    resume_score: Any = Column(Float, nullable=True)
+    ats_score: Any = Column(Float, nullable=True)
+    uploaded_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="resumes")
 
@@ -61,16 +62,16 @@ class Resume(Base):
 class Job(Base):
     __tablename__ = "jobs"
 
-    id = Column(Integer, primary_key=True, index=True)
-    job_hash = Column(String, unique=True, index=True, nullable=True)  # To deduplicate
-    company_name = Column(String, index=True)
-    job_title = Column(String, index=True)
-    location = Column(String)
-    salary = Column(String, nullable=True)
-    description = Column(Text, nullable=True)
-    source = Column(String)
-    job_url = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_hash: Any = Column(String, unique=True, index=True, nullable=True)  # To deduplicate
+    company_name: Any = Column(String, index=True)
+    job_title: Any = Column(String, index=True)
+    location: Any = Column(String)
+    salary: Any = Column(String, nullable=True)
+    description: Any = Column(Text, nullable=True)
+    source: Any = Column(String)
+    job_url: Any = Column(String)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     saved_by = relationship("SavedJob", back_populates="job")
     applications = relationship("Application", back_populates="job")
@@ -79,10 +80,10 @@ class Job(Base):
 class SavedJob(Base):
     __tablename__ = "saved_jobs"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    job_id = Column(Integer, ForeignKey("jobs.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(Integer, ForeignKey("users.id"))
+    job_id: Any = Column(Integer, ForeignKey("jobs.id"))
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="saved_jobs")
     job = relationship("Job", back_populates="saved_by")
@@ -91,11 +92,11 @@ class SavedJob(Base):
 class Application(Base):
     __tablename__ = "applications"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    job_id = Column(Integer, ForeignKey("jobs.id"))
-    status = Column(Enum(ApplicationStatus), default=ApplicationStatus.applied)
-    applied_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(Integer, ForeignKey("users.id"))
+    job_id: Any = Column(Integer, ForeignKey("jobs.id"))
+    status: Any = Column(Enum(ApplicationStatus), default=ApplicationStatus.applied)
+    applied_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="applications")
     job = relationship("Job", back_populates="applications")
@@ -104,11 +105,11 @@ class Application(Base):
 class Analytics(Base):
     __tablename__ = "analytics"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    jobs_found = Column(Integer, default=0)
-    matched_jobs = Column(Integer, default=0)
-    applications_sent = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(Integer, ForeignKey("users.id"), unique=True)
+    jobs_found: Any = Column(Integer, default=0)
+    matched_jobs: Any = Column(Integer, default=0)
+    applications_sent: Any = Column(Integer, default=0)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="analytics")
