@@ -63,7 +63,9 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Any = Column(Integer, primary_key=True, index=True)
-    job_hash: Any = Column(String, unique=True, index=True, nullable=True)  # To deduplicate
+    job_hash: Any = Column(
+        String, unique=True, index=True, nullable=True
+    )  # To deduplicate
     company_name: Any = Column(String, index=True)
     job_title: Any = Column(String, index=True)
     location: Any = Column(String)

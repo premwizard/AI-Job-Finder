@@ -38,7 +38,9 @@ class AuthProvider(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     first_name: Any = Column(String, nullable=False)
     last_name: Any = Column(String, nullable=False)
     email: Any = Column(String, unique=True, index=True, nullable=False)
@@ -50,7 +52,9 @@ class User(Base):
     deleted_at: Any = Column(DateTime, nullable=True)
     verified_at: Any = Column(DateTime, nullable=True)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     skills = relationship("Skill", back_populates="user")
@@ -64,7 +68,9 @@ class User(Base):
 class UserProfile(Base):
     __tablename__ = "user_profiles"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
 
     # Personal Information
@@ -92,7 +98,9 @@ class UserProfile(Base):
     professional_summary: Any = Column(Text, nullable=True)
 
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User", back_populates="profile")
 
@@ -123,11 +131,15 @@ class Resume(Base):
     # Metadata and Parsing
     resume_score: Any = Column(Float, nullable=True)
     ats_score: Any = Column(Float, nullable=True)
-    parsing_status: Any = Column(String, default="pending")  # pending, completed, failed
+    parsing_status: Any = Column(
+        String, default="pending"
+    )  # pending, completed, failed
     ai_summary: Any = Column(Text, nullable=True)
 
     uploaded_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User", back_populates="resumes")
 
@@ -136,7 +148,9 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Any = Column(Integer, primary_key=True, index=True)
-    job_hash: Any = Column(String, unique=True, index=True, nullable=True)  # To deduplicate
+    job_hash: Any = Column(
+        String, unique=True, index=True, nullable=True
+    )  # To deduplicate
     company_name: Any = Column(String, index=True)
     job_title: Any = Column(String, index=True)
     location: Any = Column(String)
@@ -191,7 +205,9 @@ class Analytics(Base):
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     token_hash: Any = Column(String, nullable=False, unique=True, index=True)
     otp_hash: Any = Column(String, nullable=False)
@@ -206,7 +222,9 @@ class PasswordResetToken(Base):
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     token_hash: Any = Column(String, nullable=False, unique=True, index=True)
     device_name: Any = Column(String, nullable=True)
@@ -223,7 +241,9 @@ class RefreshToken(Base):
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     token_hash: Any = Column(String, nullable=False, unique=True, index=True)
     expires_at: Any = Column(DateTime, nullable=False)
@@ -236,7 +256,9 @@ class EmailVerificationToken(Base):
 class PasswordChangeRequest(Base):
     __tablename__ = "password_change_requests"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     otp_hash: Any = Column(String, nullable=False)
     new_password_hash: Any = Column(String, nullable=False)
@@ -251,7 +273,9 @@ class PasswordChangeRequest(Base):
 class AccountDeletionRequest(Base):
     __tablename__ = "account_deletion_requests"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     otp_hash: Any = Column(String, nullable=False)
     expires_at: Any = Column(DateTime, nullable=False)
@@ -266,7 +290,9 @@ class AccountDeletionRequest(Base):
 class ConnectedAccount(Base):
     __tablename__ = "connected_accounts"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     provider: Any = Column(Enum(AuthProvider), nullable=False)
     provider_user_id: Any = Column(String, nullable=False, index=True)
@@ -282,7 +308,9 @@ class ConnectedAccount(Base):
 class Experience(Base):
     __tablename__ = "experiences"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
     company_name: Any = Column(String, nullable=False)
     company_logo_url: Any = Column(String, nullable=True)
@@ -303,7 +331,9 @@ class Experience(Base):
 class Education(Base):
     __tablename__ = "educations"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
     institution: Any = Column(String, nullable=False)
     degree: Any = Column(String, nullable=False)
@@ -322,7 +352,9 @@ class Education(Base):
 class Certification(Base):
     __tablename__ = "certifications"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
     name: Any = Column(String, nullable=False)
     issuer: Any = Column(String, nullable=False)
@@ -339,7 +371,9 @@ class Certification(Base):
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
     name: Any = Column(String, nullable=False)
     description: Any = Column(Text, nullable=True)
@@ -363,7 +397,9 @@ class Project(Base):
 class CareerPreference(Base):
     __tablename__ = "career_preferences"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     preferred_roles: Any = Column(String, nullable=True)
     preferred_industries: Any = Column(String, nullable=True)
@@ -380,7 +416,9 @@ class CareerPreference(Base):
     travel_willingness: Any = Column(String, nullable=True)
     preferred_shift: Any = Column(String, nullable=True)
     availability: Any = Column(String, nullable=True)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
 
@@ -388,7 +426,9 @@ class CareerPreference(Base):
 class SocialProfile(Base):
     __tablename__ = "social_profiles"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     github_url: Any = Column(String, nullable=True)
     linkedin_url: Any = Column(String, nullable=True)
@@ -401,7 +441,9 @@ class SocialProfile(Base):
     devto_url: Any = Column(String, nullable=True)
     youtube_url: Any = Column(String, nullable=True)
     twitter_url: Any = Column(String, nullable=True)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
 
@@ -409,7 +451,9 @@ class SocialProfile(Base):
 class AIPreference(Base):
     __tablename__ = "ai_preferences"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     dream_companies: Any = Column(String, nullable=True)
     dream_roles: Any = Column(String, nullable=True)
@@ -422,6 +466,8 @@ class AIPreference(Base):
     career_objectives: Any = Column(Text, nullable=True)
     job_search_frequency: Any = Column(String, nullable=True)
     career_growth_priorities: Any = Column(String, nullable=True)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")

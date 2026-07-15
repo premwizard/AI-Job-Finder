@@ -114,7 +114,7 @@ def login_user(
         cookie_kwargs["max_age"] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
         cookie_kwargs["expires"] = expires_at.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    response.set_cookie(**cookie_kwargs)
+    response.set_cookie(**cookie_kwargs)  # type: ignore[arg-type]
 
     return TokenResponse(access_token=access_token, user=user)
 
@@ -174,7 +174,7 @@ def refresh_access_token(
         cookie_kwargs["max_age"] = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
         cookie_kwargs["expires"] = new_expires_at.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    response.set_cookie(**cookie_kwargs)
+    response.set_cookie(**cookie_kwargs)  # type: ignore[arg-type]
 
     return TokenResponse(access_token=access_token, user=user)
 
@@ -279,6 +279,8 @@ def reset_password(db: Session, req: ResetPasswordRequest) -> SuccessResponse:
     user = auth_repository.get_user_by_email(
         db, record.user.email
     )  # user relationship is loaded
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
     if auth_service.verify_password(req.new_password, user.password_hash):
         raise HTTPException(
             status_code=400,
