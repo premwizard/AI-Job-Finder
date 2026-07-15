@@ -56,6 +56,20 @@ def upload_banner(
     return service.upload_banner(current_user.id, file)
 
 
+@router.get("/personal", response_model=profile_schemas.PersonalInfoResponse)
+def get_personal_info(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_personal_info(current_user.id)
+
+@router.delete("/avatar", status_code=status.HTTP_204_NO_CONTENT)
+def delete_avatar(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    service.delete_avatar(current_user.id)
+
 @router.put("/personal", response_model=profile_schemas.PersonalInfoResponse)
 def update_personal_info(
     req: profile_schemas.PersonalInfoUpdate,

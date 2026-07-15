@@ -4,8 +4,32 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+# --- Languages ---
+class LanguageCreate(BaseModel):
+    name: str
+    proficiency: str
+
+class LanguageUpdate(BaseModel):
+    name: Optional[str] = None
+    proficiency: Optional[str] = None
+
+class LanguageResponse(LanguageCreate):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # --- Personal Information ---
 class PersonalInfoUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    preferred_name: Optional[str] = None
+    date_of_birth: Optional[datetime] = None
+    gender: Optional[str] = None
+    alternate_phone_number: Optional[str] = None
     profile_picture_url: Optional[str] = None
     cover_banner_url: Optional[str] = None
     headline: Optional[str] = None
@@ -14,12 +38,18 @@ class PersonalInfoUpdate(BaseModel):
     country: Optional[str] = None
     state: Optional[str] = None
     city: Optional[str] = None
+    postal_code: Optional[str] = None
     time_zone: Optional[str] = None
-    languages: Optional[str] = None
+    languages: Optional[List[LanguageCreate]] = None
 
 
 class PersonalInfoResponse(PersonalInfoUpdate):
-    pass
+    email: Optional[str] = None
+    is_verified: Optional[bool] = None
+    languages: List[LanguageResponse] = []
+    
+    class Config:
+        from_attributes = True
 
 
 # --- Professional Summary ---

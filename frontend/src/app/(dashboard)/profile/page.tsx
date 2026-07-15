@@ -8,7 +8,7 @@ import {
   uploadAvatar,
   uploadBanner
 } from "@/features/profile/services/profile.api";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -156,9 +156,9 @@ export default function CareerProfileOverviewPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button asChild>
-              <Link href="/profile/personal"><Edit3 className="w-4 h-4 mr-2" /> Edit Profile</Link>
-            </Button>
+            <Link href="/profile/personal" className={buttonVariants({ variant: "default" })}>
+              <Edit3 className="w-4 h-4 mr-2" /> Edit Profile
+            </Link>
             <Button variant="outline" disabled>
               Public Profile (Coming Soon)
             </Button>
@@ -272,11 +272,11 @@ export default function CareerProfileOverviewPage() {
         <div>
           <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
           <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" asChild><Link href="/profile/resume">Upload Resume</Link></Button>
-            <Button variant="secondary" asChild><Link href="/profile/skills">Add Skill</Link></Button>
-            <Button variant="secondary" asChild><Link href="/profile/experience">Add Experience</Link></Button>
-            <Button variant="secondary" asChild><Link href="/profile/projects">Add Project</Link></Button>
-            <Button variant="secondary" asChild><Link href="/profile/social">Link Social</Link></Button>
+            <Link href="/profile/resume" className={buttonVariants({ variant: "secondary" })}>Upload Resume</Link>
+            <Link href="/profile/skills" className={buttonVariants({ variant: "secondary" })}>Add Skill</Link>
+            <Link href="/profile/experience" className={buttonVariants({ variant: "secondary" })}>Add Experience</Link>
+            <Link href="/profile/projects" className={buttonVariants({ variant: "secondary" })}>Add Project</Link>
+            <Link href="/profile/social" className={buttonVariants({ variant: "secondary" })}>Link Social</Link>
           </div>
         </div>
 

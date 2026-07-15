@@ -78,12 +78,18 @@ class UserProfile(Base):
     cover_banner_url: Any = Column(String, nullable=True)
     headline: Any = Column(String, nullable=True)
     bio: Any = Column(Text, nullable=True)
+    middle_name: Any = Column(String, nullable=True)
+    preferred_name: Any = Column(String, nullable=True)
     phone_number: Any = Column(String, nullable=True)
+    alternate_phone_number: Any = Column(String, nullable=True)
+    date_of_birth: Any = Column(DateTime, nullable=True)
+    gender: Any = Column(String, nullable=True)
     country: Any = Column(String, nullable=True)
     state: Any = Column(String, nullable=True)
     city: Any = Column(String, nullable=True)
+    postal_code: Any = Column(String, nullable=True)
     time_zone: Any = Column(String, nullable=True)
-    languages: Any = Column(String, nullable=True)  # Comma separated
+    languages: Any = Column(String, nullable=True)  # Legacy Comma separated string
 
     # Professional Summary
     current_job_title: Any = Column(String, nullable=True)
@@ -103,6 +109,21 @@ class UserProfile(Base):
     )
 
     user = relationship("User", back_populates="profile")
+    language_proficiencies = relationship("Language", back_populates="profile", cascade="all, delete-orphan")
+
+
+class Language(Base):
+    __tablename__ = "languages"
+
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
+    profile_id: Any = Column(String, ForeignKey("user_profiles.id"), nullable=False)
+    name: Any = Column(String, nullable=False)
+    proficiency: Any = Column(String, nullable=False)  # Native, Fluent, Professional, Intermediate, Beginner
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+    profile = relationship("UserProfile", back_populates="language_proficiencies")
 
 
 class Skill(Base):

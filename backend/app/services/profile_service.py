@@ -15,6 +15,8 @@ from app.models.models import (
     Skill,
     SocialProfile,
     UserProfile,
+    Language,
+    User,
 )
 from app.schemas import profile_schemas
 
@@ -262,7 +264,39 @@ class ProfileService:
         self.db.commit()
         return profile_schemas.ImageUploadResponse(url=url)
 
-    # --- Update Methods (Single Entities) ---
+    # --- Personal Information ---
+    def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        user = self.db.query(User).filter(User.id == user_id).first()
+        
+        if not profile:
+            profile = UserProfile(user_id=user_id)
+            self.db.add(profile)
+            self.db.commit()
+            self.db.refresh(profile)
+            
+        languages = self.db.query(Language).filter(Language.profile_id == profile.id).all()
+        
+        resp_data = {**profile.__dict__}
+        if user:
+            resp_data["email"] = user.email
+            resp_data["is_verified"] = user.is_verified
+            resp_data["first_name"] = user.first_name
+            resp_data["last_name"] = user.last_name
+            
+        resp_data["languages"] = [profile_schemas.LanguageResponse.model_validate(lang) for lang in languages]
+        
+        return profile_schemas.PersonalInfoResponse(**resp_data)
+
+    def delete_avatar(self, user_id: str):
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        if profile and profile.profile_picture_url:
+            # We could optionally delete the file from the filesystem here if it exists locally
+            # file_path = os.path.join(".", profile.profile_picture_url.lstrip("/"))
+            # if os.path.exists(file_path): os.remove(file_path)
+            profile.profile_picture_url = None
+            self.db.commit()
+
     def update_personal_info(
         self, user_id: str, data: profile_schemas.PersonalInfoUpdate
     ):
@@ -272,11 +306,35 @@ class ProfileService:
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
-        for key, value in data.model_dump(exclude_unset=True).items():
+            self.db.commit()
+            self.db.refresh(profile)
+            
+        user = self.db.query(User).filter(User.id == user_id).first()
+        
+        data_dict = data.model_dump(exclude_unset=True)
+        
+        if "first_name" in data_dict and user:
+            user.first_name = data_dict.pop("first_name")
+        if "last_name" in data_dict and user:
+            user.last_name = data_dict.pop("last_name")
+            
+        languages_data = data_dict.pop("languages", None)
+
+        for key, value in data_dict.items():
             setattr(profile, key, value)
+            
+        if languages_data is not None:
+            # Delete existing languages
+            self.db.query(Language).filter(Language.profile_id == profile.id).delete()
+            # Add new languages
+            for lang_data in languages_data:
+                new_lang = Language(user_id=user_id, profile_id=profile.id, name=lang_data["name"], proficiency=lang_data["proficiency"])
+                self.db.add(new_lang)
+
         self.db.commit()
         self.db.refresh(profile)
-        return profile_schemas.PersonalInfoResponse(**profile.__dict__)
+        
+        return self.get_personal_info(user_id)
 
     def update_professional_summary(
         self, user_id: str, data: profile_schemas.ProfessionalSummaryUpdate
