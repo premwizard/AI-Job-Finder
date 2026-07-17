@@ -117,7 +117,7 @@ export function LocationPreferencesCard({ form }: LocationPreferencesCardProps) 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Preferred Working Time Zone (For Remote)</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select timezone" />

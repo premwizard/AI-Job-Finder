@@ -106,6 +106,10 @@ class UserProfile(Base):
     preferred_currency: Any = Column(String, nullable=True)
     notice_period: Any = Column(String, nullable=True)
     professional_summary: Any = Column(Text, nullable=True)
+    career_objective: Any = Column(Text, nullable=True)
+    years_of_experience_summary: Any = Column(Text, nullable=True)
+    key_achievements: Any = Column(Text, nullable=True)
+    career_highlights: Any = Column(Text, nullable=True)
 
     created_at: Any = Column(DateTime, default=datetime.utcnow)
     updated_at: Any = Column(

@@ -44,7 +44,7 @@ export function CompensationCard({ form }: CompensationCardProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Currency</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                  <Select onValueChange={field.onChange} value={field.value || null}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
@@ -68,7 +68,7 @@ export function CompensationCard({ form }: CompensationCardProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                  <Select onValueChange={field.onChange} value={field.value || null}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
@@ -108,7 +108,7 @@ export function CompensationCard({ form }: CompensationCardProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Currency</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                  <Select onValueChange={field.onChange} value={field.value || null}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />

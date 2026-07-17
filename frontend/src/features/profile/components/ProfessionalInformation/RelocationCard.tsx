@@ -67,7 +67,7 @@ export function RelocationCard({ form }: RelocationCardProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Visa Sponsorship</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select visa needs" />
@@ -90,7 +90,7 @@ export function RelocationCard({ form }: RelocationCardProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Travel Availability</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select travel %" />

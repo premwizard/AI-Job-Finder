@@ -117,7 +117,7 @@ export function SkillDialog({ open, onOpenChange, skillToEdit }: SkillDialogProp
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || null}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
@@ -140,7 +140,7 @@ export function SkillDialog({ open, onOpenChange, skillToEdit }: SkillDialogProp
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Proficiency</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                    <Select onValueChange={field.onChange} value={field.value || null}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select level" />

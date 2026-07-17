@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # --- Languages ---
@@ -54,16 +54,12 @@ class PersonalInfoResponse(PersonalInfoUpdate):
 
 # --- Professional Summary ---
 class ProfessionalSummaryUpdate(BaseModel):
-    current_job_title: Optional[str] = None
-    current_company: Optional[str] = None
-    employment_status: Optional[str] = None
-    years_of_experience: Optional[str] = None
-    industry: Optional[str] = None
-    career_level: Optional[str] = None
-    expected_salary: Optional[str] = None
-    preferred_currency: Optional[str] = None
-    notice_period: Optional[str] = None
-    professional_summary: Optional[str] = None
+    headline: Optional[str] = Field(None, max_length=255)
+    professional_summary: Optional[str] = Field(None, max_length=2000)
+    career_objective: Optional[str] = Field(None, max_length=2000)
+    years_of_experience_summary: Optional[str] = Field(None, max_length=2000)
+    key_achievements: Optional[str] = Field(None, max_length=2000)
+    career_highlights: Optional[str] = Field(None, max_length=2000)
 
 
 class ProfessionalSummaryResponse(ProfessionalSummaryUpdate):

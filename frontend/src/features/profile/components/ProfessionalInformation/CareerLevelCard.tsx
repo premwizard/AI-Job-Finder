@@ -27,7 +27,7 @@ export function CareerLevelCard({ form }: CareerLevelCardProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Career Level</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select level" />
@@ -57,7 +57,7 @@ export function CareerLevelCard({ form }: CareerLevelCardProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Industry</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select industry" />

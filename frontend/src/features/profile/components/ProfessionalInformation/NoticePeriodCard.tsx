@@ -25,7 +25,7 @@ export function NoticePeriodCard({ form }: NoticePeriodCardProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Notice Period</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+              <Select onValueChange={field.onChange} value={field.value || null}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select notice period" />

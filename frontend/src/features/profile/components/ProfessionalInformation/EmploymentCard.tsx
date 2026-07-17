@@ -53,7 +53,7 @@ export function EmploymentCard({ form }: EmploymentCardProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Employment Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value || undefined} value={field.value || undefined}>
+                <Select onValueChange={field.onChange} value={field.value || null}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
