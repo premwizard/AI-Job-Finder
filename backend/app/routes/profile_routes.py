@@ -134,6 +134,13 @@ def update_ai_preferences(
 
 
 # --- Skills ---
+@router.get("/skills", response_model=list[profile_schemas.SkillResponse])
+def get_skills(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_skills(current_user.id)
+
 @router.post(
     "/skills",
     response_model=profile_schemas.SkillResponse,

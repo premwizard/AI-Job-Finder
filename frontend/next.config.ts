@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Self-host Google Fonts to avoid runtime CDN requests
-  optimizeFonts: true,
-
   async rewrites() {
     return [
       {

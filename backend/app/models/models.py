@@ -139,6 +139,19 @@ class Skill(Base):
     category: Any = Column(String, nullable=True)
     level: Any = Column(String, nullable=True)  # Beginner, Intermediate, Expert
     years_of_experience: Any = Column(Integer, nullable=True)
+    
+    # New Fields for Module 4
+    last_used: Any = Column(Integer, nullable=True)  # Year
+    currently_using: Any = Column(Boolean, default=False)
+    featured_skill: Any = Column(Boolean, default=False)
+    verified: Any = Column(Boolean, default=False)
+    
+    # Future AI Fields
+    ai_skill_confidence: Any = Column(Float, nullable=True)
+    resume_extracted: Any = Column(Boolean, default=False)
+    job_required: Any = Column(Boolean, default=False)
+    skill_gap: Any = Column(Boolean, default=False)
+    learning_priority: Any = Column(String, nullable=True)
 
     user = relationship("User", back_populates="skills")
 

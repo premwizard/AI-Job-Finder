@@ -6,7 +6,7 @@ import { getFullProfile, updateSocialProfiles } from "@/features/profile/service
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, Github, Linkedin, Twitter, Youtube, Link as LinkIcon } from "lucide-react";
+import { Loader2, Save, Link as LinkIcon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -76,11 +76,11 @@ export default function SocialProfilesPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="flex items-center gap-2"><Linkedin className="w-4 h-4 text-blue-600" /> LinkedIn</Label>
+            <Label className="flex items-center gap-2"><LinkIcon className="w-4 h-4 text-blue-600" /> LinkedIn</Label>
             <Input placeholder="https://linkedin.com/in/yourprofile" {...register("linkedin_url")} />
           </div>
           <div className="space-y-2">
-            <Label className="flex items-center gap-2"><Github className="w-4 h-4" /> GitHub</Label>
+            <Label className="flex items-center gap-2"><LinkIcon className="w-4 h-4" /> GitHub</Label>
             <Input placeholder="https://github.com/yourusername" {...register("github_url")} />
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function SocialProfilesPage() {
             <Input placeholder="https://yourwebsite.com" {...register("portfolio_url")} />
           </div>
           <div className="space-y-2">
-            <Label className="flex items-center gap-2"><Twitter className="w-4 h-4 text-sky-500" /> X (Twitter)</Label>
+            <Label className="flex items-center gap-2"><LinkIcon className="w-4 h-4 text-sky-500" /> X (Twitter)</Label>
             <Input placeholder="https://x.com/yourhandle" {...register("twitter_url")} />
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function SocialProfilesPage() {
             <Input placeholder="https://medium.com/@yourusername" {...register("medium_url")} />
           </div>
           <div className="space-y-2">
-            <Label className="flex items-center gap-2"><Youtube className="w-4 h-4 text-red-600" /> YouTube</Label>
+            <Label className="flex items-center gap-2"><LinkIcon className="w-4 h-4 text-red-600" /> YouTube</Label>
             <Input placeholder="https://youtube.com/c/yourchannel" {...register("youtube_url")} />
           </div>
         </div>

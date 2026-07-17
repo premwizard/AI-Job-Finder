@@ -460,8 +460,25 @@ class ProfileService:
         self.db.refresh(pref)
         return profile_schemas.AIPreferenceResponse(**pref.__dict__)
 
+    def get_skills(self, user_id: str):
+        return (
+            self.db.query(Skill)
+            .filter(Skill.user_id == user_id)
+            .order_by(Skill.featured_skill.desc(), Skill.skill_name.asc())
+            .all()
+        )
+
     # --- Generic List CRUD Helpers ---
     def _create_item(self, model_class, user_id: str, data):
+        # Prevent duplicates for skills
+        if model_class == Skill:
+            existing_skill = self.db.query(Skill).filter(
+                Skill.user_id == user_id, 
+                Skill.skill_name.ilike(data.skill_name)
+            ).first()
+            if existing_skill:
+                raise HTTPException(status_code=400, detail=f"Skill '{data.skill_name}' already exists.")
+
         item = model_class(user_id=user_id, **data.model_dump())
         self.db.add(item)
         self.db.commit()

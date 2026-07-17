@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getFullProfile } from "@/features/profile/services/profile.api";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, FolderGit2, Github, ExternalLink } from "lucide-react";
+import { Loader2, Plus, FolderGit2, ExternalLink, Code, Pencil } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -79,17 +79,13 @@ export default function ProjectsPage() {
               {(project.github_url || project.live_demo_url) && (
                 <CardFooter className="p-4 bg-muted/30 border-t flex gap-3">
                   {project.github_url && (
-                    <Button variant="outline" size="sm" className="w-full" asChild>
-                      <Link href={project.github_url} target="_blank">
-                        <Github className="w-4 h-4 mr-2" /> Code
-                      </Link>
+                    <Button variant="outline" size="sm" className="w-full" render={<Link href={project.github_url} target="_blank" />}>
+                      <Code className="w-4 h-4 mr-2" /> Code
                     </Button>
                   )}
                   {project.live_demo_url && (
-                    <Button variant="default" size="sm" className="w-full" asChild>
-                      <Link href={project.live_demo_url} target="_blank">
-                        <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
-                      </Link>
+                    <Button variant="default" size="sm" className="w-full" render={<Link href={project.live_demo_url} target="_blank" />}>
+                      <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
                     </Button>
                   )}
                 </CardFooter>

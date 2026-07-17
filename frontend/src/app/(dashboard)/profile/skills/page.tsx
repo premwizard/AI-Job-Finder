@@ -1,129 +1,217 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getFullProfile, addListItem, deleteListItem } from "@/features/profile/services/profile.api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, Plus, X } from "lucide-react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import React, { useState, useMemo } from 'react';
+import { useGetSkills, useUpdateSkill, useDeleteSkill } from '@/features/profile/hooks/useSkills';
+import { SkillCard } from '@/features/profile/components/Skills/SkillCard';
+import { SkillDialog } from '@/features/profile/components/Skills/SkillDialog';
+import { SkillResponse, SKILL_CATEGORIES } from '@/features/profile/types/skills';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Search, Layers, Star, Code2, Clock } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function SkillsPage() {
-  const queryClient = useQueryClient();
-  const [newSkill, setNewSkill] = useState("");
-  const [level, setLevel] = useState("Intermediate");
+  const { data: skills, isLoading } = useGetSkills();
+  const updateSkill = useUpdateSkill();
+  const deleteSkill = useDeleteSkill();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: getFullProfile,
-  });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [skillToEdit, setSkillToEdit] = useState<SkillResponse | null>(null);
 
-  const skills = profile?.skills || [];
-
-  const addMutation = useMutation({
-    mutationFn: async (skillData: any) => {
-      return addListItem("/profile/skills", skillData);
-    },
-    onSuccess: () => {
-      toast.success("Skill added.");
-      setNewSkill("");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+  // Derived state
+  const filteredSkills = useMemo(() => {
+    if (!skills) return [];
+    
+    let filtered = skills;
+    
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(s => s.category === selectedCategory);
     }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return deleteListItem("/profile/skills", id.toString());
-    },
-    onSuccess: () => {
-      toast.success("Skill removed.");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(s => s.skill_name.toLowerCase().includes(q));
     }
-  });
+    
+    return filtered;
+  }, [skills, selectedCategory, searchQuery]);
 
-  const handleAddSkill = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSkill.trim()) return;
-    addMutation.mutate({ skill_name: newSkill, level });
+  // Statistics
+  const stats = useMemo(() => {
+    if (!skills || skills.length === 0) return null;
+    
+    const categories = skills.map(s => s.category).filter(Boolean);
+    const topCategory = categories.sort((a,b) =>
+          categories.filter(v => v===a).length
+        - categories.filter(v => v===b).length
+    ).pop() || 'None';
+
+    const featuredCount = skills.filter(s => s.featured_skill).length;
+    
+    return {
+      total: skills.length,
+      topCategory,
+      featuredCount,
+    };
+  }, [skills]);
+
+  // Handlers
+  const handleEdit = (skill: SkillResponse) => {
+    setSkillToEdit(skill);
+    setIsDialogOpen(true);
   };
 
-  if (isLoading) {
-    return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted-foreground w-8 h-8" /></div>;
-  }
+  const handleAddNew = () => {
+    setSkillToEdit(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (skillId: number) => {
+    if (confirm('Are you sure you want to delete this skill?')) {
+      await deleteSkill.mutateAsync(skillId);
+    }
+  };
+
+  const handleToggleFeatured = async (skill: SkillResponse) => {
+    await updateSkill.mutateAsync({
+      id: skill.id,
+      data: { featured_skill: !skill.featured_skill }
+    });
+  };
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold">Skills</h2>
-        <p className="text-sm text-muted-foreground">Add skills to help our AI match you with the best jobs.</p>
-      </div>
-
-      <form onSubmit={handleAddSkill} className="flex gap-3 mb-8 items-end">
-        <div className="flex-1 space-y-2">
-          <label className="text-sm font-medium">Skill Name</label>
-          <Input 
-            placeholder="e.g. React, Python, Product Management" 
-            value={newSkill}
-            onChange={(e) => setNewSkill(e.target.value)}
-          />
+    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Code2 className="w-8 h-8 text-primary" />
+            Skills Management
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Manage your technical toolkit, soft skills, and expertise.
+          </p>
         </div>
-        <div className="w-48 space-y-2 hidden sm:block">
-          <label className="text-sm font-medium">Level</label>
-          <Select value={level} onValueChange={setLevel}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Beginner">Beginner</SelectItem>
-              <SelectItem value="Intermediate">Intermediate</SelectItem>
-              <SelectItem value="Expert">Expert</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button type="submit" disabled={addMutation.isPending || !newSkill.trim()}>
-          {addMutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+        <Button onClick={handleAddNew} size="lg" className="shadow-md">
+          <Plus className="w-5 h-5 mr-2" />
           Add Skill
         </Button>
-      </form>
-
-      <div className="space-y-4">
-        <h3 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">Your Skills</h3>
-        
-        {skills.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed rounded-lg bg-muted/20">
-            <p className="text-muted-foreground">No skills added yet.</p>
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill: any) => (
-              <Badge 
-                key={skill.id} 
-                variant="secondary" 
-                className="px-3 py-1.5 text-sm font-medium flex items-center gap-2 hover:bg-secondary/80 transition-colors"
-              >
-                {skill.skill_name}
-                <span className="text-xs opacity-50 font-normal">({skill.level || 'Intermediate'})</span>
-                <button
-                  type="button"
-                  onClick={() => deleteMutation.mutate(skill.id)}
-                  className="ml-1 hover:bg-background rounded-full p-0.5 transition-colors"
-                  disabled={deleteMutation.isPending}
-                >
-                  <X className="w-3 h-3 text-muted-foreground hover:text-destructive" />
-                </button>
-              </Badge>
-            ))}
-          </div>
-        )}
       </div>
+
+      {/* Statistics */}
+      {stats && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                <Layers className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Skills</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-blue-500/5 border-blue-500/20">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500">
+                <Star className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Top Skills (Pinned)</p>
+                <p className="text-2xl font-bold">{stats.featuredCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-emerald-500/5 border-emerald-500/20">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-3 bg-emerald-500/10 rounded-lg text-emerald-500">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Top Category</p>
+                <p className="text-xl font-bold truncate max-w-[150px]">{stats.topCategory}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search skills..." 
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9 bg-background"
+          />
+        </div>
+        <Select value={selectedCategory} onValueChange={(val: string | null) => setSelectedCategory(val || 'All')}>
+          <SelectTrigger className="w-full sm:w-[200px] bg-background">
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="All">All Categories</SelectItem>
+            {SKILL_CATEGORIES.map(c => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1,2,3,4,5,6].map(i => (
+            <Skeleton key={i} className="h-[140px] rounded-xl" />
+          ))}
+        </div>
+      ) : filteredSkills.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-4">
+          {filteredSkills.map(skill => (
+            <SkillCard 
+              key={skill.id} 
+              skill={skill} 
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleFeatured={handleToggleFeatured}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-20 bg-background/50 border border-dashed rounded-xl">
+          <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <Search className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">No skills found</h2>
+          <p className="text-muted-foreground mb-6">
+            {searchQuery || selectedCategory !== 'All' 
+              ? "We couldn't find any skills matching your search criteria."
+              : "You haven't added any skills yet. Start building your profile!"}
+          </p>
+          <Button onClick={handleAddNew}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Your First Skill
+          </Button>
+        </div>
+      )}
+
+      {/* Dialog */}
+      <SkillDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen}
+        skillToEdit={skillToEdit}
+      />
     </div>
   );
 }

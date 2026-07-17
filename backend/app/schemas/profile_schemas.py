@@ -108,6 +108,15 @@ class SkillCreate(BaseModel):
     category: Optional[str] = None
     level: Optional[str] = None
     years_of_experience: Optional[int] = None
+    last_used: Optional[int] = None
+    currently_using: Optional[bool] = False
+    featured_skill: Optional[bool] = False
+    verified: Optional[bool] = False
+    ai_skill_confidence: Optional[float] = None
+    resume_extracted: Optional[bool] = False
+    job_required: Optional[bool] = False
+    skill_gap: Optional[bool] = False
+    learning_priority: Optional[str] = None
 
 
 class SkillUpdate(BaseModel):
@@ -115,6 +124,15 @@ class SkillUpdate(BaseModel):
     category: Optional[str] = None
     level: Optional[str] = None
     years_of_experience: Optional[int] = None
+    last_used: Optional[int] = None
+    currently_using: Optional[bool] = None
+    featured_skill: Optional[bool] = None
+    verified: Optional[bool] = None
+    ai_skill_confidence: Optional[float] = None
+    resume_extracted: Optional[bool] = None
+    job_required: Optional[bool] = None
+    skill_gap: Optional[bool] = None
+    learning_priority: Optional[str] = None
 
 
 class SkillResponse(SkillCreate):

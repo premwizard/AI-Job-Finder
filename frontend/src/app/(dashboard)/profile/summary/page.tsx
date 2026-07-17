@@ -109,7 +109,7 @@ export default function ProfessionalSummaryPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-2">
             <Label>Employment Status</Label>
-            <Select onValueChange={(val) => setValue("employment_status", val)} value={watch("employment_status")}>
+            <Select onValueChange={(val) => setValue("employment_status", val || "")} value={watch("employment_status") || undefined}>
               <SelectTrigger>
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
@@ -123,7 +123,7 @@ export default function ProfessionalSummaryPage() {
           </div>
           <div className="space-y-2">
             <Label>Years of Experience</Label>
-            <Select onValueChange={(val) => setValue("years_of_experience", val)} value={watch("years_of_experience")}>
+            <Select onValueChange={(val) => setValue("years_of_experience", val || "")} value={watch("years_of_experience") || undefined}>
               <SelectTrigger>
                 <SelectValue placeholder="Select years" />
               </SelectTrigger>
@@ -138,7 +138,7 @@ export default function ProfessionalSummaryPage() {
           </div>
           <div className="space-y-2">
             <Label>Career Level</Label>
-            <Select onValueChange={(val) => setValue("career_level", val)} value={watch("career_level")}>
+            <Select onValueChange={(val) => setValue("career_level", val || "")} value={watch("career_level") || undefined}>
               <SelectTrigger>
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>

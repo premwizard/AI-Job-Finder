@@ -78,10 +78,8 @@ export default function CertificationsPage() {
 
                 {cert.verification_url && (
                   <div className="mt-6">
-                    <Button variant="outline" size="sm" className="w-full" asChild>
-                      <Link href={cert.verification_url} target="_blank">
-                        Show Credential <ExternalLink className="w-3 h-3 ml-2" />
-                      </Link>
+                    <Button variant="outline" size="sm" className="w-full" render={<Link href={cert.verification_url} target="_blank" />}>
+                      Show Credential <ExternalLink className="w-3 h-3 ml-2" />
                     </Button>
                   </div>
                 )}
