@@ -13,10 +13,34 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    Table,
+    Date,
 )
 from sqlalchemy.orm import relationship
 
 from app.database.database import Base
+
+# --- Association Tables ---
+experience_skills = Table(
+    "experience_skills",
+    Base.metadata,
+    Column("experience_id", String, ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True),
+    Column("skill_id", Integer, ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+)
+
+experience_projects = Table(
+    "experience_projects",
+    Base.metadata,
+    Column("experience_id", String, ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True),
+    Column("project_id", String, ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True)
+)
+
+project_skills = Table(
+    "project_skills",
+    Base.metadata,
+    Column("project_id", String, ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True),
+    Column("skill_id", Integer, ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+)
 
 
 class ApplicationStatus(str, enum.Enum):
@@ -158,6 +182,8 @@ class Skill(Base):
     learning_priority: Any = Column(String, nullable=True)
 
     user = relationship("User", back_populates="skills")
+    experiences = relationship("Experience", secondary="experience_skills", back_populates="skills")
+    projects = relationship("Project", secondary="project_skills", back_populates="skills")
 
 
 class Resume(Base):
@@ -359,15 +385,22 @@ class Experience(Base):
     role: Any = Column(String, nullable=False)
     employment_type: Any = Column(String, nullable=True)
     location: Any = Column(String, nullable=True)
+    department: Any = Column(String, nullable=True)
+    work_model: Any = Column(String, nullable=True)
     start_date: Any = Column(DateTime, nullable=True)
     end_date: Any = Column(DateTime, nullable=True)
     is_current: Any = Column(Boolean, default=False)
     description: Any = Column(Text, nullable=True)
     achievements: Any = Column(Text, nullable=True)  # JSON or Text
     technologies: Any = Column(String, nullable=True)  # Comma separated
+    manager_name: Any = Column(String, nullable=True)
+    order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User")
+    skills = relationship("Skill", secondary="experience_skills", back_populates="experiences")
+    projects = relationship("Project", secondary="experience_projects", back_populates="experiences")
 
 
 class Education(Base):
@@ -432,8 +465,11 @@ class Project(Base):
     challenges: Any = Column(Text, nullable=True)
     achievements: Any = Column(Text, nullable=True)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User")
+    skills = relationship("Skill", secondary="project_skills", back_populates="projects")
+    experiences = relationship("Experience", secondary="experience_projects", back_populates="projects")
 
 
 class CareerPreference(Base):

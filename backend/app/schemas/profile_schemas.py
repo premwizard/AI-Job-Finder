@@ -145,12 +145,18 @@ class ExperienceCreate(BaseModel):
     role: str
     employment_type: Optional[str] = None
     location: Optional[str] = None
+    department: Optional[str] = None
+    work_model: Optional[str] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     is_current: bool = False
     description: Optional[str] = None
     achievements: Optional[str] = None
     technologies: Optional[str] = None
+    manager_name: Optional[str] = None
+    order: Optional[int] = 0
+    skill_ids: Optional[List[int]] = []
+    project_ids: Optional[List[str]] = []
 
 
 class ExperienceUpdate(ExperienceCreate):
@@ -161,6 +167,9 @@ class ExperienceUpdate(ExperienceCreate):
 class ExperienceResponse(ExperienceCreate):
     id: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
+    skills: List[SkillResponse] = []
+    projects: List["ProjectResponse"] = []
 
     class Config:
         from_attributes = True
@@ -350,3 +359,5 @@ class ProfileCompletionResponse(BaseModel):
 
 class ImageUploadResponse(BaseModel):
     url: str
+
+ExperienceResponse.model_rebuild()

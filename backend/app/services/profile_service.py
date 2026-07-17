@@ -468,6 +468,48 @@ class ProfileService:
             .all()
         )
 
+    def create_experience(self, user_id: str, data: profile_schemas.ExperienceCreate):
+        data_dict = data.model_dump(exclude_unset=True)
+        skill_ids = data_dict.pop("skill_ids", [])
+        project_ids = data_dict.pop("project_ids", [])
+
+        exp = Experience(user_id=user_id, **data_dict)
+        if skill_ids:
+            skills = self.db.query(Skill).filter(Skill.id.in_(skill_ids), Skill.user_id == user_id).all()
+            exp.skills = skills
+        if project_ids:
+            projects = self.db.query(Project).filter(Project.id.in_(project_ids), Project.user_id == user_id).all()
+            exp.projects = projects
+
+        self.db.add(exp)
+        self.db.commit()
+        self.db.refresh(exp)
+        return exp
+
+    def update_experience(self, exp_id: str, user_id: str, data: profile_schemas.ExperienceUpdate):
+        exp = self.db.query(Experience).filter(Experience.id == exp_id, Experience.user_id == user_id).first()
+        if not exp:
+            raise HTTPException(status_code=404, detail="Experience not found")
+
+        data_dict = data.model_dump(exclude_unset=True)
+        skill_ids = data_dict.pop("skill_ids", None)
+        project_ids = data_dict.pop("project_ids", None)
+
+        for key, value in data_dict.items():
+            setattr(exp, key, value)
+
+        if skill_ids is not None:
+            skills = self.db.query(Skill).filter(Skill.id.in_(skill_ids), Skill.user_id == user_id).all()
+            exp.skills = skills
+            
+        if project_ids is not None:
+            projects = self.db.query(Project).filter(Project.id.in_(project_ids), Project.user_id == user_id).all()
+            exp.projects = projects
+
+        self.db.commit()
+        self.db.refresh(exp)
+        return exp
+
     # --- Generic List CRUD Helpers ---
     def _create_item(self, model_class, user_id: str, data):
         # Prevent duplicates for skills

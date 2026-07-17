@@ -184,22 +184,22 @@ def add_experience(
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
 ):
-    return service._create_item(Experience, current_user.id, req)
+    return service.create_experience(current_user.id, req)
 
 
 @router.put("/experience/{item_id}", response_model=profile_schemas.ExperienceResponse)
 def update_experience(
-    item_id: int,
+    item_id: str,
     req: profile_schemas.ExperienceUpdate,
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
 ):
-    return service._update_item(Experience, item_id, current_user.id, req)
+    return service.update_experience(item_id, current_user.id, req)
 
 
 @router.delete("/experience/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_experience(
-    item_id: int,
+    item_id: str,
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
 ):
