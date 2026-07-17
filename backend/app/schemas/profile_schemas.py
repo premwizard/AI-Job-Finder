@@ -69,6 +69,38 @@ class ProfessionalSummaryUpdate(BaseModel):
 class ProfessionalSummaryResponse(ProfessionalSummaryUpdate):
     pass
 
+# --- Professional Information (New Module) ---
+class ProfessionalInfoUpdate(BaseModel):
+    # From UserProfile
+    current_job_title: Optional[str] = None
+    current_company: Optional[str] = None
+    employment_status: Optional[str] = None
+    years_of_experience: Optional[str] = None
+    total_months_of_experience: Optional[int] = None
+    industry: Optional[str] = None
+    career_level: Optional[str] = None
+    current_annual_salary: Optional[str] = None
+    current_salary_currency: Optional[str] = None
+    salary_type: Optional[str] = None
+    notice_period: Optional[str] = None
+    
+    # From CareerPreference
+    expected_salary: Optional[str] = None
+    expected_joining_bonus: Optional[str] = None
+    negotiable_salary: Optional[bool] = None
+    preferred_currency: Optional[str] = None
+    employment_types: Optional[str] = None # JSON/CSV
+    work_setup: Optional[str] = None # JSON/CSV
+    preferred_locations: Optional[str] = None # JSON/CSV
+    preferred_time_zone: Optional[str] = None
+    willing_to_relocate: Optional[bool] = None
+    relocation_countries: Optional[str] = None
+    visa_status: Optional[str] = None
+    travel_willingness: Optional[str] = None
+
+class ProfessionalInfoResponse(ProfessionalInfoUpdate):
+    pass
+
 
 # --- Skills ---
 class SkillCreate(BaseModel):

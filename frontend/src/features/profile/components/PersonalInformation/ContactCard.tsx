@@ -11,7 +11,7 @@ import { PersonalInfoFormValues } from '../../utils/validators';
 import { PersonalInfoResponse } from '../../services/personal-info.service';
 
 interface ContactCardProps {
-  form: UseFormReturn<PersonalInfoFormValues>;
+  form: any;
   initialData?: PersonalInfoResponse;
 }
 

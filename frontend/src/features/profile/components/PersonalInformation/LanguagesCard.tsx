@@ -12,7 +12,7 @@ import { Plus, X } from 'lucide-react';
 import { PersonalInfoFormValues } from '../../utils/validators';
 
 interface LanguagesCardProps {
-  form: UseFormReturn<PersonalInfoFormValues>;
+  form: any;
 }
 
 export function LanguagesCard({ form }: LanguagesCardProps) {
@@ -29,7 +29,7 @@ export function LanguagesCard({ form }: LanguagesCardProps) {
     
     // Check if already exists
     const exists = form.getValues('languages')?.some(
-      l => l.name.toLowerCase() === newLanguage.trim().toLowerCase()
+      (l: any) => l.name.toLowerCase() === newLanguage.trim().toLowerCase()
     );
     
     if (!exists) {
@@ -75,7 +75,7 @@ export function LanguagesCard({ form }: LanguagesCardProps) {
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Proficiency
             </label>
-            <Select value={newProficiency} onValueChange={setNewProficiency}>
+            <Select value={newProficiency} onValueChange={(val) => setNewProficiency(val || 'Native')}>
               <SelectTrigger>
                 <SelectValue placeholder="Select level" />
               </SelectTrigger>
@@ -101,7 +101,7 @@ export function LanguagesCard({ form }: LanguagesCardProps) {
 
         {fields.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-2">
-            {fields.map((field, index) => (
+            {fields.map((field: any, index: number) => (
               <Badge 
                 key={field.id} 
                 variant="secondary"

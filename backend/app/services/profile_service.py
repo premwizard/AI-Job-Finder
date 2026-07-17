@@ -368,6 +368,66 @@ class ProfileService:
         self.db.refresh(pref)
         return profile_schemas.CareerPreferenceResponse(**pref.__dict__)
 
+    # --- Professional Information (New Module) ---
+    def get_professional_info(self, user_id: str) -> profile_schemas.ProfessionalInfoResponse:
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+
+        if not profile:
+            profile = UserProfile(user_id=user_id)
+            self.db.add(profile)
+        if not career_pref:
+            career_pref = CareerPreference(user_id=user_id)
+            self.db.add(career_pref)
+            
+        self.db.commit()
+
+        resp_data = {}
+        if profile:
+            resp_data.update(profile.__dict__)
+        if career_pref:
+            resp_data.update(career_pref.__dict__)
+            
+        return profile_schemas.ProfessionalInfoResponse(**resp_data)
+
+    def update_professional_info(self, user_id: str, data: profile_schemas.ProfessionalInfoUpdate) -> profile_schemas.ProfessionalInfoResponse:
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+
+        if not profile:
+            profile = UserProfile(user_id=user_id)
+            self.db.add(profile)
+        if not career_pref:
+            career_pref = CareerPreference(user_id=user_id)
+            self.db.add(career_pref)
+
+        data_dict = data.model_dump(exclude_unset=True)
+        
+        # Determine which fields go to UserProfile and which go to CareerPreference
+        profile_fields = [
+            "current_job_title", "current_company", "employment_status", 
+            "years_of_experience", "total_months_of_experience", "industry", 
+            "career_level", "current_annual_salary", "current_salary_currency", 
+            "salary_type", "notice_period"
+        ]
+        
+        career_pref_fields = [
+            "expected_salary", "expected_joining_bonus", "negotiable_salary",
+            "preferred_currency", "employment_types", "work_setup", 
+            "preferred_locations", "preferred_time_zone", "willing_to_relocate", 
+            "relocation_countries", "visa_status", "travel_willingness"
+        ]
+        
+        for key, value in data_dict.items():
+            if key in profile_fields:
+                setattr(profile, key, value)
+            elif key in career_pref_fields:
+                setattr(career_pref, key, value)
+
+        self.db.commit()
+        
+        return self.get_professional_info(user_id)
+
     def update_social_profiles(
         self, user_id: str, data: profile_schemas.SocialProfileUpdate
     ):

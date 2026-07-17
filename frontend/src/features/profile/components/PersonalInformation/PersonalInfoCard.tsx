@@ -11,7 +11,7 @@ import { AvatarUploader } from './AvatarUploader';
 import { PersonalInfoResponse } from '../../services/personal-info.service';
 
 interface PersonalInfoCardProps {
-  form: UseFormReturn<PersonalInfoFormValues>;
+  form: any;
   initialData?: PersonalInfoResponse;
 }
 

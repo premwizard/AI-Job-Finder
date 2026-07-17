@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { PersonalInfoFormValues } from '../../utils/validators';
 
 interface LocationCardProps {
-  form: UseFormReturn<PersonalInfoFormValues>;
+  form: any;
 }
 
 export function LocationCard({ form }: LocationCardProps) {

@@ -78,6 +78,22 @@ def update_personal_info(
 ):
     return service.update_personal_info(current_user.id, req)
 
+# --- Professional Information (New Module) ---
+@router.get("/professional", response_model=profile_schemas.ProfessionalInfoResponse)
+def get_professional_info(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_professional_info(current_user.id)
+
+@router.put("/professional", response_model=profile_schemas.ProfessionalInfoResponse)
+def update_professional_info(
+    req: profile_schemas.ProfessionalInfoUpdate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_professional_info(current_user.id, req)
+
 
 @router.put("/summary", response_model=profile_schemas.ProfessionalSummaryResponse)
 def update_professional_summary(
