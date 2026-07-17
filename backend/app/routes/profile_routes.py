@@ -172,8 +172,14 @@ def delete_skill(
 ):
     service._delete_item(Skill, item_id, current_user.id)
 
-
 # --- Experience ---
+@router.get("/experience", response_model=list[profile_schemas.ExperienceResponse])
+def get_experiences(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_experiences(current_user.id)
+
 @router.post(
     "/experience",
     response_model=profile_schemas.ExperienceResponse,

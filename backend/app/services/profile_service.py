@@ -467,6 +467,14 @@ class ProfileService:
             .order_by(Skill.featured_skill.desc(), Skill.skill_name.asc())
             .all()
         )
+    def get_experiences(self, user_id: str):
+        return (
+            self.db.query(Experience)
+            .filter(Experience.user_id == user_id)
+            .order_by(Experience.order.asc(), Experience.start_date.desc())
+            .all()
+        )
+
 
     def create_experience(self, user_id: str, data: profile_schemas.ExperienceCreate):
         data_dict = data.model_dump(exclude_unset=True)
