@@ -14,7 +14,8 @@ from app.routes import (
     settings_routes,
     social_auth_routes,
 )
-from src.api.routers import analytics, applications, resume, saved_jobs, users
+from src.api.routers import analytics, applications, resume, saved_jobs, users, work_experience
+
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -42,6 +43,7 @@ app.include_router(analytics.router)
 app.include_router(resume.router)
 app.include_router(saved_jobs.router)
 app.include_router(applications.router)
+app.include_router(work_experience.router)
 
 from fastapi.staticfiles import StaticFiles
 

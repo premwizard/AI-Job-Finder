@@ -1,9 +1,9 @@
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, date
+from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr
 
-from src.models.models import ApplicationStatus
+from src.models.models import ApplicationStatus, EmploymentType, WorkModel
 
 
 # Common generic properties
@@ -118,3 +118,75 @@ class AnalyticsResponse(BaseSchema):
     matched_jobs: int
     applications_sent: int
     created_at: datetime
+
+
+# --- Project Schemas ---
+class ProjectBase(BaseSchema):
+    name: str
+    description: Optional[str] = None
+
+
+class ProjectCreate(ProjectBase):
+    pass
+
+
+class ProjectResponse(ProjectBase):
+    id: int
+    user_id: int
+    created_at: datetime
+
+
+# --- Work Experience Schemas ---
+class WorkExperienceBase(BaseSchema):
+    company_name: str
+    company_logo: Optional[str] = None
+    role: str
+    department: Optional[str] = None
+    employment_type: EmploymentType = EmploymentType.full_time
+    location: Optional[str] = None
+    work_model: WorkModel = WorkModel.onsite
+    start_date: date
+    end_date: Optional[date] = None
+    is_current: bool = False
+    description: Optional[str] = None
+    achievements: Optional[str] = None
+    technologies_used: Optional[str] = None
+    manager_name: Optional[str] = None
+    sort_order: int = 0
+
+
+class WorkExperienceCreate(WorkExperienceBase):
+    skill_ids: Optional[List[int]] = []
+    project_ids: Optional[List[int]] = []
+
+
+class WorkExperienceUpdate(BaseModel):
+    company_name: Optional[str] = None
+    company_logo: Optional[str] = None
+    role: Optional[str] = None
+    department: Optional[str] = None
+    employment_type: Optional[EmploymentType] = None
+    location: Optional[str] = None
+    work_model: Optional[WorkModel] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_current: Optional[bool] = None
+    description: Optional[str] = None
+    achievements: Optional[str] = None
+    technologies_used: Optional[str] = None
+    manager_name: Optional[str] = None
+    sort_order: Optional[int] = None
+    skill_ids: Optional[List[int]] = None
+    project_ids: Optional[List[int]] = None
+
+    class Config:
+        from_attributes = True
+
+
+class WorkExperienceResponse(WorkExperienceBase):
+    id: int
+    user_id: int
+    created_at: datetime
+    updated_at: datetime
+    skills_used: List[SkillResponse] = []
+    projects: List[ProjectResponse] = []
