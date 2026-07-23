@@ -513,6 +513,10 @@ class ProfileService:
         from app.services.resume_cleaning_service import ResumeCleaningService
         return ResumeCleaningService(self.db).clean_user_resume(user_id, resume_id)
 
+    def parse_resume_ai(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        from app.services.ai_resume_parser_service import AIResumeParserBackendService
+        return AIResumeParserBackendService(self.db).parse_resume(user_id, resume_id)
+
     def set_active_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
         """Set a specific resume version as active and deactivate all others."""
         resume = self.db.query(Resume).filter(

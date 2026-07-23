@@ -446,9 +446,11 @@ class ResumeResponse(BaseModel):
     parsing_status: str
     raw_text: Optional[str] = None
     clean_text: Optional[str] = None
+    parsed_data_json: Optional[str] = None
     processing_error: Optional[str] = None
     processed_at: Optional[datetime] = None
     cleaned_at: Optional[datetime] = None
+    parsed_at: Optional[datetime] = None
     ocr_confidence: Optional[float] = None
     ocr_processing_time_ms: Optional[float] = None
     is_low_confidence: Optional[bool] = False

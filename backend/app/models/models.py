@@ -207,9 +207,11 @@ class Resume(Base):
     parsing_status: Any = Column(String, default="Queued")  # Queued, Processing, Completed, Failed
     raw_text: Any = Column(Text, nullable=True)
     clean_text: Any = Column(Text, nullable=True)
+    parsed_data_json: Any = Column(Text, nullable=True)
     processing_error: Any = Column(Text, nullable=True)
     processed_at: Any = Column(DateTime, nullable=True)
     cleaned_at: Any = Column(DateTime, nullable=True)
+    parsed_at: Any = Column(DateTime, nullable=True)
     ocr_confidence: Any = Column(Float, nullable=True)
     ocr_processing_time_ms: Any = Column(Float, nullable=True)
     is_low_confidence: Any = Column(Boolean, default=False)

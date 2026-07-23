@@ -11,9 +11,11 @@ export interface ResumeItem {
   parsing_status: string;
   raw_text?: string | null;
   clean_text?: string | null;
+  parsed_data_json?: string | null;
   processing_error?: string | null;
   processed_at?: string | null;
   cleaned_at?: string | null;
+  parsed_at?: string | null;
   ocr_confidence?: number | null;
   ocr_processing_time_ms?: number | null;
   is_low_confidence?: boolean;

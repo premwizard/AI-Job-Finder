@@ -500,6 +500,44 @@ def clean_resume_text(
     return service.clean_resume_text(current_user.id, resume_id)
 
 
+@router.post(
+    "/resume/{resume_id}/parse",
+    response_model=profile_schemas.ResumeResponse,
+)
+def parse_resume_ai(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.parse_resume_ai(current_user.id, resume_id)
+
+
+@router.get("/resume/{resume_id}/parsed-data")
+def get_resume_parsed_data(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    resumes = service.get_resumes(current_user.id)
+    target = next((r for r in resumes if r.id == resume_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    parsed_json = {}
+    if target.parsed_data_json:
+        try:
+            import json
+            parsed_json = json.loads(target.parsed_data_json)
+        except Exception:
+            pass
+    return {
+        "id": target.id,
+        "file_name": target.file_name,
+        "parsing_status": target.parsing_status,
+        "parsed_at": target.parsed_at,
+        "parsed_data": parsed_json,
+    }
+
+
 @router.get("/resume/{resume_id}/text")
 @router.get("/resume/{resume_id}/cleaned-text")
 def get_resume_raw_and_cleaned_text(

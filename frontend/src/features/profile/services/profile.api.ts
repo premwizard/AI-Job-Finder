@@ -226,6 +226,16 @@ export const getResumeCleanedText = async (resumeId: number) => {
   return response.data;
 };
 
+export const parseResumeAI = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/parse`);
+  return response.data;
+};
+
+export const getResumeParsedData = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/parsed-data`);
+  return response.data;
+};
+
 // Career Preferences API
 export const getCareerPreferences = async () => {
   const response = await authApi.get(`${PROFILE_URL}/career-preferences`);

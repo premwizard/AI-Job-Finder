@@ -296,6 +296,16 @@ class DocumentProcessingService:
             resume.clean_text = ResumeCleaner.clean_raw_text(resume.raw_text)
             resume.cleaned_at = datetime.utcnow()
 
+            # Run AI Resume Parser Engine (Gemini Flash)
+            try:
+                from app.services.ai_resume_parser_service import AIResumeParserService
+                target_text = resume.clean_text or resume.raw_text
+                parsed = AIResumeParserService.parse_with_gemini(target_text)
+                resume.parsed_data_json = parsed.model_dump_json()
+                resume.parsed_at = datetime.utcnow()
+            except Exception:
+                pass
+
         self.db.commit()
         self.db.refresh(resume)
         return profile_schemas.ResumeResponse.model_validate(resume)
