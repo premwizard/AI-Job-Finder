@@ -9,6 +9,7 @@ from app.middleware.auth_middleware import get_current_user
 from app.models.models import Certification, Education, Experience, Project, Resume, Skill, User
 from app.schemas import profile_schemas
 from app.services.profile_service import ProfileService
+from app.services.profile_approval_service import ApproveMergeRequest
 
 router = APIRouter(prefix="/api/profile", tags=["Profile"])
 
@@ -545,6 +546,17 @@ def get_resume_merge_suggestions(
     current_user: User = Depends(get_current_user),
 ):
     return service.get_merge_suggestions(current_user.id, resume_id)
+
+
+@router.post("/resume/{resume_id}/approve-merge")
+def approve_resume_merge(
+    resume_id: int,
+    request: ApproveMergeRequest,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    request.resume_id = resume_id
+    return service.approve_resume_merge(current_user.id, request)
 
 
 @router.get("/resume/{resume_id}/text")

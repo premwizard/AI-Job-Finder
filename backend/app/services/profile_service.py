@@ -521,6 +521,10 @@ class ProfileService:
         from app.services.profile_merge_service import ProfileMergeService
         return ProfileMergeService(self.db).generate_merge_suggestions(user_id, resume_id)
 
+    def approve_resume_merge(self, user_id: str, request):
+        from app.services.profile_approval_service import ProfileApprovalService
+        return ProfileApprovalService(self.db).apply_approved_merge(user_id, request)
+
     def set_active_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
         """Set a specific resume version as active and deactivate all others."""
         resume = self.db.query(Resume).filter(
