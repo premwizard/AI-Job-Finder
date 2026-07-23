@@ -537,17 +537,23 @@ class AIPreference(Base):
         String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
-    dream_companies: Any = Column(String, nullable=True)
-    dream_roles: Any = Column(String, nullable=True)
-    dream_technologies: Any = Column(String, nullable=True)
-    preferred_ai_domains: Any = Column(String, nullable=True)
+    # Aspirations
+    dream_companies: Any = Column(String, nullable=True)         # CSV chips
+    dream_roles: Any = Column(String, nullable=True)             # CSV chips
+    dream_technologies: Any = Column(String, nullable=True)      # CSV chips
+    # AI & Learning
+    preferred_ai_domains: Any = Column(String, nullable=True)    # CSV chips
     learning_goals: Any = Column(Text, nullable=True)
-    interview_level: Any = Column(String, nullable=True)
+    preferred_learning_resources: Any = Column(String, nullable=True)  # CSV: "Coursera,YouTube"
+    # Career Goals
     target_salary: Any = Column(String, nullable=True)
-    target_country: Any = Column(String, nullable=True)
+    target_country: Any = Column(String, nullable=True)          # Legacy single
+    target_countries: Any = Column(String, nullable=True)        # CSV chips
     career_objectives: Any = Column(Text, nullable=True)
+    career_growth_priorities: Any = Column(String, nullable=True)  # CSV chips
+    # Meta
+    interview_level: Any = Column(String, nullable=True)
     job_search_frequency: Any = Column(String, nullable=True)
-    career_growth_priorities: Any = Column(String, nullable=True)
     updated_at: Any = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )

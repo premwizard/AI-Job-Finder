@@ -126,6 +126,14 @@ def update_career_preferences(
     return service.update_career_preferences(current_user.id, req)
 
 
+@router.get("/social", response_model=profile_schemas.SocialProfileResponse)
+def get_social_profiles(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_social_profiles(current_user.id)
+
+
 @router.put("/social", response_model=profile_schemas.SocialProfileResponse)
 def update_social_profiles(
     req: profile_schemas.SocialProfileUpdate,

@@ -211,8 +211,14 @@ export const updateCareerPreferences = async (data: any) => {
   const response = await authApi.put(`${PROFILE_URL}/career-preferences`, data);
   return response.data;
 };
+// Social Profiles API
+export const getSocialProfiles = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/social`);
+  return response.data;
+};
 
-
-
-
+export const updateSocialProfiles = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/social`, data);
+  return response.data;
+};
 

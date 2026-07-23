@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -371,9 +371,27 @@ class SocialProfileUpdate(BaseModel):
     youtube_url: Optional[str] = None
     twitter_url: Optional[str] = None
 
+    @classmethod
+    def validate_url(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or v.strip() == "":
+            return None
+        v = v.strip()
+        if not v.startswith(("http://", "https://")):
+            v = f"https://{v}"
+        return v
+
+    def model_post_init(self, __context: Any) -> None:
+        for field in self.model_fields:
+            val = getattr(self, field, None)
+            if isinstance(val, str):
+                setattr(self, field, self.validate_url(val))
+
 
 class SocialProfileResponse(SocialProfileUpdate):
-    pass
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 # --- AI Preferences ---

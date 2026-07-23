@@ -618,6 +618,16 @@ class ProfileService:
         
         return self.get_professional_info(user_id)
 
+    def get_social_profiles(self, user_id: str) -> profile_schemas.SocialProfileResponse:
+        social = (
+            self.db.query(SocialProfile)
+            .filter(SocialProfile.user_id == user_id)
+            .first()
+        )
+        if not social:
+            return profile_schemas.SocialProfileResponse()
+        return profile_schemas.SocialProfileResponse.model_validate(social)
+
     def update_social_profiles(
         self, user_id: str, data: profile_schemas.SocialProfileUpdate
     ):
@@ -633,7 +643,7 @@ class ProfileService:
             setattr(social, key, value)
         self.db.commit()
         self.db.refresh(social)
-        return profile_schemas.SocialProfileResponse(**social.__dict__)
+        return profile_schemas.SocialProfileResponse.model_validate(social)
 
     def update_ai_preferences(
         self, user_id: str, data: profile_schemas.AIPreferenceUpdate

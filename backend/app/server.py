@@ -76,6 +76,8 @@ def startup_event():
             "ALTER TABLE career_preferences ADD COLUMN preferred_cities VARCHAR",
             "ALTER TABLE career_preferences ADD COLUMN startup_or_enterprise VARCHAR",
             "ALTER TABLE career_preferences ADD COLUMN negotiable_salary BOOLEAN DEFAULT 0",
+            "ALTER TABLE ai_preferences ADD COLUMN preferred_learning_resources VARCHAR",
+            "ALTER TABLE ai_preferences ADD COLUMN target_countries VARCHAR",
         ]:
             try:
                 conn.execute(text(col_def))
