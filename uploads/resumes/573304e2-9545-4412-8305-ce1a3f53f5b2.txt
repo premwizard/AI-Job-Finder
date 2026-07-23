@@ -1,0 +1,4 @@
+John Doe
+Senior Full Stack Software Engineer
+Skills: Python, TypeScript, React, PostgreSQL
+Experience: 5 years at Tech Corp.

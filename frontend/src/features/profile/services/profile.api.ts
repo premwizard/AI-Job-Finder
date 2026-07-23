@@ -201,6 +201,31 @@ export const deleteResume = async (resumeId: number) => {
   return response.data;
 };
 
+export const activateResume = async (resumeId: number) => {
+  const response = await authApi.put(`${PROFILE_URL}/resume/activate/${resumeId}`);
+  return response.data;
+};
+
+export const processResumeDocument = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/process`);
+  return response.data;
+};
+
+export const getResumeRawText = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/text`);
+  return response.data;
+};
+
+export const cleanResumeText = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/clean`);
+  return response.data;
+};
+
+export const getResumeCleanedText = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/cleaned-text`);
+  return response.data;
+};
+
 // Career Preferences API
 export const getCareerPreferences = async () => {
   const response = await authApi.get(`${PROFILE_URL}/career-preferences`);

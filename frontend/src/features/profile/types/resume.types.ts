@@ -3,10 +3,21 @@ export interface ResumeItem {
   file_url: string;
   file_name?: string | null;
   file_size?: number | null;     // bytes
-  file_type?: string | null;     // "PDF", "DOCX", etc.
+  file_type?: string | null;     // "PDF", "DOCX", "PNG", etc.
+  mime_type?: string | null;
+  file_hash?: string | null;
   version: number;
   is_active: boolean;
   parsing_status: string;
+  raw_text?: string | null;
+  clean_text?: string | null;
+  processing_error?: string | null;
+  processed_at?: string | null;
+  cleaned_at?: string | null;
+  ocr_confidence?: number | null;
+  ocr_processing_time_ms?: number | null;
+  is_low_confidence?: boolean;
+  ocr_provider?: string | null;
   resume_score?: number | null;  // Reserved - AI
   ats_score?: number | null;     // Reserved - AI
   ai_summary?: string | null;    // Reserved - AI

@@ -424,6 +424,8 @@ class ResumeCreate(BaseModel):
     file_name: Optional[str] = None
     file_size: Optional[int] = None
     file_type: Optional[str] = None
+    mime_type: Optional[str] = None
+    file_hash: Optional[str] = None
     version: int = 1
     is_active: bool = True
     parsing_status: str = "Ready"
@@ -435,11 +437,22 @@ class ResumeResponse(BaseModel):
     file_name: Optional[str] = None
     file_size: Optional[int] = None
     file_type: Optional[str] = None
+    mime_type: Optional[str] = None
+    file_hash: Optional[str] = None
     version: int
     is_active: bool = True
     resume_score: Optional[float] = None
     ats_score: Optional[float] = None
     parsing_status: str
+    raw_text: Optional[str] = None
+    clean_text: Optional[str] = None
+    processing_error: Optional[str] = None
+    processed_at: Optional[datetime] = None
+    cleaned_at: Optional[datetime] = None
+    ocr_confidence: Optional[float] = None
+    ocr_processing_time_ms: Optional[float] = None
+    is_low_confidence: Optional[bool] = False
+    ocr_provider: Optional[str] = None
     ai_summary: Optional[str] = None
     uploaded_at: datetime
     updated_at: datetime

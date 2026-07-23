@@ -196,13 +196,24 @@ class Resume(Base):
     file_name: Any = Column(String, nullable=True)
     file_size: Any = Column(Integer, nullable=True)  # in bytes
     file_type: Any = Column(String, nullable=True)   # e.g. "PDF", "DOCX"
+    mime_type: Any = Column(String, nullable=True)   # e.g. "application/pdf"
+    file_hash: Any = Column(String, nullable=True)   # SHA-256 content hash
     version: Any = Column(Integer, default=1)
     is_active: Any = Column(Boolean, default=True)
 
     # Reserved — AI / Parsing fields (not implemented yet)
     resume_score: Any = Column(Float, nullable=True)
     ats_score: Any = Column(Float, nullable=True)
-    parsing_status: Any = Column(String, default="Ready")  # Ready, Processing, Completed
+    parsing_status: Any = Column(String, default="Queued")  # Queued, Processing, Completed, Failed
+    raw_text: Any = Column(Text, nullable=True)
+    clean_text: Any = Column(Text, nullable=True)
+    processing_error: Any = Column(Text, nullable=True)
+    processed_at: Any = Column(DateTime, nullable=True)
+    cleaned_at: Any = Column(DateTime, nullable=True)
+    ocr_confidence: Any = Column(Float, nullable=True)
+    ocr_processing_time_ms: Any = Column(Float, nullable=True)
+    is_low_confidence: Any = Column(Boolean, default=False)
+    ocr_provider: Any = Column(String, nullable=True)
     ai_summary: Any = Column(Text, nullable=True)
 
     uploaded_at: Any = Column(DateTime, default=datetime.utcnow)

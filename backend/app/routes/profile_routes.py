@@ -1,5 +1,7 @@
+import os
 from typing import List
-from fastapi import APIRouter, Depends, status, UploadFile, File
+from fastapi import APIRouter, Depends, status, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
@@ -440,6 +442,10 @@ def upload_resume(
     "/resume/replace/{resume_id}",
     response_model=profile_schemas.ResumeResponse,
 )
+@router.put(
+    "/resume/replace/{resume_id}",
+    response_model=profile_schemas.ResumeResponse,
+)
 def replace_resume(
     resume_id: int,
     file: UploadFile = File(...),
@@ -449,6 +455,18 @@ def replace_resume(
     return service.replace_resume(current_user.id, resume_id, file)
 
 
+@router.put(
+    "/resume/activate/{resume_id}",
+    response_model=profile_schemas.ResumeResponse,
+)
+def set_active_resume(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.set_active_resume(current_user.id, resume_id)
+
+
 @router.delete("/resume/{resume_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_resume(
     resume_id: int,
@@ -456,6 +474,73 @@ def delete_resume(
     current_user: User = Depends(get_current_user),
 ):
     service.delete_resume(current_user.id, resume_id)
+
+
+@router.post(
+    "/resume/{resume_id}/process",
+    response_model=profile_schemas.ResumeResponse,
+)
+def process_resume_document(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.process_resume_document(current_user.id, resume_id)
+
+
+@router.post(
+    "/resume/{resume_id}/clean",
+    response_model=profile_schemas.ResumeResponse,
+)
+def clean_resume_text(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.clean_resume_text(current_user.id, resume_id)
+
+
+@router.get("/resume/{resume_id}/text")
+@router.get("/resume/{resume_id}/cleaned-text")
+def get_resume_raw_and_cleaned_text(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    resumes = service.get_resumes(current_user.id)
+    target = next((r for r in resumes if r.id == resume_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    return {
+        "id": target.id,
+        "file_name": target.file_name,
+        "parsing_status": target.parsing_status,
+        "raw_text": target.raw_text,
+        "clean_text": target.clean_text,
+        "processing_error": target.processing_error,
+        "processed_at": target.processed_at,
+        "cleaned_at": target.cleaned_at,
+    }
+
+
+@router.get("/resume/{resume_id}/download")
+def download_resume(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    resumes = service.get_resumes(current_user.id)
+    target = next((r for r in resumes if r.id == resume_id), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Resume not found")
+    file_path = target.file_url.lstrip("/")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Resume file missing from storage")
+    return FileResponse(
+        path=file_path,
+        filename=target.file_name or f"resume_v{target.version}.pdf",
+        media_type=target.mime_type or "application/octet-stream",
+    )
 
 
 # --- Achievements ---

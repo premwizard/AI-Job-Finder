@@ -6,12 +6,27 @@ import {
   getResumes,
   uploadResumeFile,
   replaceResumeFile,
+  activateResume,
   deleteResume,
+  processResumeDocument,
+  cleanResumeText,
 } from "@/features/profile/services/profile.api";
 import { ResumeItem, formatFileSize } from "@/features/profile/types/resume.types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 import {
   FileText,
   UploadCloud,
@@ -33,6 +48,13 @@ import {
   ScanText,
   Layers,
   AlertCircle,
+  Eye,
+  Check,
+  RotateCw,
+  Copy,
+  Cpu,
+  AlertTriangle,
+  Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -46,6 +68,9 @@ function FileTypeBadge({ type }: { type?: string | null }) {
     DOC:  "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25",
     TXT:  "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/25",
     RTF:  "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/25",
+    PNG:  "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/25",
+    JPEG: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/25",
+    WEBP: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/25",
   };
   const label = type || "FILE";
   return (
@@ -66,6 +91,227 @@ function VersionBadge({ version, isActive }: { version: number; isActive: boolea
       {isActive && <CheckCircle2 className="w-3 h-3 mr-1" />}
       v{version}.0 {isActive ? "• Active" : ""}
     </Badge>
+  );
+}
+
+function OcrConfidenceBadge({ confidence, isLow }: { confidence?: number | null; isLow?: boolean }) {
+  if (confidence == null) return null;
+
+  if (isLow || confidence < 60) {
+    return (
+      <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-semibold text-xs flex items-center gap-1">
+        <AlertTriangle className="w-3 h-3 text-red-500" /> {confidence}% OCR (Low)
+      </Badge>
+    );
+  }
+  if (confidence >= 85) {
+    return (
+      <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold text-xs flex items-center gap-1">
+        <CheckCircle2 className="w-3 h-3 text-emerald-500" /> {confidence}% OCR (High)
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold text-xs flex items-center gap-1">
+      <Clock className="w-3 h-3 text-amber-500" /> {confidence}% OCR
+    </Badge>
+  );
+}
+
+function ProcessingStatusBadge({ status, error }: { status?: string; error?: string | null }) {
+  const s = status || "Queued";
+  if (s === "Completed") {
+    return (
+      <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold text-xs flex items-center gap-1">
+        <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Extracted & Cleaned
+      </Badge>
+    );
+  }
+  if (s === "Processing") {
+    return (
+      <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-semibold text-xs flex items-center gap-1">
+        <Loader2 className="w-3 h-3 text-blue-500 animate-spin" /> Processing…
+      </Badge>
+    );
+  }
+  if (s === "Failed") {
+    return (
+      <Badge
+        title={error || "Processing failed"}
+        className="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-semibold text-xs flex items-center gap-1"
+      >
+        <AlertCircle className="w-3 h-3 text-red-500" /> Extraction Failed
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 font-semibold text-xs flex items-center gap-1">
+      <Clock className="w-3 h-3 text-amber-500" /> Queued
+    </Badge>
+  );
+}
+
+// ── Preview Modal Component ───────────────────────────────────────────────────
+
+interface PreviewModalProps {
+  resume: ResumeItem | null;
+  onClose: () => void;
+}
+
+function ResumePreviewModal({ resume, onClose }: PreviewModalProps) {
+  if (!resume) return null;
+
+  const backendBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const fileUrl = `${backendBase}${resume.file_url}`;
+  const fileExt = (resume.file_type || "").toUpperCase();
+  const isImage = ["PNG", "JPEG", "JPG", "WEBP"].includes(fileExt);
+  const isPdf = fileExt === "PDF";
+
+  return (
+    <Dialog open={!!resume} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-4xl max-h-[85vh] flex flex-col p-6">
+        <DialogHeader className="pb-3 border-b">
+          <DialogTitle className="flex items-center gap-2 text-base font-bold">
+            <Eye className="w-4 h-4 text-primary" />
+            Resume Document Preview — {resume.file_name} (v{resume.version})
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-auto min-h-[400px] flex items-center justify-center p-2 bg-muted/20 rounded-lg">
+          {isImage ? (
+            <img
+              src={fileUrl}
+              alt={resume.file_name || "Resume preview"}
+              className="max-h-[600px] max-w-full object-contain rounded border shadow-sm"
+            />
+          ) : isPdf ? (
+            <iframe
+              src={fileUrl}
+              className="w-full h-[600px] rounded border"
+              title="PDF Resume Preview"
+            />
+          ) : (
+            <div className="text-center space-y-3 p-8">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <FileText className="w-8 h-8 text-primary" />
+              </div>
+              <p className="font-semibold text-sm">{resume.file_name}</p>
+              <p className="text-xs text-muted-foreground">
+                Direct in-browser document preview is supported for PDF, PNG, JPG, and WEBP.
+              </p>
+              <Button size="sm" asChild variant="outline" className="mt-2">
+                <a href={`${backendBase}/api/profile/resume/${resume.id}/download`} download>
+                  <Download className="w-4 h-4 mr-2" /> Download Document
+                </a>
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Extracted & Cleaned Text Modal Component ─────────────────────────────────
+
+interface ExtractedTextModalProps {
+  resume: ResumeItem | null;
+  onClose: () => void;
+  onReClean: (id: number) => void;
+  isCleaning: boolean;
+}
+
+function ExtractedTextModal({ resume, onClose, onReClean, isCleaning }: ExtractedTextModalProps) {
+  const [copied, setCopied] = useState(false);
+  const [activeTab, setActiveTab] = useState<"clean" | "raw">("clean");
+  if (!resume) return null;
+
+  const currentText = activeTab === "clean" ? (resume.clean_text || resume.raw_text) : resume.raw_text;
+
+  const handleCopy = () => {
+    if (currentText) {
+      navigator.clipboard.writeText(currentText);
+      setCopied(true);
+      toast.success(`${activeTab === "clean" ? "Cleaned" : "Raw"} text copied to clipboard!`);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <Dialog open={!!resume} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col p-6">
+        <DialogHeader className="pb-3 border-b flex flex-row items-center justify-between">
+          <DialogTitle className="flex items-center gap-2 text-base font-bold">
+            <Wand2 className="w-4 h-4 text-primary" />
+            Resume Text Center — {resume.file_name} (v{resume.version})
+          </DialogTitle>
+        </DialogHeader>
+
+        <Tabs defaultValue="clean" onValueChange={(v) => setActiveTab(v as "clean" | "raw")} className="flex-1 flex flex-col min-h-0 mt-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2">
+            <TabsList>
+              <TabsTrigger value="clean" className="text-xs font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" /> Cleaned Text
+              </TabsTrigger>
+              <TabsTrigger value="raw" className="text-xs font-semibold flex items-center gap-1.5">
+                <ScanText className="w-3.5 h-3.5 text-muted-foreground" /> Raw Extracted Text
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-xs text-indigo-600 dark:text-indigo-400 border-indigo-500/30"
+                disabled={isCleaning}
+                onClick={() => onReClean(resume.id)}
+              >
+                {isCleaning ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Wand2 className="w-3 h-3 mr-1" />}
+                Re-Clean Text
+              </Button>
+
+              {currentText && (
+                <Button size="sm" variant="ghost" onClick={handleCopy} className="h-7 text-xs">
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-500 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="text-xs text-muted-foreground py-1 border-b flex items-center justify-between gap-2">
+            <span>
+              {activeTab === "clean"
+                ? "Normalized dates, bullet points, emails, phone numbers, and URLs. Removed page numbers & headers."
+                : `Raw text extracted via ${resume.ocr_provider || "Standard Extractor"}`}
+            </span>
+            {resume.cleaned_at && activeTab === "clean" && (
+              <span className="shrink-0">Cleaned {format(new Date(resume.cleaned_at), "h:mm a, MMM d")}</span>
+            )}
+          </div>
+
+          <TabsContent value="clean" className="flex-1 overflow-auto p-4 bg-muted/20 font-mono text-xs leading-relaxed rounded-lg border whitespace-pre-wrap mt-2 max-h-[480px]">
+            {resume.clean_text ? (
+              resume.clean_text
+            ) : (
+              <p className="text-muted-foreground italic text-center py-8">
+                No cleaned text stored yet. Click "Re-Clean Text" to run the Resume Cleaning Engine.
+              </p>
+            )}
+          </TabsContent>
+
+          <TabsContent value="raw" className="flex-1 overflow-auto p-4 bg-muted/20 font-mono text-xs leading-relaxed rounded-lg border whitespace-pre-wrap mt-2 max-h-[480px]">
+            {resume.raw_text ? (
+              resume.raw_text
+            ) : (
+              <p className="text-muted-foreground italic text-center py-8">
+                No raw text recorded. Re-run document extraction.
+              </p>
+            )}
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -105,7 +351,7 @@ function UploadZone({ onFile, isUploading }: UploadZoneProps) {
       <input
         ref={inputRef}
         type="file"
-        accept=".pdf,.doc,.docx,.txt,.rtf"
+        accept=".pdf,.doc,.docx,.txt,.rtf,.png,.jpg,.jpeg,.webp"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
@@ -124,12 +370,14 @@ function UploadZone({ onFile, isUploading }: UploadZoneProps) {
 
       <div>
         <p className="font-semibold text-base">
-          {isUploading ? "Uploading…" : isDragging ? "Drop to upload" : "Drag & drop your resume here"}
+          {isUploading ? "Uploading, Extracting & Cleaning Text…" : isDragging ? "Drop resume file here" : "Drag & drop your resume here"}
         </p>
         <p className="text-sm text-muted-foreground mt-1">
-          or <span className="text-primary font-medium underline">click to browse</span>
+          or <span className="text-primary font-medium underline">click to browse files</span>
         </p>
-        <p className="text-xs text-muted-foreground/70 mt-2">Supported: PDF, DOCX, DOC, TXT, RTF · Max 10 MB</p>
+        <p className="text-xs text-muted-foreground/70 mt-2">
+          Supported Formats: PDF, DOC, DOCX, TXT, RTF, PNG, JPG, JPEG, WEBP · Max 10 MB
+        </p>
       </div>
     </div>
   );
@@ -167,12 +415,25 @@ interface ResumeCardProps {
   resume: ResumeItem;
   onReplace: (id: number) => void;
   onDelete: (id: number) => void;
+  onPreview: (resume: ResumeItem) => void;
+  onViewText: (resume: ResumeItem) => void;
+  onProcess: (id: number) => void;
   isReplacing: boolean;
+  isProcessing: boolean;
 }
 
-function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCardProps) {
+function ActiveResumeCard({
+  resume,
+  onReplace,
+  onDelete,
+  onPreview,
+  onViewText,
+  onProcess,
+  isReplacing,
+  isProcessing,
+}: ResumeCardProps) {
   const backendBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  const downloadUrl = `${backendBase}${resume.file_url}`;
+  const downloadUrl = `${backendBase}/api/profile/resume/${resume.id}/download`;
 
   return (
     <Card className="border-emerald-500/30 ring-1 ring-emerald-500/15 shadow-sm bg-card overflow-hidden">
@@ -191,6 +452,8 @@ function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCa
               </h3>
               <VersionBadge version={resume.version} isActive={resume.is_active} />
               <FileTypeBadge type={resume.file_type} />
+              <ProcessingStatusBadge status={resume.parsing_status} error={resume.processing_error} />
+              <OcrConfidenceBadge confidence={resume.ocr_confidence} isLow={resume.is_low_confidence} />
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -201,14 +464,12 @@ function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCa
                 <HardDrive className="w-3.5 h-3.5" />
                 {formatFileSize(resume.file_size)}
               </span>
-              <span className="flex items-center gap-1">
-                <FileType className="w-3.5 h-3.5" />
-                {resume.file_type || "Unknown type"}
-              </span>
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                Status: {resume.parsing_status}
-              </span>
+              {resume.ocr_provider && (
+                <span className="flex items-center gap-1">
+                  <Cpu className="w-3.5 h-3.5" />
+                  {resume.ocr_provider} ({resume.ocr_processing_time_ms ?? 0} ms)
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -218,10 +479,45 @@ function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCa
         {/* Action Buttons Row */}
         <div className="flex flex-wrap gap-2">
           <Button variant="default" size="sm" className="h-8 text-xs shadow-sm" asChild>
-            <a href={downloadUrl} target="_blank" rel="noreferrer" download={resume.file_name ?? "resume"}>
+            <a href={downloadUrl} download={resume.file_name ?? "resume"}>
               <Download className="w-3.5 h-3.5 mr-1.5" /> Download
             </a>
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => onPreview(resume)}
+          >
+            <Eye className="w-3.5 h-3.5 mr-1.5 text-primary" /> Preview
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => onViewText(resume)}
+          >
+            <Wand2 className="w-3.5 h-3.5 mr-1.5 text-emerald-500" /> Cleaned Text
+          </Button>
+
+          {(resume.parsing_status === "Failed" || resume.parsing_status === "Queued" || resume.is_low_confidence || !resume.clean_text) && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
+              disabled={isProcessing}
+              onClick={() => onProcess(resume.id)}
+            >
+              {isProcessing ? (
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <RotateCw className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              {resume.parsing_status === "Failed" ? "Retry Processing" : "Re-run Extraction & Cleaning"}
+            </Button>
+          )}
 
           <Button
             variant="outline"
@@ -247,6 +543,30 @@ function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCa
             <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete
           </Button>
         </div>
+
+        {/* Low Confidence User Warning Alert */}
+        {resume.is_low_confidence && (
+          <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/25 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2.5">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+            <div>
+              <p className="font-bold">Low OCR Confidence Warning ({resume.ocr_confidence}%)</p>
+              <p className="mt-0.5 leading-relaxed">
+                The image quality or text contrast of this resume is low. Text extraction may contain inaccuracies. Please consider uploading a higher resolution PDF or image.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Failure Banner */}
+        {resume.parsing_status === "Failed" && resume.processing_error && (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-600 dark:text-red-400 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Processing Failure</p>
+              <p className="mt-0.5">{resume.processing_error}</p>
+            </div>
+          </div>
+        )}
 
         {/* Reserved AI Intelligence Section */}
         <div>
@@ -296,15 +616,26 @@ function ActiveResumeCard({ resume, onReplace, onDelete, isReplacing }: ResumeCa
 
 interface HistoryRowProps {
   resume: ResumeItem;
+  onActivate: (id: number) => void;
   onDelete: (id: number) => void;
+  onPreview: (resume: ResumeItem) => void;
+  onViewText: (resume: ResumeItem) => void;
+  isActivating: boolean;
 }
 
-function VersionHistoryRow({ resume, onDelete }: HistoryRowProps) {
+function VersionHistoryRow({
+  resume,
+  onActivate,
+  onDelete,
+  onPreview,
+  onViewText,
+  isActivating,
+}: HistoryRowProps) {
   const backendBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-  const downloadUrl = `${backendBase}${resume.file_url}`;
+  const downloadUrl = `${backendBase}/api/profile/resume/${resume.id}/download`;
 
   return (
-    <div className="flex items-center justify-between gap-4 py-3 px-4 rounded-lg bg-muted/10 hover:bg-muted/20 border border-transparent hover:border-border/40 transition-colors">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 px-4 rounded-lg bg-muted/10 hover:bg-muted/20 border border-transparent hover:border-border/40 transition-colors">
       <div className="flex items-center gap-3 min-w-0">
         <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
         <div className="min-w-0">
@@ -317,12 +648,33 @@ function VersionHistoryRow({ resume, onDelete }: HistoryRowProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-2 shrink-0 flex-wrap">
         <VersionBadge version={resume.version} isActive={resume.is_active} />
         <FileTypeBadge type={resume.file_type} />
+        <OcrConfidenceBadge confidence={resume.ocr_confidence} isLow={resume.is_low_confidence} />
+        <ProcessingStatusBadge status={resume.parsing_status} error={resume.processing_error} />
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 px-2.5 text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+          onClick={() => onActivate(resume.id)}
+          disabled={isActivating}
+        >
+          {isActivating ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
+          Make Active
+        </Button>
+
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => onPreview(resume)}>
+          <Eye className="w-3.5 h-3.5" />
+        </Button>
+
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => onViewText(resume)}>
+          <Wand2 className="w-3.5 h-3.5 text-emerald-500" />
+        </Button>
 
         <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" asChild>
-          <a href={downloadUrl} target="_blank" rel="noreferrer" download={resume.file_name ?? "resume"}>
+          <a href={downloadUrl} download={resume.file_name ?? "resume"}>
             <Download className="w-3.5 h-3.5" />
           </a>
         </Button>
@@ -340,13 +692,18 @@ function VersionHistoryRow({ resume, onDelete }: HistoryRowProps) {
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
+// ── Main Page Component ───────────────────────────────────────────────────────
 
 export default function ResumeCenterPage() {
   const queryClient = useQueryClient();
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [replacingId, setReplacingId] = useState<number | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [previewResume, setPreviewResume] = useState<ResumeItem | null>(null);
+  const [viewTextResume, setViewTextResume] = useState<ResumeItem | null>(null);
+  const [activatingId, setActivatingId] = useState<number | null>(null);
+  const [processingId, setProcessingId] = useState<number | null>(null);
+  const [cleaningId, setCleaningId] = useState<number | null>(null);
 
   const { data: resumes = [], isLoading } = useQuery<ResumeItem[]>({
     queryKey: ["resumes"],
@@ -358,9 +715,12 @@ export default function ResumeCenterPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Resume uploaded successfully");
+      toast.success("Resume uploaded, text extracted & cleaned!");
     },
-    onError: () => toast.error("Upload failed. Please try again."),
+    onError: (err: any) => {
+      const msg = err.response?.data?.detail || "Upload failed. Please try again.";
+      toast.error(msg);
+    },
   });
 
   const replaceMutation = useMutation({
@@ -368,12 +728,53 @@ export default function ResumeCenterPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Resume replaced successfully");
+      toast.success("Resume replaced, text re-extracted & cleaned!");
       setReplacingId(null);
     },
-    onError: () => {
-      toast.error("Replacement failed. Please try again.");
+    onError: (err: any) => {
+      const msg = err.response?.data?.detail || "Replacement failed. Please try again.";
+      toast.error(msg);
       setReplacingId(null);
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: activateResume,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Resume set to active!");
+      setActivatingId(null);
+    },
+    onError: () => {
+      toast.error("Failed to activate resume version.");
+      setActivatingId(null);
+    },
+  });
+
+  const processMutation = useMutation({
+    mutationFn: processResumeDocument,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      toast.success("Document processing & cleaning completed!");
+      setProcessingId(null);
+    },
+    onError: () => {
+      toast.error("Document processing failed.");
+      setProcessingId(null);
+    },
+  });
+
+  const cleanMutation = useMutation({
+    mutationFn: cleanResumeText,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      toast.success("Resume text re-cleaned & normalized!");
+      setCleaningId(null);
+    },
+    onError: () => {
+      toast.error("Resume text cleaning failed.");
+      setCleaningId(null);
     },
   });
 
@@ -389,7 +790,7 @@ export default function ResumeCenterPage() {
 
   const handleFileUpload = (file: File) => {
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("File too large. Maximum size is 10 MB.");
+      toast.error("File size exceeds 10 MB limit.");
       return;
     }
     uploadMutation.mutate(file);
@@ -404,12 +805,27 @@ export default function ResumeCenterPage() {
     const file = e.target.files?.[0];
     if (file && replacingId != null) {
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File too large. Maximum size is 10 MB.");
+        toast.error("File size exceeds 10 MB limit.");
         return;
       }
       replaceMutation.mutate({ id: replacingId, file });
     }
     e.target.value = "";
+  };
+
+  const handleActivate = (id: number) => {
+    setActivatingId(id);
+    activateMutation.mutate(id);
+  };
+
+  const handleProcess = (id: number) => {
+    setProcessingId(id);
+    processMutation.mutate(id);
+  };
+
+  const handleReClean = (id: number) => {
+    setCleaningId(id);
+    cleanMutation.mutate(id);
   };
 
   const handleDelete = (id: number) => {
@@ -435,7 +851,7 @@ export default function ResumeCenterPage() {
       <input
         ref={replaceInputRef}
         type="file"
-        accept=".pdf,.doc,.docx,.txt,.rtf"
+        accept=".pdf,.doc,.docx,.txt,.rtf,.png,.jpg,.jpeg,.webp"
         className="hidden"
         onChange={handleReplaceFile}
       />
@@ -445,10 +861,10 @@ export default function ResumeCenterPage() {
         <div>
           <div className="flex items-center gap-2">
             <FileText className="w-7 h-7 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight">Resume Center</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Resume Center & Cleaning Engine</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            Upload, manage, and track your resume versions. AI intelligence coming soon.
+            Upload, extract text, and clean raw text by normalizing dates, bullets, emails, phone numbers, and URLs while stripping headers & page numbers.
           </p>
         </div>
 
@@ -459,7 +875,7 @@ export default function ResumeCenterPage() {
         )}
       </div>
 
-      {/* Upload Zone (shown when no resumes OR always) */}
+      {/* Upload Zone */}
       {resumes.length === 0 ? (
         <div className="space-y-4">
           <UploadZone onFile={handleFileUpload} isUploading={uploadMutation.isPending} />
@@ -467,21 +883,21 @@ export default function ResumeCenterPage() {
           <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-500/5 border border-blue-500/15 text-sm text-blue-700 dark:text-blue-300">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <p>
-              Upload your resume to enable AI-powered ATS scoring, skill extraction, and smart job matching. <span className="font-medium">(AI features coming in next phase.)</span>
+              Upload image or document resumes. Our Resume Cleaning Engine automatically strips headers, footers, page numbers, and normalizes dates, bullets, emails, and phone numbers.
             </p>
           </div>
         </div>
       ) : (
         /* Compact upload bar when resume exists */
         <div
-          onClick={() => handleFileUpload}
-          className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-border/60 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors"
+          onClick={() => replaceInputRef.current?.click()}
+          className="flex items-center gap-3 p-3.5 rounded-xl border border-dashed border-border/60 bg-muted/10 cursor-pointer hover:bg-muted/20 transition-colors"
           role="button"
           tabIndex={0}
         >
           <UploadCloud className="w-5 h-5 text-muted-foreground shrink-0" />
           <span className="text-sm text-muted-foreground flex-1">
-            Upload a new version to replace the current active resume.
+            Upload a new file to auto-increment version number (v{resumes.length + 1}).
           </span>
           <Button
             size="sm"
@@ -513,7 +929,11 @@ export default function ResumeCenterPage() {
             resume={activeResume}
             onReplace={handleReplaceClick}
             onDelete={handleDelete}
+            onPreview={setPreviewResume}
+            onViewText={setViewTextResume}
+            onProcess={handleProcess}
             isReplacing={replaceMutation.isPending && replacingId === activeResume.id}
+            isProcessing={processMutation.isPending && processingId === activeResume.id}
           />
         </div>
       )}
@@ -534,7 +954,15 @@ export default function ResumeCenterPage() {
           {showHistory && (
             <div className="space-y-2">
               {historyResumes.map((r) => (
-                <VersionHistoryRow key={r.id} resume={r} onDelete={handleDelete} />
+                <VersionHistoryRow
+                  key={r.id}
+                  resume={r}
+                  onActivate={handleActivate}
+                  onDelete={handleDelete}
+                  onPreview={setPreviewResume}
+                  onViewText={setViewTextResume}
+                  isActivating={activatingId === r.id}
+                />
               ))}
             </div>
           )}
@@ -550,18 +978,32 @@ export default function ResumeCenterPage() {
           </div>
           <div className="text-center border-x">
             <p className="text-2xl font-bold text-foreground">
-              {activeResume?.file_type || "—"}
+              {activeResume?.clean_text ? "Cleaned" : "Raw"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Current Format</p>
+            <p className="text-xs text-muted-foreground mt-1">Text Engine Status</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-foreground">
-              {activeResume ? format(new Date(activeResume.uploaded_at), "MMM d") : "—"}
+              {activeResume?.ocr_processing_time_ms ? `${activeResume.ocr_processing_time_ms} ms` : "—"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">Last Updated</p>
+            <p className="text-xs text-muted-foreground mt-1">Extraction Time</p>
           </div>
         </div>
       )}
+
+      {/* Resume Preview Modal */}
+      <ResumePreviewModal
+        resume={previewResume}
+        onClose={() => setPreviewResume(null)}
+      />
+
+      {/* Extracted & Cleaned Text Modal */}
+      <ExtractedTextModal
+        resume={viewTextResume}
+        onClose={() => setViewTextResume(null)}
+        onReClean={handleReClean}
+        isCleaning={cleanMutation.isPending && cleaningId === viewTextResume?.id}
+      />
     </div>
   );
 }

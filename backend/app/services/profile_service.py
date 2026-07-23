@@ -1,7 +1,8 @@
 import os
-from typing import List
+from typing import List, Optional
 import shutil
 import uuid
+import hashlib
 from datetime import datetime
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
@@ -333,21 +334,102 @@ class ProfileService:
         )
         return [profile_schemas.ResumeResponse.model_validate(r) for r in resumes]
 
+    SUPPORTED_EXTENSIONS = {
+        ".pdf": ("PDF", "application/pdf"),
+        ".doc": ("DOC", "application/msword"),
+        ".docx": ("DOCX", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        ".txt": ("TXT", "text/plain"),
+        ".rtf": ("RTF", "application/rtf"),
+        ".png": ("PNG", "image/png"),
+        ".jpg": ("JPEG", "image/jpeg"),
+        ".jpeg": ("JPEG", "image/jpeg"),
+        ".webp": ("WEBP", "image/webp"),
+    }
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+    def _validate_and_process_resume_file(
+        self, user_id: str, file: UploadFile, is_replace_id: Optional[int] = None
+    ):
+        """Validate size, format, corruptions, duplicate hash, and compute metadata."""
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is required")
+
+        file_ext = os.path.splitext(file.filename)[1].lower()
+        if file_ext not in self.SUPPORTED_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file format '{file_ext}'. Allowed formats: PDF, DOC, DOCX, TXT, RTF, PNG, JPG, JPEG, WEBP",
+            )
+
+        file_type, mime_type = self.SUPPORTED_EXTENSIONS[file_ext]
+
+        # Read content for validation and hashing
+        content = file.file.read()
+        file_size = len(content)
+
+        # 1. Size check & 0-byte check
+        if file_size == 0:
+            raise HTTPException(status_code=400, detail="File is empty or corrupted")
+        if file_size > self.MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=400,
+                detail="File size exceeds maximum allowed limit of 10 MB",
+            )
+
+        # 2. Header Corruption Check
+        header = content[:16]
+        if file_ext == ".pdf" and not content.startswith(b"%PDF"):
+            raise HTTPException(status_code=400, detail="Corrupted PDF file (invalid PDF header)")
+        elif file_ext == ".png" and not content.startswith(b"\x89PNG"):
+            raise HTTPException(status_code=400, detail="Corrupted PNG file (invalid PNG header)")
+        elif file_ext in (".jpg", ".jpeg") and not content.startswith(b"\xff\xd8\xff"):
+            raise HTTPException(status_code=400, detail="Corrupted JPEG file (invalid JPEG header)")
+        elif file_ext == ".webp" and (b"RIFF" not in header or b"WEBP" not in content[:32]):
+            raise HTTPException(status_code=400, detail="Corrupted WEBP file (invalid WEBP header)")
+        elif file_ext == ".docx" and not content.startswith(b"PK"):
+            raise HTTPException(status_code=400, detail="Corrupted DOCX file (invalid ZIP/DOCX header)")
+        elif file_ext == ".doc" and not content.startswith(b"\xd0\xcf\x11\xe0"):
+            raise HTTPException(status_code=400, detail="Corrupted DOC file (invalid OLE/DOC header)")
+
+        # 3. Duplicate Detection via SHA-256
+        file_hash = hashlib.sha256(content).hexdigest()
+        existing_query = self.db.query(Resume).filter(
+            Resume.user_id == user_id, Resume.file_hash == file_hash
+        )
+        if is_replace_id is not None:
+            existing_query = existing_query.filter(Resume.id != is_replace_id)
+        duplicate = existing_query.first()
+        if duplicate:
+            raise HTTPException(
+                status_code=400,
+                detail="Duplicate resume detected. This exact file has already been uploaded.",
+            )
+
+        # Reset file pointer
+        file.file.seek(0)
+        return content, file_size, file_type, mime_type, file_hash, file_ext
+
+    def get_resumes(self, user_id: str) -> List[profile_schemas.ResumeResponse]:
+        resumes = (
+            self.db.query(Resume)
+            .filter(Resume.user_id == user_id)
+            .order_by(Resume.version.desc())
+            .all()
+        )
+        return [profile_schemas.ResumeResponse.model_validate(r) for r in resumes]
+
     def upload_resume(self, user_id: str, file: UploadFile) -> profile_schemas.ResumeResponse:
         """Upload a new resume, auto-incrementing version. Sets all previous versions to inactive."""
-        # Read file content to get accurate size
-        file.file.seek(0, 2)  # Seek to end
-        file_size = file.file.tell()
-        file.file.seek(0)     # Reset to start
+        content, file_size, file_type, mime_type, file_hash, file_ext = (
+            self._validate_and_process_resume_file(user_id, file)
+        )
 
-        # Save file
         upload_dir = os.path.join("uploads", "resumes")
         os.makedirs(upload_dir, exist_ok=True)
-        file_ext = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
         unique_filename = f"{uuid.uuid4()}{file_ext}"
         file_path = os.path.join(upload_dir, unique_filename)
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(content)
         file_url = f"/uploads/resumes/{unique_filename}"
 
         # Calculate next version number
@@ -364,15 +446,20 @@ class ProfileService:
             file_url=file_url,
             file_name=file.filename,
             file_size=file_size,
-            file_type=self._detect_file_type(file.filename),
+            file_type=file_type,
+            mime_type=mime_type,
+            file_hash=file_hash,
             version=next_version,
             is_active=True,
-            parsing_status="Ready",
+            parsing_status="Queued",
         )
         self.db.add(new_resume)
         self.db.commit()
         self.db.refresh(new_resume)
-        return profile_schemas.ResumeResponse.model_validate(new_resume)
+
+        # Trigger document processing engine
+        from app.services.document_processing_service import DocumentProcessingService
+        return DocumentProcessingService(self.db).process_resume_document(user_id, new_resume.id)
 
     def replace_resume(self, user_id: str, resume_id: int, file: UploadFile) -> profile_schemas.ResumeResponse:
         """Replace a specific resume version with a new file, keeping same version number."""
@@ -381,6 +468,10 @@ class ProfileService:
         ).first()
         if not resume:
             raise HTTPException(status_code=404, detail="Resume not found")
+
+        content, file_size, file_type, mime_type, file_hash, file_ext = (
+            self._validate_and_process_resume_file(user_id, file, is_replace_id=resume_id)
+        )
 
         # Delete old file if it exists
         if resume.file_url:
@@ -391,25 +482,47 @@ class ProfileService:
                 except OSError:
                     pass
 
-        # Read file content to get accurate size
-        file.file.seek(0, 2)
-        file_size = file.file.tell()
-        file.file.seek(0)
-
-        # Save new file
         upload_dir = os.path.join("uploads", "resumes")
         os.makedirs(upload_dir, exist_ok=True)
-        file_ext = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
         unique_filename = f"{uuid.uuid4()}{file_ext}"
         file_path = os.path.join(upload_dir, unique_filename)
         with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(content)
 
         resume.file_url = f"/uploads/resumes/{unique_filename}"
         resume.file_name = file.filename
         resume.file_size = file_size
-        resume.file_type = self._detect_file_type(file.filename)
-        resume.parsing_status = "Ready"
+        resume.file_type = file_type
+        resume.mime_type = mime_type
+        resume.file_hash = file_hash
+        resume.parsing_status = "Queued"
+        resume.raw_text = None
+        resume.processing_error = None
+        self.db.commit()
+        self.db.refresh(resume)
+
+        # Trigger document processing engine
+        from app.services.document_processing_service import DocumentProcessingService
+        return DocumentProcessingService(self.db).process_resume_document(user_id, resume.id)
+
+    def process_resume_document(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        from app.services.document_processing_service import DocumentProcessingService
+        return DocumentProcessingService(self.db).process_resume_document(user_id, resume_id)
+
+    def clean_resume_text(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        from app.services.resume_cleaning_service import ResumeCleaningService
+        return ResumeCleaningService(self.db).clean_user_resume(user_id, resume_id)
+
+    def set_active_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        """Set a specific resume version as active and deactivate all others."""
+        resume = self.db.query(Resume).filter(
+            Resume.id == resume_id, Resume.user_id == user_id
+        ).first()
+        if not resume:
+            raise HTTPException(status_code=404, detail="Resume not found")
+
+        self.db.query(Resume).filter(Resume.user_id == user_id).update({"is_active": False})
+        resume.is_active = True
         self.db.commit()
         self.db.refresh(resume)
         return profile_schemas.ResumeResponse.model_validate(resume)
