@@ -1,252 +1,266 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
-import { getFullProfile, updateProfessionalSummary } from "@/features/profile/services/profile.api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Loader2, Save, Sparkles, Wand2, SearchCheck, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import { getProfileAnalytics } from "@/features/profile/services/profile.api";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import {
+  BarChart3,
+  CheckCircle2,
+  XCircle,
+  FileText,
+  Briefcase,
+  Award,
+  FolderGit2,
+  Sparkles,
+  TrendingUp,
+  Clock,
+  Loader2,
+  Brain,
+  ShieldCheck,
+} from "lucide-react";
+import { formatDistanceToNow, parseISO } from "date-fns";
 
-export default function ProfessionalSummaryPage() {
-  const queryClient = useQueryClient();
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: getFullProfile,
+export default function ProfileAnalyticsPage() {
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ["profileAnalytics"],
+    queryFn: getProfileAnalytics,
   });
-
-  const { register, handleSubmit, reset, control, formState: { isDirty } } = useForm({
-    defaultValues: {
-      headline: "",
-      professional_summary: "",
-      career_objective: "",
-      years_of_experience_summary: "",
-      key_achievements: "",
-      career_highlights: "",
-    }
-  });
-
-  useEffect(() => {
-    if (profile?.professional_summary) {
-      reset({
-        headline: profile.professional_summary.headline || "",
-        professional_summary: profile.professional_summary.professional_summary || "",
-        career_objective: profile.professional_summary.career_objective || "",
-        years_of_experience_summary: profile.professional_summary.years_of_experience_summary || "",
-        key_achievements: profile.professional_summary.key_achievements || "",
-        career_highlights: profile.professional_summary.career_highlights || "",
-      });
-      if (profile.professional_summary.updated_at) {
-        setLastSaved(new Date(profile.professional_summary.updated_at));
-      }
-    }
-  }, [profile, reset]);
-
-  const mutation = useMutation({
-    mutationFn: updateProfessionalSummary,
-    onSuccess: (data) => {
-      toast.success("Professional summary updated successfully.");
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      if (data?.updated_at) {
-        setLastSaved(new Date(data.updated_at));
-      } else {
-        setLastSaved(new Date());
-      }
-    },
-    onError: () => {
-      toast.error("Failed to update professional summary.");
-    }
-  });
-
-  const onSubmit = (data: any) => {
-    mutation.mutate(data);
-  };
-
-  const AiButton = ({ icon: Icon, label }: { icon: any, label: string }) => (
-    <Button variant="outline" size="sm" type="button" disabled className="h-8 text-xs font-medium bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary">
-      <Icon className="w-3.5 h-3.5 mr-1.5" />
-      {label}
-    </Button>
-  );
 
   if (isLoading) {
-    return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted-foreground w-8 h-8" /></div>;
+    return (
+      <div className="py-24 flex justify-center items-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
+  const {
+    profile_completion = 0,
+    skills_count = 0,
+    experience_count = 0,
+    experience_years = 0,
+    certifications_count = 0,
+    projects_count = 0,
+    resume_status = "No Resume Uploaded",
+    career_readiness_score = 0,
+    section_breakdown = [],
+    recent_updates = [],
+  } = analytics || {};
+
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Professional Summary</h2>
-          <p className="text-muted-foreground mt-1">Shape your professional narrative. Enhance it continuously to attract the best opportunities.</p>
+    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="border-b pb-6">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-7 h-7 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight">Profile Analytics</h1>
         </div>
-        <div className="flex items-center gap-3">
-          {lastSaved && (
-            <span className="text-xs text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded-md">
-              <RefreshCw className="w-3 h-3" />
-              Last saved: {format(lastSaved, 'MMM d, h:mm a')}
-            </span>
-          )}
-        </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          Detailed metrics, section completion breakdown, readiness scores, and activity tracking.
+        </p>
       </div>
 
-      {isDirty && (
-        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-md text-sm mb-6 flex items-center justify-between">
-          <span>You have unsaved changes.</span>
-          <Button size="sm" onClick={handleSubmit(onSubmit)} disabled={mutation.isPending}>
-            {mutation.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            Save Now
-          </Button>
-        </div>
-      )}
+      {/* Primary KPI Grid (Metric Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Profile Completion</p>
+              <h3 className="text-2xl font-bold mt-0.5">{profile_completion}%</h3>
+            </div>
+          </CardContent>
+        </Card>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-        
-        {/* Professional Headline */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Professional Headline</Label>
-            <div className="flex gap-2">
-              <AiButton icon={Sparkles} label="Generate AI Headline" />
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Readiness Score</p>
+              <h3 className="text-2xl font-bold mt-0.5">{career_readiness_score}/100</h3>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Experience</p>
+              <h3 className="text-2xl font-bold mt-0.5">{experience_years} yrs</h3>
+              <p className="text-[11px] text-muted-foreground">{experience_count} role(s)</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+              <FileText className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Resume Status</p>
+              <h3 className="text-sm font-bold mt-1 line-clamp-1">{resume_status}</h3>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Secondary Metrics Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Brain className="w-5 h-5 text-indigo-500" />
+              <span className="text-sm font-medium">Skills Verified</span>
+            </div>
+            <span className="text-lg font-bold">{skills_count}</span>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FolderGit2 className="w-5 h-5 text-teal-500" />
+              <span className="text-sm font-medium">Portfolio Projects</span>
+            </div>
+            <span className="text-lg font-bold">{projects_count}</span>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Award className="w-5 h-5 text-amber-500" />
+              <span className="text-sm font-medium">Certifications</span>
+            </div>
+            <span className="text-lg font-bold">{certifications_count}</span>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts & Breakdown Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Completion Progress Chart & Section Breakdown */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-primary" /> Section Completion Breakdown
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Weight distribution towards overall profile strength
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-2">
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span>Overall Completion</span>
+                <span>{profile_completion}%</span>
+              </div>
+              <Progress value={profile_completion} className="h-2.5" />
+            </div>
+
+            <div className="space-y-3 pt-2">
+              {section_breakdown.map((item: any) => (
+                <div key={item.section} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    {item.completed ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    ) : (
+                      <XCircle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                    )}
+                    <span className={item.completed ? "font-medium" : "text-muted-foreground"}>
+                      {item.section}
+                    </span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={`text-[10px] ${
+                      item.completed
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                        : "text-muted-foreground border-border/40"
+                    }`}
+                  >
+                    Weight: {item.weight}%
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Activity & Recent Updates */}
+        <Card className="border-border/60 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Clock className="w-4 h-4 text-primary" /> Recent Profile Activity
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Timeline of recent section modifications
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-2">
+            {recent_updates.length > 0 ? (
+              <div className="space-y-4">
+                {recent_updates.map((update: any) => (
+                  <div key={update.section} className="flex items-center justify-between border-b border-border/40 pb-3 last:border-0">
+                    <div>
+                      <p className="text-sm font-semibold">{update.section}</p>
+                      <p className="text-xs text-muted-foreground">Updated recently</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded">
+                      {formatDistanceToNow(parseISO(update.updated_at), { addSuffix: true })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No recent profile update logs recorded.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Reserved Space for Future AI Insights */}
+      <Card className="border-purple-500/20 bg-purple-500/5 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base font-bold flex items-center gap-2 text-purple-700 dark:text-purple-300">
+            <Sparkles className="w-4 h-4 text-purple-500" /> AI Insights & Recommendations
+            <Badge variant="outline" className="ml-auto text-[10px] border-purple-500/30 text-purple-600 dark:text-purple-400">
+              Reserved / Coming Soon
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-xs text-purple-900/80 dark:text-purple-200/80">
+            Future updates will surface AI-driven competitive analysis, keyword optimization suggestions for targeted roles, and benchmark comparisons against industry candidates.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div className="p-3 rounded-lg border border-purple-500/20 bg-background/50 text-xs">
+              <p className="font-semibold text-purple-700 dark:text-purple-300">Target Role Match</p>
+              <p className="text-muted-foreground mt-0.5">Calculated once job search goals are set</p>
+            </div>
+            <div className="p-3 rounded-lg border border-purple-500/20 bg-background/50 text-xs">
+              <p className="font-semibold text-purple-700 dark:text-purple-300">ATS Keyword Fit</p>
+              <p className="text-muted-foreground mt-0.5">Scanned against active industry listings</p>
+            </div>
+            <div className="p-3 rounded-lg border border-purple-500/20 bg-background/50 text-xs">
+              <p className="font-semibold text-purple-700 dark:text-purple-300">Growth Recommendations</p>
+              <p className="text-muted-foreground mt-0.5">Personalized skill and cert suggestions</p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">A concise, impactful statement describing your role and core value.</p>
-          <Input 
-            placeholder="e.g. Senior Full-Stack Engineer | AI Enthusiast | Building Scalable Systems" 
-            className="font-medium text-lg h-12"
-            maxLength={255}
-            {...register("headline")} 
-          />
-        </section>
-
-        {/* Career Summary */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Career Summary</Label>
-            <div className="flex gap-2 hidden sm:flex">
-              <AiButton icon={Wand2} label="Improve" />
-              <AiButton icon={SearchCheck} label="Optimize for ATS" />
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground">An executive overview of your professional background, skills, and overall trajectory.</p>
-          <Controller
-            name="professional_summary"
-            control={control}
-            render={({ field }) => (
-              <RichTextEditor 
-                value={field.value} 
-                onChange={field.onChange} 
-                placeholder="Write your career summary..." 
-                maxLength={2000}
-                className="min-h-[200px]"
-              />
-            )}
-          />
-        </section>
-
-        {/* Years of Experience Summary */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Years of Experience Summary</Label>
-          </div>
-          <p className="text-sm text-muted-foreground">Detail how your experience spans across different industries, technologies, or roles.</p>
-          <Controller
-            name="years_of_experience_summary"
-            control={control}
-            render={({ field }) => (
-              <RichTextEditor 
-                value={field.value} 
-                onChange={field.onChange} 
-                placeholder="e.g. 5+ years in FinTech, 3 years specializing in Machine Learning..." 
-                maxLength={2000}
-                className="min-h-[150px]"
-              />
-            )}
-          />
-        </section>
-
-        {/* Career Objective */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Career Objective</Label>
-          </div>
-          <p className="text-sm text-muted-foreground">What are you looking for in your next role? What are your short-term and long-term goals?</p>
-          <Controller
-            name="career_objective"
-            control={control}
-            render={({ field }) => (
-              <RichTextEditor 
-                value={field.value} 
-                onChange={field.onChange} 
-                placeholder="Looking for a leadership role in an AI-driven startup..." 
-                maxLength={2000}
-                className="min-h-[150px]"
-              />
-            )}
-          />
-        </section>
-
-        {/* Key Achievements */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Key Achievements</Label>
-            <div className="flex gap-2">
-              <AiButton icon={Wand2} label="Rewrite Professionally" />
-            </div>
-          </div>
-          <p className="text-sm text-muted-foreground">Highlight 3-5 of your most impressive professional milestones with quantifiable results.</p>
-          <Controller
-            name="key_achievements"
-            control={control}
-            render={({ field }) => (
-              <RichTextEditor 
-                value={field.value} 
-                onChange={field.onChange} 
-                placeholder="Use bullet points for impact..." 
-                maxLength={2000}
-                className="min-h-[150px]"
-              />
-            )}
-          />
-        </section>
-
-        {/* Career Highlights */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Career Highlights</Label>
-          </div>
-          <p className="text-sm text-muted-foreground">Notable projects, awards, speaking engagements, or unique experiences.</p>
-          <Controller
-            name="career_highlights"
-            control={control}
-            render={({ field }) => (
-              <RichTextEditor 
-                value={field.value} 
-                onChange={field.onChange} 
-                placeholder="e.g. Keynote speaker at ReactConf 2023..." 
-                maxLength={2000}
-                className="min-h-[150px]"
-              />
-            )}
-          />
-        </section>
-
-        <div className="sticky bottom-0 bg-background/80 backdrop-blur-md p-4 -mx-6 md:-mx-8 border-t flex justify-end gap-4 mt-12 z-10">
-          <Button type="button" variant="outline" onClick={() => reset()} disabled={!isDirty || mutation.isPending}>
-            Discard Changes
-          </Button>
-          <Button type="submit" disabled={!isDirty || mutation.isPending}>
-            {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Save All Changes
-          </Button>
-        </div>
-      </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

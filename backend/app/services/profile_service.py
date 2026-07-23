@@ -884,3 +884,113 @@ class ProfileService:
         self.db.refresh(pref)
         return profile_schemas.JobSearchPreferenceResponse.model_validate(pref)
 
+    # --- Profile Analytics ---
+    def get_profile_analytics(self, user_id: str) -> profile_schemas.ProfileAnalyticsResponse:
+        user_prof = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
+        exps = self.db.query(Experience).filter(Experience.user_id == user_id).all()
+        certs = self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        projs = self.db.query(Project).filter(Project.user_id == user_id).all()
+        resumes = self.db.query(Resume).filter(Resume.user_id == user_id).all()
+        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+        social_prof = self.db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
+        ai_pref = self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        achievements = self.db.query(Achievement).filter(Achievement.user_id == user_id).all()
+        job_search_pref = self.db.query(JobSearchPreference).filter(JobSearchPreference.user_id == user_id).first()
+
+        # Section completion & weights
+        sections = [
+            ("Personal Info", bool(user_prof and user_prof.first_name and user_prof.email), 15),
+            ("Experience", bool(exps), 20),
+            ("Skills", len(skills) >= 3, 15),
+            ("Projects", bool(projs), 15),
+            ("Certifications", bool(certs), 10),
+            ("Resume", bool(resumes), 15),
+            ("Career Preferences", bool(career_pref and (career_pref.preferred_roles or career_pref.expected_salary)), 10),
+        ]
+
+        total_weight = sum(w for _, _, w in sections)
+        earned_weight = sum(w for _, completed, w in sections if completed)
+        completion_pct = int((earned_weight / total_weight) * 100) if total_weight > 0 else 0
+
+        # Calculate experience years
+        total_days = 0
+        for exp in exps:
+            start = exp.start_date
+            end = exp.end_date if not exp.is_current else datetime.utcnow()
+            if start and end:
+                total_days += (end - start).days
+        experience_years = round(total_days / 365.25, 1)
+
+        # Resume status
+        active_resume = next((r for r in resumes if getattr(r, "is_active", False)), None)
+        if active_resume:
+            resume_status = "Active Resume Uploaded"
+        elif resumes:
+            resume_status = f"{len(resumes)} Resume(s) Uploaded"
+        else:
+            resume_status = "No Resume Uploaded"
+
+        # Career Readiness Score
+        # Combination of completion %, having a resume, having skills, having experience, and having AI preferences
+        readiness_score = int(completion_pct * 0.5)
+        if resumes: readiness_score += 15
+        if len(skills) >= 5: readiness_score += 10
+        if exps: readiness_score += 15
+        if ai_pref or job_search_pref: readiness_score += 10
+        readiness_score = min(100, readiness_score)
+
+        section_breakdown = [
+            profile_schemas.SectionCompletionItem(section=name, completed=done, weight=w)
+            for name, done, w in sections
+        ]
+
+        # Recent updates timestamps
+        updates = []
+        if user_prof and getattr(user_prof, "updated_at", None):
+            updates.append(("Personal Info", user_prof.updated_at.isoformat()))
+        if exps:
+            latest_exp = max(exps, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            t = getattr(latest_exp, "updated_at", latest_exp.created_at)
+            if t: updates.append(("Experience", t.isoformat()))
+        if projs:
+            latest_proj = max(projs, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            t = getattr(latest_proj, "updated_at", latest_proj.created_at)
+            if t: updates.append(("Projects", t.isoformat()))
+        if certs:
+            latest_cert = max(certs, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            t = getattr(latest_cert, "updated_at", latest_cert.created_at)
+            if t: updates.append(("Certifications", t.isoformat()))
+        if resumes:
+            latest_res = max(resumes, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            t = getattr(latest_res, "updated_at", latest_res.created_at)
+            if t: updates.append(("Resume Center", t.isoformat()))
+        if career_pref and getattr(career_pref, "updated_at", None):
+            updates.append(("Career Preferences", career_pref.updated_at.isoformat()))
+        if ai_pref and getattr(ai_pref, "updated_at", None):
+            updates.append(("AI Preferences", ai_pref.updated_at.isoformat()))
+        if achievements:
+            latest_ach = max(achievements, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            t = getattr(latest_ach, "updated_at", latest_ach.created_at)
+            if t: updates.append(("Achievements", t.isoformat()))
+
+        updates.sort(key=lambda x: x[1], reverse=True)
+        recent_updates = [
+            profile_schemas.RecentUpdateItem(section=name, updated_at=dt)
+            for name, dt in updates[:5]
+        ]
+
+        return profile_schemas.ProfileAnalyticsResponse(
+            profile_completion=completion_pct,
+            skills_count=len(skills),
+            experience_count=len(exps),
+            experience_years=experience_years,
+            certifications_count=len(certs),
+            projects_count=len(projs),
+            resume_status=resume_status,
+            career_readiness_score=readiness_score,
+            section_breakdown=section_breakdown,
+            recent_updates=recent_updates,
+        )
+
+

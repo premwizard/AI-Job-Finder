@@ -473,6 +473,28 @@ class ProfileCompletionResponse(BaseModel):
     completion_percentage: int
     missing_sections: List[str]
 
+class SectionCompletionItem(BaseModel):
+    section: str
+    completed: bool
+    weight: int
+
+class RecentUpdateItem(BaseModel):
+    section: str
+    updated_at: str
+
+class ProfileAnalyticsResponse(BaseModel):
+    profile_completion: int
+    skills_count: int
+    experience_count: int
+    experience_years: float
+    certifications_count: int
+    projects_count: int
+    resume_status: str
+    career_readiness_score: int
+    section_breakdown: List[SectionCompletionItem]
+    recent_updates: List[RecentUpdateItem]
+
+
 class ImageUploadResponse(BaseModel):
     url: str
 

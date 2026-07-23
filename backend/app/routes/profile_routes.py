@@ -543,3 +543,16 @@ def update_job_search_preferences(
     return service.update_job_search_preferences(current_user.id, req)
 
 
+# --- Profile Analytics ---
+@router.get(
+    "/analytics",
+    response_model=profile_schemas.ProfileAnalyticsResponse,
+)
+def get_profile_analytics(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_profile_analytics(current_user.id)
+
+
+

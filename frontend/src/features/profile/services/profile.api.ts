@@ -275,4 +275,11 @@ export const updateJobSearchPreferences = async (data: any) => {
   return response.data;
 };
 
+// Profile Analytics API
+export const getProfileAnalytics = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/analytics`);
+  return response.data;
+};
+
+
 
