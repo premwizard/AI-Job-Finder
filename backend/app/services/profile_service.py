@@ -2,6 +2,7 @@ import os
 from typing import List
 import shutil
 import uuid
+from datetime import datetime
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,8 @@ from app.models.models import (
     Education,
     Experience,
     JobSearchPreference,
+    NotificationSetting,
+    PrivacySetting,
     Project,
     Resume,
     Skill,
@@ -992,5 +995,98 @@ class ProfileService:
             section_breakdown=section_breakdown,
             recent_updates=recent_updates,
         )
+
+    # --- Privacy Settings ---
+    def get_privacy_settings(
+        self, user_id: str
+    ) -> profile_schemas.PrivacySettingResponse:
+        setting = (
+            self.db.query(PrivacySetting)
+            .filter(PrivacySetting.user_id == user_id)
+            .first()
+        )
+        if not setting:
+            return profile_schemas.PrivacySettingResponse()
+        return profile_schemas.PrivacySettingResponse.model_validate(setting)
+
+    def update_privacy_settings(
+        self, user_id: str, data: profile_schemas.PrivacySettingUpdate
+    ) -> profile_schemas.PrivacySettingResponse:
+        setting = (
+            self.db.query(PrivacySetting)
+            .filter(PrivacySetting.user_id == user_id)
+            .first()
+        )
+        if not setting:
+            setting = PrivacySetting(user_id=user_id)
+            self.db.add(setting)
+        for key, value in data.model_dump(exclude_unset=True).items():
+            setattr(setting, key, value)
+        self.db.commit()
+        self.db.refresh(setting)
+        return profile_schemas.PrivacySettingResponse.model_validate(setting)
+
+    def export_user_data(self, user_id: str) -> dict:
+        user_prof = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        privacy = self.get_privacy_settings(user_id)
+        job_search = self.get_job_search_preferences(user_id)
+        achievements = self.get_achievements(user_id)
+        skills = self.get_skills(user_id)
+        experiences = self.get_experiences(user_id)
+        educations = self.get_educations(user_id)
+        certs = self.get_certifications(user_id)
+        projects = self.get_projects(user_id)
+        resumes = self.get_resumes(user_id)
+        return {
+            "user_id": user_id,
+            "exported_at": datetime.utcnow().isoformat(),
+            "profile": {
+                "first_name": user_prof.first_name if user_prof else None,
+                "last_name": user_prof.last_name if user_prof else None,
+                "email": user_prof.email if user_prof else None,
+                "skills_count": len(skills),
+                "experience_count": len(experiences),
+                "education_count": len(educations),
+                "certifications_count": len(certs),
+                "projects_count": len(projects),
+                "resumes_count": len(resumes),
+            },
+            "privacy_settings": privacy.model_dump() if hasattr(privacy, "model_dump") else privacy,
+            "job_search_preferences": job_search.model_dump() if hasattr(job_search, "model_dump") else job_search,
+            "achievements": [a.model_dump() if hasattr(a, "model_dump") else a for a in achievements],
+        }
+
+    # --- Notification Settings ---
+    def get_notification_settings(
+        self, user_id: str
+    ) -> profile_schemas.NotificationSettingResponse:
+        setting = (
+            self.db.query(NotificationSetting)
+            .filter(NotificationSetting.user_id == user_id)
+            .first()
+        )
+        if not setting:
+            return profile_schemas.NotificationSettingResponse()
+        return profile_schemas.NotificationSettingResponse.model_validate(setting)
+
+    def update_notification_settings(
+        self, user_id: str, data: profile_schemas.NotificationSettingUpdate
+    ) -> profile_schemas.NotificationSettingResponse:
+        setting = (
+            self.db.query(NotificationSetting)
+            .filter(NotificationSetting.user_id == user_id)
+            .first()
+        )
+        if not setting:
+            setting = NotificationSetting(user_id=user_id)
+            self.db.add(setting)
+        for key, value in data.model_dump(exclude_unset=True).items():
+            setattr(setting, key, value)
+        self.db.commit()
+        self.db.refresh(setting)
+        return profile_schemas.NotificationSettingResponse.model_validate(setting)
+
+
+
 
 

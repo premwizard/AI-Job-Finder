@@ -634,3 +634,62 @@ class JobSearchPreference(Base):
 
     user = relationship("User")
 
+
+class PrivacySetting(Base):
+    __tablename__ = "privacy_settings"
+
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
+    is_public_profile: Any = Column(Boolean, default=True)
+    hide_email: Any = Column(Boolean, default=False)
+    hide_phone: Any = Column(Boolean, default=False)
+    resume_visibility: Any = Column(String, default="Recruiters Only")  # Public, Recruiters Only, Private
+    recruiter_visibility: Any = Column(Boolean, default=True)
+    search_engine_indexing: Any = Column(Boolean, default=False)
+    account_visibility: Any = Column(String, default="Public")          # Public, Connections Only, Private
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user = relationship("User")
+
+
+class NotificationSetting(Base):
+    __tablename__ = "notification_settings"
+
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
+    
+    # Types
+    job_matches: Any = Column(Boolean, default=True)
+    daily_digest: Any = Column(Boolean, default=True)
+    weekly_digest: Any = Column(Boolean, default=True)
+    resume_tips: Any = Column(Boolean, default=True)
+    career_tips: Any = Column(Boolean, default=True)
+    interview_reminders: Any = Column(Boolean, default=True)
+    product_updates: Any = Column(Boolean, default=False)
+    security_alerts: Any = Column(Boolean, default=True)
+
+    # Channels
+    email_channel: Any = Column(Boolean, default=True)
+    in_app_channel: Any = Column(Boolean, default=True)
+    push_channel: Any = Column(Boolean, default=False)  # Reserved for future
+
+    # Frequency & Quiet Hours
+    notification_frequency: Any = Column(String, default="Instant")  # Instant, Hourly, Daily Batch
+    quiet_hours_enabled: Any = Column(Boolean, default=False)
+    quiet_hours_start: Any = Column(String, default="22:00")
+    quiet_hours_end: Any = Column(String, default="08:00")
+
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user = relationship("User")
+
+
+

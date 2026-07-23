@@ -555,4 +555,37 @@ def get_profile_analytics(
     return service.get_profile_analytics(current_user.id)
 
 
+# --- Privacy Settings ---
+@router.get(
+    "/privacy-settings",
+    response_model=profile_schemas.PrivacySettingResponse,
+)
+def get_privacy_settings(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_privacy_settings(current_user.id)
+
+
+@router.put(
+    "/privacy-settings",
+    response_model=profile_schemas.PrivacySettingResponse,
+)
+def update_privacy_settings(
+    req: profile_schemas.PrivacySettingUpdate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_privacy_settings(current_user.id, req)
+
+
+@router.get("/export-data")
+def export_user_data(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.export_user_data(current_user.id)
+
+
+
 

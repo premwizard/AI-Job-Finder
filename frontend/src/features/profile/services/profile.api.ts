@@ -281,5 +281,22 @@ export const getProfileAnalytics = async () => {
   return response.data;
 };
 
+// Privacy Settings API
+export const getPrivacySettings = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/privacy-settings`);
+  return response.data;
+};
+
+export const updatePrivacySettings = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/privacy-settings`, data);
+  return response.data;
+};
+
+export const exportUserData = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/export-data`);
+  return response.data;
+};
+
+
 
 

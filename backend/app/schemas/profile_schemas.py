@@ -570,3 +570,51 @@ class JobSearchPreferenceResponse(JobSearchPreferenceUpdate):
         from_attributes = True
 
 
+# --- Privacy Settings ---
+class PrivacySettingUpdate(BaseModel):
+    is_public_profile: Optional[bool] = None
+    hide_email: Optional[bool] = None
+    hide_phone: Optional[bool] = None
+    resume_visibility: Optional[str] = None
+    recruiter_visibility: Optional[bool] = None
+    search_engine_indexing: Optional[bool] = None
+    account_visibility: Optional[str] = None
+
+
+class PrivacySettingResponse(PrivacySettingUpdate):
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# --- Notification Settings ---
+class NotificationSettingUpdate(BaseModel):
+    job_matches: Optional[bool] = None
+    daily_digest: Optional[bool] = None
+    weekly_digest: Optional[bool] = None
+    resume_tips: Optional[bool] = None
+    career_tips: Optional[bool] = None
+    interview_reminders: Optional[bool] = None
+    product_updates: Optional[bool] = None
+    security_alerts: Optional[bool] = None
+
+    email_channel: Optional[bool] = None
+    in_app_channel: Optional[bool] = None
+    push_channel: Optional[bool] = None
+
+    notification_frequency: Optional[str] = None
+    quiet_hours_enabled: Optional[bool] = None
+    quiet_hours_start: Optional[str] = None
+    quiet_hours_end: Optional[str] = None
+
+
+class NotificationSettingResponse(NotificationSettingUpdate):
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+
+
