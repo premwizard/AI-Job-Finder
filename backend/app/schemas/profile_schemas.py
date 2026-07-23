@@ -396,21 +396,26 @@ class SocialProfileResponse(SocialProfileUpdate):
 
 # --- AI Preferences ---
 class AIPreferenceUpdate(BaseModel):
-    dream_companies: Optional[str] = None
-    dream_roles: Optional[str] = None
-    dream_technologies: Optional[str] = None
-    preferred_ai_domains: Optional[str] = None
-    learning_goals: Optional[str] = None
-    interview_level: Optional[str] = None
+    # Aspirations
+    dream_companies: Optional[str] = None          # CSV chips
+    dream_roles: Optional[str] = None              # CSV chips
+    dream_technologies: Optional[str] = None       # CSV chips
+    # AI & Learning
+    preferred_ai_domains: Optional[str] = None     # CSV chips
+    learning_goals: Optional[str] = None           # Free text
+    preferred_learning_resources: Optional[str] = None  # CSV chips
+    # Career Goals
     target_salary: Optional[str] = None
-    target_country: Optional[str] = None
-    career_objectives: Optional[str] = None
-    job_search_frequency: Optional[str] = None
-    career_growth_priorities: Optional[str] = None
+    target_countries: Optional[str] = None         # CSV chips
+    career_objectives: Optional[str] = None        # Free text
+    career_growth_priorities: Optional[str] = None  # CSV chips
 
 
 class AIPreferenceResponse(AIPreferenceUpdate):
-    pass
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 # --- Resume ---
@@ -472,3 +477,53 @@ class ImageUploadResponse(BaseModel):
     url: str
 
 ExperienceResponse.model_rebuild()
+
+
+# --- Achievements ---
+ACHIEVEMENT_TYPES = [
+    "Award",
+    "Scholarship",
+    "Publication",
+    "Open Source Contribution",
+    "Hackathon",
+    "Competition",
+    "Patent",
+    "Speaking Engagement",
+]
+
+
+class AchievementCreate(BaseModel):
+    type: str
+    title: str
+    organization: Optional[str] = None
+    date: Optional[datetime] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+
+
+class AchievementUpdate(BaseModel):
+    type: Optional[str] = None
+    title: Optional[str] = None
+    organization: Optional[str] = None
+    date: Optional[datetime] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+
+
+class AchievementResponse(BaseModel):
+    id: str
+    type: str
+    title: str
+    organization: Optional[str] = None
+    date: Optional[datetime] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+    file_url: Optional[str] = None
+    file_name: Optional[str] = None
+    order: int = 0
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+

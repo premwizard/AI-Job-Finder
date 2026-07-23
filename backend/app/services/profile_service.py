@@ -6,6 +6,7 @@ from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.models.models import (
+    Achievement,
     AIPreference,
     CareerPreference,
     Certification,
@@ -645,6 +646,14 @@ class ProfileService:
         self.db.refresh(social)
         return profile_schemas.SocialProfileResponse.model_validate(social)
 
+    def get_ai_preferences(self, user_id: str) -> profile_schemas.AIPreferenceResponse:
+        pref = (
+            self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
+        if not pref:
+            return profile_schemas.AIPreferenceResponse()
+        return profile_schemas.AIPreferenceResponse.model_validate(pref)
+
     def update_ai_preferences(
         self, user_id: str, data: profile_schemas.AIPreferenceUpdate
     ):
@@ -658,7 +667,7 @@ class ProfileService:
             setattr(pref, key, value)
         self.db.commit()
         self.db.refresh(pref)
-        return profile_schemas.AIPreferenceResponse(**pref.__dict__)
+        return profile_schemas.AIPreferenceResponse.model_validate(pref)
 
     def get_skills(self, user_id: str):
         return (
@@ -760,3 +769,86 @@ class ProfileService:
         self.db.delete(item)
         self.db.commit()
         return True
+
+    # --- Achievements ---
+    def get_achievements(
+        self, user_id: str, achievement_type: str = None
+    ) -> List[profile_schemas.AchievementResponse]:
+        q = self.db.query(Achievement).filter(Achievement.user_id == user_id)
+        if achievement_type:
+            q = q.filter(Achievement.type == achievement_type)
+        items = q.order_by(Achievement.date.desc(), Achievement.created_at.desc()).all()
+        return [profile_schemas.AchievementResponse.model_validate(a) for a in items]
+
+    def create_achievement(
+        self, user_id: str, data: profile_schemas.AchievementCreate
+    ) -> profile_schemas.AchievementResponse:
+        achievement = Achievement(
+            user_id=user_id,
+            **data.model_dump(exclude_none=True),
+        )
+        self.db.add(achievement)
+        self.db.commit()
+        self.db.refresh(achievement)
+        return profile_schemas.AchievementResponse.model_validate(achievement)
+
+    def update_achievement(
+        self, user_id: str, achievement_id: str, data: profile_schemas.AchievementUpdate
+    ) -> profile_schemas.AchievementResponse:
+        achievement = (
+            self.db.query(Achievement)
+            .filter(Achievement.id == achievement_id, Achievement.user_id == user_id)
+            .first()
+        )
+        if not achievement:
+            raise HTTPException(status_code=404, detail="Achievement not found")
+        for key, value in data.model_dump(exclude_unset=True).items():
+            setattr(achievement, key, value)
+        self.db.commit()
+        self.db.refresh(achievement)
+        return profile_schemas.AchievementResponse.model_validate(achievement)
+
+    def delete_achievement(self, user_id: str, achievement_id: str) -> bool:
+        achievement = (
+            self.db.query(Achievement)
+            .filter(Achievement.id == achievement_id, Achievement.user_id == user_id)
+            .first()
+        )
+        if not achievement:
+            raise HTTPException(status_code=404, detail="Achievement not found")
+        # Delete supporting file from disk if it exists
+        if achievement.file_url:
+            file_path = achievement.file_url.lstrip("/")
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError:
+                    pass
+        self.db.delete(achievement)
+        self.db.commit()
+        return True
+
+    def upload_achievement_file(
+        self, user_id: str, achievement_id: str, file: UploadFile
+    ) -> profile_schemas.AchievementResponse:
+        achievement = (
+            self.db.query(Achievement)
+            .filter(Achievement.id == achievement_id, Achievement.user_id == user_id)
+            .first()
+        )
+        if not achievement:
+            raise HTTPException(status_code=404, detail="Achievement not found")
+        # Remove old file if present
+        if achievement.file_url:
+            old_path = achievement.file_url.lstrip("/")
+            if os.path.exists(old_path):
+                try:
+                    os.remove(old_path)
+                except OSError:
+                    pass
+        file_url = self._save_upload_file(file, "achievements")
+        achievement.file_url = file_url
+        achievement.file_name = file.filename
+        self.db.commit()
+        self.db.refresh(achievement)
+        return profile_schemas.AchievementResponse.model_validate(achievement)

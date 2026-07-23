@@ -222,3 +222,13 @@ export const updateSocialProfiles = async (data: any) => {
   return response.data;
 };
 
+// AI Preferences API
+export const getAIPreferences = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/ai-preferences`);
+  return response.data;
+};
+
+export const updateAIPreferences = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/ai-preferences`, data);
+  return response.data;
+};

@@ -589,3 +589,24 @@ class Education(Base):
 
     user = relationship("User", back_populates="education")
 
+
+class Achievement(Base):
+    __tablename__ = "achievements"
+
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
+    type: Any = Column(String, nullable=False)          # Award, Scholarship, Publication, etc.
+    title: Any = Column(String, nullable=False)
+    organization: Any = Column(String, nullable=True)   # Issuing org / event name
+    date: Any = Column(Date, nullable=True)
+    description: Any = Column(Text, nullable=True)
+    url: Any = Column(String, nullable=True)             # Reference / proof link
+    file_url: Any = Column(String, nullable=True)        # Supporting document
+    file_name: Any = Column(String, nullable=True)
+    order: Any = Column(Integer, default=0)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")

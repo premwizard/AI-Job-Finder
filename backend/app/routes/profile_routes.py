@@ -143,6 +143,14 @@ def update_social_profiles(
     return service.update_social_profiles(current_user.id, req)
 
 
+@router.get("/ai-preferences", response_model=profile_schemas.AIPreferenceResponse)
+def get_ai_preferences(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_ai_preferences(current_user.id)
+
+
 @router.put("/ai-preferences", response_model=profile_schemas.AIPreferenceResponse)
 def update_ai_preferences(
     req: profile_schemas.AIPreferenceUpdate,
