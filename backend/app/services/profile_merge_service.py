@@ -83,7 +83,11 @@ class ProfileMergeService:
         suggestions: List[MergeSuggestionItem] = []
 
         # ── 1. Skills Comparison ───────────────────────────────────────────
-        profile_skill_names = {s.name.strip().lower(): s.name for s in existing_skills if s.name}
+        profile_skill_names = {}
+        for s in existing_skills:
+            val = (getattr(s, "skill_name", None) or getattr(s, "name", None) or "").strip()
+            if val:
+                profile_skill_names[val.lower()] = val
         resume_skills = resume_data.get("skills", [])
         for sk in resume_skills:
             skill_name = (sk.get("name") if isinstance(sk, dict) else str(sk)).strip()
@@ -112,22 +116,28 @@ class ProfileMergeService:
                 ))
 
         # ── 2. Experience Comparison ──────────────────────────────────────
-        exp_lookup = {
-            f"{(e.job_title or '').strip().lower()}|{(e.company or '').strip().lower()}": e
-            for e in existing_exp
-        }
+        exp_lookup = {}
+        for e in existing_exp:
+            r_title = (getattr(e, "role", None) or getattr(e, "job_title", None) or "").strip().lower()
+            c_name = (getattr(e, "company_name", None) or getattr(e, "company", None) or "").strip().lower()
+            if r_title or c_name:
+                exp_lookup[f"{r_title}|{c_name}"] = e
+
         resume_exp = resume_data.get("work_experience", [])
         for exp in resume_exp:
-            job_title = (exp.get("job_title") or "").strip()
-            company = (exp.get("company") or "").strip()
+            job_title = (exp.get("job_title") or exp.get("role") or "").strip()
+            company = (exp.get("company") or exp.get("company_name") or "").strip()
             if not job_title and not company:
                 continue
 
             key = f"{job_title.lower()}|{company.lower()}"
             if key in exp_lookup:
                 existing_item = exp_lookup[key]
-                # Compare dates/description to decide DUPLICATE vs UPDATE vs CONFLICT
-                existing_dates = f"{existing_item.start_date or ''} - {existing_item.end_date or ''}"
+                e_title = getattr(existing_item, "role", None) or getattr(existing_item, "job_title", "")
+                e_comp = getattr(existing_item, "company_name", None) or getattr(existing_item, "company", "")
+                e_start = str(existing_item.start_date) if existing_item.start_date else ""
+                e_end = str(existing_item.end_date) if existing_item.end_date else ""
+                existing_dates = f"{e_start} - {e_end}"
                 resume_dates = f"{exp.get('start_date') or ''} - {exp.get('end_date') or ''}"
 
                 if existing_dates == resume_dates and (existing_item.description or "") == (exp.get("description") or ""):
@@ -136,7 +146,7 @@ class ProfileMergeService:
                         category="experience",
                         status="DUPLICATE",
                         title=f"{job_title} at {company}",
-                        existing_value=f"{existing_item.job_title} ({existing_dates})",
+                        existing_value=f"{e_title} ({existing_dates})",
                         resume_value=f"{job_title} ({resume_dates})",
                         recommendation="Identical experience record found.",
                     ))
@@ -146,7 +156,7 @@ class ProfileMergeService:
                         category="experience",
                         status="CONFLICT",
                         title=f"{job_title} at {company}",
-                        existing_value={"job_title": existing_item.job_title, "company": existing_item.company, "dates": existing_dates},
+                        existing_value={"job_title": e_title, "company": e_comp, "dates": existing_dates},
                         resume_value={"job_title": job_title, "company": company, "dates": resume_dates},
                         recommendation="Date mismatch between profile and resume.",
                     ))
@@ -156,7 +166,7 @@ class ProfileMergeService:
                         category="experience",
                         status="UPDATE",
                         title=f"{job_title} at {company}",
-                        existing_value={"job_title": existing_item.job_title, "company": existing_item.company, "description": existing_item.description},
+                        existing_value={"job_title": e_title, "company": e_comp, "description": existing_item.description},
                         resume_value={"job_title": job_title, "company": company, "description": exp.get("description")},
                         recommendation="Updated description available from resume.",
                     ))

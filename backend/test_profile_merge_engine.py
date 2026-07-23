@@ -38,9 +38,9 @@ def test_profile_merge_engine():
 
         # Populate initial profile data: Python, FastAPI
         profile = UserProfile(user_id=user_id, professional_summary="Senior Engineer with Python experience.")
-        sk1 = Skill(user_id=user_id, name="Python")
-        sk2 = Skill(user_id=user_id, name="FastAPI")
-        exp1 = Experience(user_id=user_id, job_title="Backend Lead", company="TechCorp", start_date="2021", end_date="Present")
+        sk1 = Skill(user_id=user_id, skill_name="Python")
+        sk2 = Skill(user_id=user_id, skill_name="FastAPI")
+        exp1 = Experience(user_id=user_id, role="Backend Lead", company_name="TechCorp")
         db.add_all([profile, sk1, sk2, exp1])
         db.commit()
 
