@@ -12,6 +12,7 @@ from app.models.models import (
     Certification,
     Education,
     Experience,
+    JobSearchPreference,
     Project,
     Resume,
     Skill,
@@ -852,3 +853,34 @@ class ProfileService:
         self.db.commit()
         self.db.refresh(achievement)
         return profile_schemas.AchievementResponse.model_validate(achievement)
+
+    # --- Job Search Preferences ---
+    def get_job_search_preferences(
+        self, user_id: str
+    ) -> profile_schemas.JobSearchPreferenceResponse:
+        pref = (
+            self.db.query(JobSearchPreference)
+            .filter(JobSearchPreference.user_id == user_id)
+            .first()
+        )
+        if not pref:
+            return profile_schemas.JobSearchPreferenceResponse()
+        return profile_schemas.JobSearchPreferenceResponse.model_validate(pref)
+
+    def update_job_search_preferences(
+        self, user_id: str, data: profile_schemas.JobSearchPreferenceUpdate
+    ) -> profile_schemas.JobSearchPreferenceResponse:
+        pref = (
+            self.db.query(JobSearchPreference)
+            .filter(JobSearchPreference.user_id == user_id)
+            .first()
+        )
+        if not pref:
+            pref = JobSearchPreference(user_id=user_id)
+            self.db.add(pref)
+        for key, value in data.model_dump(exclude_unset=True).items():
+            setattr(pref, key, value)
+        self.db.commit()
+        self.db.refresh(pref)
+        return profile_schemas.JobSearchPreferenceResponse.model_validate(pref)
+

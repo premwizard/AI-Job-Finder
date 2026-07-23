@@ -456,3 +456,90 @@ def delete_resume(
     current_user: User = Depends(get_current_user),
 ):
     service.delete_resume(current_user.id, resume_id)
+
+
+# --- Achievements ---
+@router.get(
+    "/achievements",
+    response_model=List[profile_schemas.AchievementResponse],
+)
+def get_achievements(
+    type: str = None,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_achievements(current_user.id, achievement_type=type)
+
+
+@router.post(
+    "/achievements",
+    response_model=profile_schemas.AchievementResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_achievement(
+    req: profile_schemas.AchievementCreate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.create_achievement(current_user.id, req)
+
+
+@router.put(
+    "/achievements/{achievement_id}",
+    response_model=profile_schemas.AchievementResponse,
+)
+def update_achievement(
+    achievement_id: str,
+    req: profile_schemas.AchievementUpdate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_achievement(current_user.id, achievement_id, req)
+
+
+@router.delete("/achievements/{achievement_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_achievement(
+    achievement_id: str,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    service.delete_achievement(current_user.id, achievement_id)
+
+
+@router.post(
+    "/achievements/{achievement_id}/upload",
+    response_model=profile_schemas.AchievementResponse,
+)
+def upload_achievement_file(
+    achievement_id: str,
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.upload_achievement_file(current_user.id, achievement_id, file)
+
+
+# --- Job Search Preferences ---
+@router.get(
+    "/job-search-preferences",
+    response_model=profile_schemas.JobSearchPreferenceResponse,
+)
+def get_job_search_preferences(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_job_search_preferences(current_user.id)
+
+
+@router.put(
+    "/job-search-preferences",
+    response_model=profile_schemas.JobSearchPreferenceResponse,
+)
+def update_job_search_preferences(
+    req: profile_schemas.JobSearchPreferenceUpdate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_job_search_preferences(current_user.id, req)
+
+

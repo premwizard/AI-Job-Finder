@@ -232,3 +232,47 @@ export const updateAIPreferences = async (data: any) => {
   const response = await authApi.put(`${PROFILE_URL}/ai-preferences`, data);
   return response.data;
 };
+
+// Achievements API
+export const getAchievements = async (type?: string) => {
+  const params = type ? `?type=${encodeURIComponent(type)}` : "";
+  const response = await authApi.get(`${PROFILE_URL}/achievements${params}`);
+  return response.data;
+};
+
+export const createAchievement = async (data: any) => {
+  const response = await authApi.post(`${PROFILE_URL}/achievements`, data);
+  return response.data;
+};
+
+export const updateAchievement = async (id: string, data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/achievements/${id}`, data);
+  return response.data;
+};
+
+export const deleteAchievement = async (id: string) => {
+  const response = await authApi.delete(`${PROFILE_URL}/achievements/${id}`);
+  return response.data;
+};
+
+export const uploadAchievementFile = async (id: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/achievements/${id}/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+// Job Search Preferences API
+export const getJobSearchPreferences = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/job-search-preferences`);
+  return response.data;
+};
+
+export const updateJobSearchPreferences = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/job-search-preferences`, data);
+  return response.data;
+};
+
+

@@ -610,3 +610,27 @@ class Achievement(Base):
     updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User")
+
+
+class JobSearchPreference(Base):
+    __tablename__ = "job_search_preferences"
+
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
+    search_frequency: Any = Column(String, default="Daily")          # Daily, Weekly, Instant, Manual
+    email_notifications: Any = Column(Boolean, default=True)
+    digest_frequency: Any = Column(String, default="Daily")           # Daily, Weekly, Never
+    job_alert_keywords: Any = Column(String, nullable=True)          # CSV chips
+    min_match_score: Any = Column(Integer, default=70)               # Percentage integer (0-100)
+    preferred_sources: Any = Column(String, nullable=True)           # CSV chips (e.g. LinkedIn, Indeed, Glassdoor)
+    ignore_companies: Any = Column(String, nullable=True)            # CSV chips
+    ignore_keywords: Any = Column(String, nullable=True)             # CSV chips
+    blocked_locations: Any = Column(String, nullable=True)           # CSV chips
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    user = relationship("User")
+

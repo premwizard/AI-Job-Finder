@@ -527,3 +527,24 @@ class AchievementResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+# --- Job Search Preferences ---
+class JobSearchPreferenceUpdate(BaseModel):
+    search_frequency: Optional[str] = None
+    email_notifications: Optional[bool] = None
+    digest_frequency: Optional[str] = None
+    job_alert_keywords: Optional[str] = None
+    min_match_score: Optional[int] = None
+    preferred_sources: Optional[str] = None
+    ignore_companies: Optional[str] = None
+    ignore_keywords: Optional[str] = None
+    blocked_locations: Optional[str] = None
+
+
+class JobSearchPreferenceResponse(JobSearchPreferenceUpdate):
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
