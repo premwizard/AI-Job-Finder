@@ -538,6 +538,15 @@ def get_resume_parsed_data(
     }
 
 
+@router.get("/resume/{resume_id}/merge-suggestions")
+def get_resume_merge_suggestions(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_merge_suggestions(current_user.id, resume_id)
+
+
 @router.get("/resume/{resume_id}/text")
 @router.get("/resume/{resume_id}/cleaned-text")
 def get_resume_raw_and_cleaned_text(

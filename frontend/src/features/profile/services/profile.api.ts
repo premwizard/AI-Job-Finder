@@ -236,6 +236,11 @@ export const getResumeParsedData = async (resumeId: number) => {
   return response.data;
 };
 
+export const getResumeMergeSuggestions = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/merge-suggestions`);
+  return response.data;
+};
+
 // Career Preferences API
 export const getCareerPreferences = async () => {
   const response = await authApi.get(`${PROFILE_URL}/career-preferences`);

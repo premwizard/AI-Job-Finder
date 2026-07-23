@@ -517,6 +517,10 @@ class ProfileService:
         from app.services.ai_resume_parser_service import AIResumeParserBackendService
         return AIResumeParserBackendService(self.db).parse_resume(user_id, resume_id)
 
+    def get_merge_suggestions(self, user_id: str, resume_id: int):
+        from app.services.profile_merge_service import ProfileMergeService
+        return ProfileMergeService(self.db).generate_merge_suggestions(user_id, resume_id)
+
     def set_active_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
         """Set a specific resume version as active and deactivate all others."""
         resume = self.db.query(Resume).filter(
