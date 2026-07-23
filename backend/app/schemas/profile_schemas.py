@@ -177,25 +177,52 @@ class ExperienceResponse(ExperienceCreate):
 
 # --- Education ---
 class EducationCreate(BaseModel):
-    institution: str
+    institution_name: str
+    institution_logo_url: Optional[str] = None
     degree: str
     major: Optional[str] = None
     specialization: Optional[str] = None
     cgpa: Optional[str] = None
+    grade: Optional[str] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
+    is_current: Optional[bool] = False
     activities: Optional[str] = None
-    achievements: Optional[str] = None
+    honors_awards: Optional[str] = None
+    relevant_coursework: Optional[str] = None
+    certificate_url: Optional[str] = None
+    verification_status: Optional[str] = "unverified"
+    order: Optional[int] = 0
+
+    # Backwards compatibility property / alias if institution is passed
+    @property
+    def institution(self) -> str:
+        return self.institution_name
 
 
-class EducationUpdate(EducationCreate):
-    institution: Optional[str] = None  # type: ignore[assignment]
-    degree: Optional[str] = None  # type: ignore[assignment]
+class EducationUpdate(BaseModel):
+    institution_name: Optional[str] = None
+    institution_logo_url: Optional[str] = None
+    degree: Optional[str] = None
+    major: Optional[str] = None
+    specialization: Optional[str] = None
+    cgpa: Optional[str] = None
+    grade: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    is_current: Optional[bool] = None
+    activities: Optional[str] = None
+    honors_awards: Optional[str] = None
+    relevant_coursework: Optional[str] = None
+    certificate_url: Optional[str] = None
+    verification_status: Optional[str] = None
+    order: Optional[int] = None
 
 
 class EducationResponse(EducationCreate):
     id: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

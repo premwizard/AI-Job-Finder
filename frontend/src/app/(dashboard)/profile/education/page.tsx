@@ -1,89 +1,288 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getFullProfile } from "@/features/profile/services/profile.api";
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getEducations,
+  createEducation,
+  updateEducation,
+  deleteEducation,
+} from "@/features/profile/services/profile.api";
+import { EducationItem, EducationSortOption } from "@/features/profile/types/education.types";
+import { EducationTimeline } from "@/features/profile/components/education/EducationTimeline";
+import { EducationDialog } from "@/features/profile/components/education/EducationDialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, GraduationCap, Calendar, Award } from "lucide-react";
-import { format } from "date-fns";
-import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Plus, 
+  Search, 
+  Sparkles, 
+  FileText, 
+  ShieldCheck, 
+  Compass, 
+  Loader2, 
+  GraduationCap,
+  ListFilter,
+  LayoutList,
+  Grid
+} from "lucide-react";
+import { toast } from "sonner";
 
 export default function EducationPage() {
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: getFullProfile,
+  const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<EducationSortOption>("newest");
+  const [viewMode, setViewMode] = useState<"timeline" | "grid">("timeline");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<EducationItem | null>(null);
+
+  // Fetch education list
+  const { data: educations = [], isLoading } = useQuery<EducationItem[]>({
+    queryKey: ["educations"],
+    queryFn: getEducations,
   });
 
-  const educations = profile?.educations || [];
+  // Mutations
+  const createMutation = useMutation({
+    mutationFn: createEducation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["educations"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Education entry added successfully");
+    },
+    onError: () => {
+      toast.error("Failed to add education entry");
+    },
+  });
 
-  if (isLoading) {
-    return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted-foreground w-8 h-8" /></div>;
-  }
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => updateEducation(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["educations"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Education entry updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update education entry");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteEducation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["educations"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Education entry removed");
+    },
+    onError: () => {
+      toast.error("Failed to delete education entry");
+    },
+  });
+
+  // Handlers
+  const handleAddClick = () => {
+    setEditingEducation(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditClick = (item: EducationItem) => {
+    setEditingEducation(item);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = async (id: string) => {
+    if (confirm("Are you sure you want to delete this education entry?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleSave = async (formData: any) => {
+    if (editingEducation) {
+      await updateMutation.mutateAsync({ id: editingEducation.id, data: formData });
+    } else {
+      await createMutation.mutateAsync(formData);
+    }
+  };
+
+  // Filter & Sort
+  const filteredAndSortedEducations = useMemo(() => {
+    let result = [...educations];
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((item) => {
+        const inst = (item.institution_name || item.institution || "").toLowerCase();
+        const deg = (item.degree || "").toLowerCase();
+        const maj = (item.major || "").toLowerCase();
+        const spec = (item.specialization || "").toLowerCase();
+        const course = (item.relevant_coursework || "").toLowerCase();
+        return inst.includes(q) || deg.includes(q) || maj.includes(q) || spec.includes(q) || course.includes(q);
+      });
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (sortBy === "newest") {
+        const dateA = a.start_date ? new Date(a.start_date).getTime() : 0;
+        const dateB = b.start_date ? new Date(b.start_date).getTime() : 0;
+        return dateB - dateA;
+      }
+      if (sortBy === "oldest") {
+        const dateA = a.start_date ? new Date(a.start_date).getTime() : 0;
+        const dateB = b.start_date ? new Date(b.start_date).getTime() : 0;
+        return dateA - dateB;
+      }
+      if (sortBy === "institution") {
+        const nameA = a.institution_name || a.institution || "";
+        const nameB = b.institution_name || b.institution || "";
+        return nameA.localeCompare(nameB);
+      }
+      if (sortBy === "degree") {
+        return (a.degree || "").localeCompare(b.degree || "");
+      }
+      return 0;
+    });
+
+    return result;
+  }, [educations, searchQuery, sortBy]);
+
+  // Future Ready Feature Placeholders
+  const handleFeatureNotice = (featureName: string) => {
+    toast.info(`${featureName} feature is ready for integration. AI features are currently set to dormant.`);
+  };
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-6">
         <div>
-          <h2 className="text-xl font-bold">Education</h2>
-          <p className="text-sm text-muted-foreground">List your academic background and achievements.</p>
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-7 h-7 text-primary" />
+            <h1 className="text-2xl font-bold tracking-tight">Education Management</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage your degrees, academic achievements, coursework, and certificates.
+          </p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Education
+
+        <Button onClick={handleAddClick} className="shadow-sm">
+          <Plus className="w-4 h-4 mr-2" /> Add Education
         </Button>
       </div>
 
-      {educations.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed rounded-lg bg-muted/10">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <GraduationCap className="w-6 h-6 text-primary" />
+      {/* Future-Ready Feature Toolbar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-muted/20 border rounded-xl">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleFeatureNotice("Resume Education Import")}
+          className="h-9 text-xs justify-start border-dashed hover:border-primary/50"
+        >
+          <FileText className="w-3.5 h-3.5 mr-2 text-blue-500" /> Resume Import
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleFeatureNotice("AI Education Analysis")}
+          className="h-9 text-xs justify-start border-dashed hover:border-purple/50"
+        >
+          <Sparkles className="w-3.5 h-3.5 mr-2 text-purple-500" /> AI Analysis
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleFeatureNotice("Degree Verification")}
+          className="h-9 text-xs justify-start border-dashed hover:border-emerald/50"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 mr-2 text-emerald-500" /> Verify Degree
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleFeatureNotice("Career Recommendation")}
+          className="h-9 text-xs justify-start border-dashed hover:border-amber/50"
+        >
+          <Compass className="w-3.5 h-3.5 mr-2 text-amber-500" /> Career Paths
+        </Button>
+      </div>
+
+      {/* Controls: Search, Sort & View Mode */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-card p-4 rounded-xl border">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search institution, degree, major, coursework..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 text-sm"
+          />
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ListFilter className="w-4 h-4 text-muted-foreground hidden sm:block" />
+            <Select value={sortBy} onValueChange={(val: EducationSortOption) => setSortBy(val)}>
+              <SelectTrigger className="w-[150px] text-xs h-9">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="institution">Institution (A-Z)</SelectItem>
+                <SelectItem value="degree">Degree (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <h3 className="font-semibold text-lg">No education added</h3>
-          <p className="text-muted-foreground mt-1 mb-6">Add your educational background.</p>
-          <Button variant="outline">
-            <Plus className="w-4 h-4 mr-2" /> Add Education
-          </Button>
+
+          <div className="flex items-center border rounded-lg p-0.5 bg-muted/30">
+            <Button
+              variant={viewMode === "timeline" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("timeline")}
+              className="h-8 px-2.5"
+              title="Timeline View"
+            >
+              <LayoutList className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("grid")}
+              className="h-8 px-2.5"
+              title="Grid View"
+            >
+              <Grid className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      {isLoading ? (
+        <div className="py-20 flex justify-center items-center">
+          <Loader2 className="animate-spin text-primary w-8 h-8" />
         </div>
       ) : (
-        <div className="space-y-6">
-          {educations.map((edu: any) => (
-            <Card key={edu.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <CardContent className="p-0">
-                <div className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                    <div className="flex gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <GraduationCap className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold">{edu.institution}</h3>
-                        <p className="font-medium mt-1">
-                          {edu.degree} {edu.major && `in ${edu.major}`}
-                        </p>
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="w-4 h-4" />
-                            <span>
-                              {edu.start_date ? format(new Date(edu.start_date), "yyyy") : ""} - {" "}
-                              {edu.end_date ? format(new Date(edu.end_date), "yyyy") : "Present"}
-                            </span>
-                          </div>
-                          {edu.cgpa && (
-                            <div className="flex items-center gap-1.5 font-medium text-foreground">
-                              <Award className="w-4 h-4 text-amber-500" />
-                              <span>CGPA: {edu.cgpa}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-8 md:self-start">Edit</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <EducationTimeline
+          educations={filteredAndSortedEducations}
+          viewMode={viewMode}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onAddClick={handleAddClick}
+          onAIAnalysis={(item) => handleFeatureNotice(`AI Review for ${item.degree}`)}
+        />
       )}
+
+      {/* Modal Dialog */}
+      <EducationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        education={editingEducation}
+        onSave={handleSave}
+      />
     </div>
   );
 }

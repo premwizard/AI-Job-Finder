@@ -1,4 +1,5 @@
 import os
+from typing import List
 import shutil
 import uuid
 from fastapi import HTTPException, UploadFile
@@ -263,6 +264,19 @@ class ProfileService:
         profile.cover_banner_url = url
         self.db.commit()
         return profile_schemas.ImageUploadResponse(url=url)
+
+    def upload_education_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+        url = self._save_upload_file(file, "education")
+        return profile_schemas.ImageUploadResponse(url=url)
+
+    def get_educations(self, user_id: str) -> List[profile_schemas.EducationResponse]:
+        educations = (
+            self.db.query(Education)
+            .filter(Education.user_id == user_id)
+            .order_by(Education.start_date.desc())
+            .all()
+        )
+        return [profile_schemas.EducationResponse.model_validate(e) for e in educations]
 
     # --- Personal Information ---
     def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:

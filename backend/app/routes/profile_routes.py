@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -213,6 +214,17 @@ def delete_experience(
 
 
 # --- Education ---
+@router.get(
+    "/education",
+    response_model=List[profile_schemas.EducationResponse],
+)
+def get_education(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_educations(current_user.id)
+
+
 @router.post(
     "/education",
     response_model=profile_schemas.EducationResponse,
@@ -226,9 +238,21 @@ def add_education(
     return service._create_item(Education, current_user.id, req)
 
 
+@router.post(
+    "/education/upload",
+    response_model=profile_schemas.ImageUploadResponse,
+)
+def upload_education_file(
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.upload_education_file(file)
+
+
 @router.put("/education/{item_id}", response_model=profile_schemas.EducationResponse)
 def update_education(
-    item_id: int,
+    item_id: str,
     req: profile_schemas.EducationUpdate,
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
@@ -238,11 +262,12 @@ def update_education(
 
 @router.delete("/education/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_education(
-    item_id: int,
+    item_id: str,
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
 ):
     service._delete_item(Education, item_id, current_user.id)
+
 
 
 # --- Certifications ---

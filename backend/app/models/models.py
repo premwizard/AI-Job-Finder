@@ -404,25 +404,6 @@ class Experience(Base):
     projects = relationship("Project", secondary="experience_projects", back_populates="experiences")
 
 
-class Education(Base):
-    __tablename__ = "educations"
-
-    id: Any = Column(
-        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
-    )
-    user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
-    institution: Any = Column(String, nullable=False)
-    degree: Any = Column(String, nullable=False)
-    major: Any = Column(String, nullable=True)
-    specialization: Any = Column(String, nullable=True)
-    cgpa: Any = Column(String, nullable=True)
-    start_date: Any = Column(DateTime, nullable=True)
-    end_date: Any = Column(DateTime, nullable=True)
-    activities: Any = Column(Text, nullable=True)
-    achievements: Any = Column(Text, nullable=True)
-    created_at: Any = Column(DateTime, default=datetime.utcnow)
-
-    user = relationship("User")
 
 
 class Certification(Base):
@@ -569,6 +550,7 @@ class Education(Base):
     degree: Any = Column(String, nullable=False)
     major: Any = Column(String, nullable=True)
     specialization: Any = Column(String, nullable=True)
+    cgpa: Any = Column(String, nullable=True)
     grade: Any = Column(String, nullable=True)
     start_date: Any = Column(DateTime, nullable=True)
     end_date: Any = Column(DateTime, nullable=True)
@@ -577,8 +559,10 @@ class Education(Base):
     honors_awards: Any = Column(Text, nullable=True)
     relevant_coursework: Any = Column(Text, nullable=True)
     certificate_url: Any = Column(String, nullable=True)
+    verification_status: Any = Column(String, default="unverified")
     order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
     updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User", back_populates="education")
+

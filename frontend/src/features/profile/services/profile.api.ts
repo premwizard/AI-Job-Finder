@@ -81,3 +81,34 @@ export const deleteListItem = async (endpoint: string, id: string) => {
   const response = await authApi.delete(`${url}/${id}`);
   return response.data;
 };
+
+// Education API
+export const getEducations = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/education`);
+  return response.data;
+};
+
+export const createEducation = async (data: any) => {
+  const response = await authApi.post(`${PROFILE_URL}/education`, data);
+  return response.data;
+};
+
+export const updateEducation = async (id: string, data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/education/${id}`, data);
+  return response.data;
+};
+
+export const deleteEducation = async (id: string) => {
+  const response = await authApi.delete(`${PROFILE_URL}/education/${id}`);
+  return response.data;
+};
+
+export const uploadEducationFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/education/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
