@@ -267,28 +267,56 @@ class CertificationResponse(CertificationCreate):
 # --- Projects ---
 class ProjectCreate(BaseModel):
     name: str
+    short_description: Optional[str] = None
     description: Optional[str] = None
     project_type: Optional[str] = None
     role: Optional[str] = None
-    team_size: Optional[int] = None
+    team_size: Optional[str] = None
+    duration: Optional[str] = None
     duration_months: Optional[int] = None
     tech_stack: Optional[str] = None
     ai_technologies: Optional[str] = None
     github_url: Optional[str] = None
     live_demo_url: Optional[str] = None
     video_demo_url: Optional[str] = None
+    images: Optional[str] = None
     highlights: Optional[str] = None
     challenges: Optional[str] = None
     achievements: Optional[str] = None
+    status: Optional[str] = "Completed"
+    is_featured: Optional[bool] = False
+
+    @property
+    def title(self) -> str:
+        return self.name
 
 
-class ProjectUpdate(ProjectCreate):
-    name: Optional[str] = None  # type: ignore[assignment]
+class ProjectUpdate(BaseModel):
+    name: Optional[str] = None
+    short_description: Optional[str] = None
+    description: Optional[str] = None
+    project_type: Optional[str] = None
+    role: Optional[str] = None
+    team_size: Optional[str] = None
+    duration: Optional[str] = None
+    duration_months: Optional[int] = None
+    tech_stack: Optional[str] = None
+    ai_technologies: Optional[str] = None
+    github_url: Optional[str] = None
+    live_demo_url: Optional[str] = None
+    video_demo_url: Optional[str] = None
+    images: Optional[str] = None
+    highlights: Optional[str] = None
+    challenges: Optional[str] = None
+    achievements: Optional[str] = None
+    status: Optional[str] = None
+    is_featured: Optional[bool] = None
 
 
 class ProjectResponse(ProjectCreate):
     id: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

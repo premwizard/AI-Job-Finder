@@ -65,12 +65,18 @@ def startup_event():
             "ALTER TABLE certifications ADD COLUMN updated_at DATETIME",
             "ALTER TABLE education ADD COLUMN verification_status VARCHAR DEFAULT 'unverified'",
             "ALTER TABLE education ADD COLUMN updated_at DATETIME",
+            "ALTER TABLE projects ADD COLUMN short_description VARCHAR",
+            "ALTER TABLE projects ADD COLUMN duration VARCHAR",
+            "ALTER TABLE projects ADD COLUMN images TEXT",
+            "ALTER TABLE projects ADD COLUMN status VARCHAR DEFAULT 'Completed'",
+            "ALTER TABLE projects ADD COLUMN is_featured BOOLEAN DEFAULT 0",
         ]:
             try:
                 conn.execute(text(col_def))
                 conn.commit()
             except Exception:
                 pass
+
 
 @app.get("/")
 def read_root():

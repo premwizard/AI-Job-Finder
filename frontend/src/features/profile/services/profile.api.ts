@@ -142,4 +142,35 @@ export const uploadCertificationFile = async (file: File) => {
   return response.data;
 };
 
+// Projects API
+export const getProjects = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/projects`);
+  return response.data;
+};
+
+export const createProject = async (data: any) => {
+  const response = await authApi.post(`${PROFILE_URL}/projects`, data);
+  return response.data;
+};
+
+export const updateProject = async (id: string, data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/projects/${id}`, data);
+  return response.data;
+};
+
+export const deleteProject = async (id: string) => {
+  const response = await authApi.delete(`${PROFILE_URL}/projects/${id}`);
+  return response.data;
+};
+
+export const uploadProjectFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/projects/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+
 

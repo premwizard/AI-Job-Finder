@@ -291,6 +291,20 @@ class ProfileService:
         )
         return [profile_schemas.CertificationResponse.model_validate(c) for c in certs]
 
+    def upload_project_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+        url = self._save_upload_file(file, "projects")
+        return profile_schemas.ImageUploadResponse(url=url)
+
+    def get_projects(self, user_id: str) -> List[profile_schemas.ProjectResponse]:
+        projects = (
+            self.db.query(Project)
+            .filter(Project.user_id == user_id)
+            .order_by(Project.is_featured.desc(), Project.created_at.desc())
+            .all()
+        )
+        return [profile_schemas.ProjectResponse.model_validate(p) for p in projects]
+
+
 
     # --- Personal Information ---
     def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:
