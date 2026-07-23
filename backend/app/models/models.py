@@ -87,6 +87,7 @@ class User(Base):
     applications = relationship("Application", back_populates="user")
     analytics = relationship("Analytics", back_populates="user", uselist=False)
     connected_accounts = relationship("ConnectedAccount", back_populates="user")
+    education = relationship("Education", back_populates="user", cascade="all, delete-orphan")
 
 
 class UserProfile(Base):
@@ -554,3 +555,30 @@ class AIPreference(Base):
     )
 
     user = relationship("User")
+
+
+class Education(Base):
+    __tablename__ = "education"
+
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
+    institution_name: Any = Column(String, nullable=False)
+    institution_logo_url: Any = Column(String, nullable=True)
+    degree: Any = Column(String, nullable=False)
+    major: Any = Column(String, nullable=True)
+    specialization: Any = Column(String, nullable=True)
+    grade: Any = Column(String, nullable=True)
+    start_date: Any = Column(DateTime, nullable=True)
+    end_date: Any = Column(DateTime, nullable=True)
+    is_current: Any = Column(Boolean, default=False)
+    activities: Any = Column(Text, nullable=True)
+    honors_awards: Any = Column(Text, nullable=True)
+    relevant_coursework: Any = Column(Text, nullable=True)
+    certificate_url: Any = Column(String, nullable=True)
+    order: Any = Column(Integer, default=0)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User", back_populates="education")
