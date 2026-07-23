@@ -112,3 +112,34 @@ export const uploadEducationFile = async (file: File) => {
   return response.data;
 };
 
+// Certifications API
+export const getCertifications = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/certifications`);
+  return response.data;
+};
+
+export const createCertification = async (data: any) => {
+  const response = await authApi.post(`${PROFILE_URL}/certifications`, data);
+  return response.data;
+};
+
+export const updateCertification = async (id: string, data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/certifications/${id}`, data);
+  return response.data;
+};
+
+export const deleteCertification = async (id: string) => {
+  const response = await authApi.delete(`${PROFILE_URL}/certifications/${id}`);
+  return response.data;
+};
+
+export const uploadCertificationFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/certifications/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+

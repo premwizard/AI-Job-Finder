@@ -418,9 +418,13 @@ class Certification(Base):
     credential_id: Any = Column(String, nullable=True)
     issue_date: Any = Column(DateTime, nullable=True)
     expiry_date: Any = Column(DateTime, nullable=True)
+    does_not_expire: Any = Column(Boolean, default=False)
     verification_url: Any = Column(String, nullable=True)
     certificate_image_url: Any = Column(String, nullable=True)
+    category: Any = Column(String, nullable=True)
+    verification_status: Any = Column(String, default="unverified")
     created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = relationship("User")
 

@@ -51,6 +51,27 @@ from fastapi.staticfiles import StaticFiles
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
+from app.database.database import engine, Base
+from sqlalchemy import text
+
+@app.on_event("startup")
+def startup_event():
+    Base.metadata.create_all(bind=engine)
+    with engine.connect() as conn:
+        for col_def in [
+            "ALTER TABLE certifications ADD COLUMN does_not_expire BOOLEAN DEFAULT 0",
+            "ALTER TABLE certifications ADD COLUMN category VARCHAR",
+            "ALTER TABLE certifications ADD COLUMN verification_status VARCHAR DEFAULT 'unverified'",
+            "ALTER TABLE certifications ADD COLUMN updated_at DATETIME",
+            "ALTER TABLE education ADD COLUMN verification_status VARCHAR DEFAULT 'unverified'",
+            "ALTER TABLE education ADD COLUMN updated_at DATETIME",
+        ]:
+            try:
+                conn.execute(text(col_def))
+                conn.commit()
+            except Exception:
+                pass
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the AI Job Finder API"}

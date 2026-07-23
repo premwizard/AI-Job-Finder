@@ -278,6 +278,20 @@ class ProfileService:
         )
         return [profile_schemas.EducationResponse.model_validate(e) for e in educations]
 
+    def upload_certification_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+        url = self._save_upload_file(file, "certifications")
+        return profile_schemas.ImageUploadResponse(url=url)
+
+    def get_certifications(self, user_id: str) -> List[profile_schemas.CertificationResponse]:
+        certs = (
+            self.db.query(Certification)
+            .filter(Certification.user_id == user_id)
+            .order_by(Certification.issue_date.desc())
+            .all()
+        )
+        return [profile_schemas.CertificationResponse.model_validate(c) for c in certs]
+
+
     # --- Personal Information ---
     def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:
         profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()

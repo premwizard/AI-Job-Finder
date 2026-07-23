@@ -235,18 +235,30 @@ class CertificationCreate(BaseModel):
     credential_id: Optional[str] = None
     issue_date: Optional[datetime] = None
     expiry_date: Optional[datetime] = None
+    does_not_expire: Optional[bool] = False
     verification_url: Optional[str] = None
     certificate_image_url: Optional[str] = None
+    category: Optional[str] = None
+    verification_status: Optional[str] = "unverified"
 
 
-class CertificationUpdate(CertificationCreate):
-    name: Optional[str] = None  # type: ignore[assignment]
-    issuer: Optional[str] = None  # type: ignore[assignment]
+class CertificationUpdate(BaseModel):
+    name: Optional[str] = None
+    issuer: Optional[str] = None
+    credential_id: Optional[str] = None
+    issue_date: Optional[datetime] = None
+    expiry_date: Optional[datetime] = None
+    does_not_expire: Optional[bool] = None
+    verification_url: Optional[str] = None
+    certificate_image_url: Optional[str] = None
+    category: Optional[str] = None
+    verification_status: Optional[str] = None
 
 
 class CertificationResponse(CertificationCreate):
     id: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
