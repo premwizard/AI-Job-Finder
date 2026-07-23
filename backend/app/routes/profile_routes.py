@@ -587,5 +587,30 @@ def export_user_data(
     return service.export_user_data(current_user.id)
 
 
+# --- Notification Settings ---
+@router.get(
+    "/notification-settings",
+    response_model=profile_schemas.NotificationSettingResponse,
+)
+def get_notification_settings(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_notification_settings(current_user.id)
+
+
+@router.put(
+    "/notification-settings",
+    response_model=profile_schemas.NotificationSettingResponse,
+)
+def update_notification_settings(
+    req: profile_schemas.NotificationSettingUpdate,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_notification_settings(current_user.id, req)
+
+
+
 
 

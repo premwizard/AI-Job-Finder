@@ -297,6 +297,18 @@ export const exportUserData = async () => {
   return response.data;
 };
 
+// Notification Settings API
+export const getNotificationSettings = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/notification-settings`);
+  return response.data;
+};
+
+export const updateNotificationSettings = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/notification-settings`, data);
+  return response.data;
+};
+
+
 
 
 
