@@ -470,26 +470,34 @@ class CareerPreference(Base):
         String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
+    # Role & Industry
     preferred_roles: Any = Column(String, nullable=True)
     preferred_industries: Any = Column(String, nullable=True)
-    preferred_locations: Any = Column(String, nullable=True)
-    work_setup: Any = Column(
-        String, nullable=True
-    )  # Remote, Hybrid, Onsite (comma separated)
+    # Location
+    preferred_locations: Any = Column(String, nullable=True)  # Legacy combined
+    preferred_countries: Any = Column(String, nullable=True)  # CSV e.g. "India,USA"
+    preferred_cities: Any = Column(String, nullable=True)     # CSV e.g. "Bangalore,Remote"
+    # Work Setup
+    work_setup: Any = Column(String, nullable=True)           # CSV: "Remote,Hybrid,Onsite"
+    # Compensation
     expected_salary: Any = Column(String, nullable=True)
     preferred_currency: Any = Column(String, nullable=True)
-    employment_types: Any = Column(String, nullable=True)
-    company_size: Any = Column(String, nullable=True)
+    negotiable_salary: Any = Column(Boolean, default=False)
+    expected_joining_bonus: Any = Column(String, nullable=True)
+    # Company
+    employment_types: Any = Column(String, nullable=True)     # CSV: "Full-Time,Contract"
+    company_size: Any = Column(String, nullable=True)         # CSV: "1-50,51-200"
+    startup_or_enterprise: Any = Column(String, nullable=True)  # "Startup","Enterprise","Any"
+    # Mobility
     visa_sponsorship: Any = Column(Boolean, default=False)
     visa_status: Any = Column(String, nullable=True)
     willing_to_relocate: Any = Column(Boolean, default=False)
     relocation_countries: Any = Column(String, nullable=True)
+    # Schedule & Travel
     travel_willingness: Any = Column(String, nullable=True)
     preferred_shift: Any = Column(String, nullable=True)
     preferred_time_zone: Any = Column(String, nullable=True)
     availability: Any = Column(String, nullable=True)
-    negotiable_salary: Any = Column(Boolean, default=False)
-    expected_joining_bonus: Any = Column(String, nullable=True)
     updated_at: Any = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )

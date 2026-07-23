@@ -105,6 +105,16 @@ def update_professional_summary(
     return service.update_professional_summary(current_user.id, req)
 
 
+@router.get(
+    "/career-preferences", response_model=profile_schemas.CareerPreferenceResponse
+)
+def get_career_preferences(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_career_preferences(current_user.id)
+
+
 @router.put(
     "/career-preferences", response_model=profile_schemas.CareerPreferenceResponse
 )

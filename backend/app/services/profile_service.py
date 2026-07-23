@@ -531,6 +531,16 @@ class ProfileService:
         self.db.refresh(profile)
         return profile_schemas.ProfessionalSummaryResponse(**profile.__dict__)
 
+    def get_career_preferences(self, user_id: str) -> profile_schemas.CareerPreferenceResponse:
+        pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
+        if not pref:
+            return profile_schemas.CareerPreferenceResponse()
+        return profile_schemas.CareerPreferenceResponse.model_validate(pref)
+
     def update_career_preferences(
         self, user_id: str, data: profile_schemas.CareerPreferenceUpdate
     ):
@@ -546,7 +556,7 @@ class ProfileService:
             setattr(pref, key, value)
         self.db.commit()
         self.db.refresh(pref)
-        return profile_schemas.CareerPreferenceResponse(**pref.__dict__)
+        return profile_schemas.CareerPreferenceResponse.model_validate(pref)
 
     # --- Professional Information (New Module) ---
     def get_professional_info(self, user_id: str) -> profile_schemas.ProfessionalInfoResponse:

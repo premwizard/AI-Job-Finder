@@ -201,6 +201,18 @@ export const deleteResume = async (resumeId: number) => {
   return response.data;
 };
 
+// Career Preferences API
+export const getCareerPreferences = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/career-preferences`);
+  return response.data;
+};
+
+export const updateCareerPreferences = async (data: any) => {
+  const response = await authApi.put(`${PROFILE_URL}/career-preferences`, data);
+  return response.data;
+};
+
+
 
 
 

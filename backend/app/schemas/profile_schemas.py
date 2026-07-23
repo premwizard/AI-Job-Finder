@@ -324,23 +324,37 @@ class ProjectResponse(ProjectCreate):
 
 # --- Career Preferences ---
 class CareerPreferenceUpdate(BaseModel):
-    preferred_roles: Optional[str] = None
-    preferred_industries: Optional[str] = None
-    preferred_locations: Optional[str] = None
-    work_setup: Optional[str] = None
+    # Roles & Industries
+    preferred_roles: Optional[str] = None           # CSV chips
+    preferred_industries: Optional[str] = None      # CSV chips
+    # Location
+    preferred_countries: Optional[str] = None       # CSV chips
+    preferred_cities: Optional[str] = None          # CSV chips
+    preferred_locations: Optional[str] = None       # Legacy
+    # Work Setup
+    work_setup: Optional[str] = None                # CSV: "Remote,Hybrid,Onsite"
+    # Compensation
     expected_salary: Optional[str] = None
     preferred_currency: Optional[str] = None
-    employment_types: Optional[str] = None
-    company_size: Optional[str] = None
+    negotiable_salary: Optional[bool] = None
+    # Company Preferences
+    employment_types: Optional[str] = None          # CSV
+    company_size: Optional[str] = None              # CSV
+    startup_or_enterprise: Optional[str] = None     # "Startup", "Enterprise", "Any"
+    # Mobility
     visa_sponsorship: Optional[bool] = None
     willing_to_relocate: Optional[bool] = None
+    # Schedule & Travel
+    availability: Optional[str] = None
     travel_willingness: Optional[str] = None
     preferred_shift: Optional[str] = None
-    availability: Optional[str] = None
 
 
 class CareerPreferenceResponse(CareerPreferenceUpdate):
-    pass
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 # --- Social Profiles ---
