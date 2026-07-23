@@ -304,7 +304,145 @@ class ProfileService:
         )
         return [profile_schemas.ProjectResponse.model_validate(p) for p in projects]
 
+    # --- Resume Center ---
+    def _detect_file_type(self, filename: str) -> str:
+        """Detect file type label from extension."""
+        if not filename:
+            return "UNKNOWN"
+        ext = os.path.splitext(filename)[1].lower()
+        mapping = {
+            ".pdf": "PDF",
+            ".doc": "DOC",
+            ".docx": "DOCX",
+            ".txt": "TXT",
+            ".rtf": "RTF",
+        }
+        return mapping.get(ext, ext.lstrip(".").upper())
 
+    def get_resumes(self, user_id: str) -> List[profile_schemas.ResumeResponse]:
+        resumes = (
+            self.db.query(Resume)
+            .filter(Resume.user_id == user_id)
+            .order_by(Resume.version.desc())
+            .all()
+        )
+        return [profile_schemas.ResumeResponse.model_validate(r) for r in resumes]
+
+    def upload_resume(self, user_id: str, file: UploadFile) -> profile_schemas.ResumeResponse:
+        """Upload a new resume, auto-incrementing version. Sets all previous versions to inactive."""
+        # Read file content to get accurate size
+        file.file.seek(0, 2)  # Seek to end
+        file_size = file.file.tell()
+        file.file.seek(0)     # Reset to start
+
+        # Save file
+        upload_dir = os.path.join("uploads", "resumes")
+        os.makedirs(upload_dir, exist_ok=True)
+        file_ext = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        file_url = f"/uploads/resumes/{unique_filename}"
+
+        # Calculate next version number
+        max_version = self.db.query(Resume).filter(Resume.user_id == user_id).count()
+        next_version = max_version + 1
+
+        # Deactivate all existing versions
+        self.db.query(Resume).filter(Resume.user_id == user_id).update({"is_active": False})
+        self.db.commit()
+
+        # Create new active resume record
+        new_resume = Resume(
+            user_id=user_id,
+            file_url=file_url,
+            file_name=file.filename,
+            file_size=file_size,
+            file_type=self._detect_file_type(file.filename),
+            version=next_version,
+            is_active=True,
+            parsing_status="Ready",
+        )
+        self.db.add(new_resume)
+        self.db.commit()
+        self.db.refresh(new_resume)
+        return profile_schemas.ResumeResponse.model_validate(new_resume)
+
+    def replace_resume(self, user_id: str, resume_id: int, file: UploadFile) -> profile_schemas.ResumeResponse:
+        """Replace a specific resume version with a new file, keeping same version number."""
+        resume = self.db.query(Resume).filter(
+            Resume.id == resume_id, Resume.user_id == user_id
+        ).first()
+        if not resume:
+            raise HTTPException(status_code=404, detail="Resume not found")
+
+        # Delete old file if it exists
+        if resume.file_url:
+            old_path = resume.file_url.lstrip("/")
+            if os.path.exists(old_path):
+                try:
+                    os.remove(old_path)
+                except OSError:
+                    pass
+
+        # Read file content to get accurate size
+        file.file.seek(0, 2)
+        file_size = file.file.tell()
+        file.file.seek(0)
+
+        # Save new file
+        upload_dir = os.path.join("uploads", "resumes")
+        os.makedirs(upload_dir, exist_ok=True)
+        file_ext = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(upload_dir, unique_filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        resume.file_url = f"/uploads/resumes/{unique_filename}"
+        resume.file_name = file.filename
+        resume.file_size = file_size
+        resume.file_type = self._detect_file_type(file.filename)
+        resume.parsing_status = "Ready"
+        self.db.commit()
+        self.db.refresh(resume)
+        return profile_schemas.ResumeResponse.model_validate(resume)
+
+    def delete_resume(self, user_id: str, resume_id: int) -> bool:
+        """Delete a resume version and its file."""
+        resume = self.db.query(Resume).filter(
+            Resume.id == resume_id, Resume.user_id == user_id
+        ).first()
+        if not resume:
+            raise HTTPException(status_code=404, detail="Resume not found")
+
+        # Delete physical file
+        if resume.file_url:
+            file_path = resume.file_url.lstrip("/")
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError:
+                    pass
+
+        was_active = resume.is_active
+        self.db.delete(resume)
+        self.db.commit()
+
+        # If we deleted the active version, promote the next most recent to active
+        if was_active:
+            latest = (
+                self.db.query(Resume)
+                .filter(Resume.user_id == user_id)
+                .order_by(Resume.version.desc())
+                .first()
+            )
+            if latest:
+                latest.is_active = True
+                self.db.commit()
+
+        return True
 
     # --- Personal Information ---
     def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:

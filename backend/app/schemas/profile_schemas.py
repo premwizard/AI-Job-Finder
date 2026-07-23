@@ -381,13 +381,25 @@ class AIPreferenceResponse(AIPreferenceUpdate):
     pass
 
 
-# --- Resume Metadata ---
+# --- Resume ---
+class ResumeCreate(BaseModel):
+    file_url: str
+    file_name: Optional[str] = None
+    file_size: Optional[int] = None
+    file_type: Optional[str] = None
+    version: int = 1
+    is_active: bool = True
+    parsing_status: str = "Ready"
+
+
 class ResumeResponse(BaseModel):
     id: int
     file_url: str
     file_name: Optional[str] = None
     file_size: Optional[int] = None
+    file_type: Optional[str] = None
     version: int
+    is_active: bool = True
     resume_score: Optional[float] = None
     ats_score: Optional[float] = None
     parsing_status: str

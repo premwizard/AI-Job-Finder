@@ -70,6 +70,8 @@ def startup_event():
             "ALTER TABLE projects ADD COLUMN images TEXT",
             "ALTER TABLE projects ADD COLUMN status VARCHAR DEFAULT 'Completed'",
             "ALTER TABLE projects ADD COLUMN is_featured BOOLEAN DEFAULT 0",
+            "ALTER TABLE resumes ADD COLUMN file_type VARCHAR",
+            "ALTER TABLE resumes ADD COLUMN is_active BOOLEAN DEFAULT 1",
         ]:
             try:
                 conn.execute(text(col_def))

@@ -172,5 +172,35 @@ export const uploadProjectFile = async (file: File) => {
   return response.data;
 };
 
+// Resume Center API
+export const getResumes = async () => {
+  const response = await authApi.get(`${PROFILE_URL}/resume`);
+  return response.data;
+};
+
+export const uploadResumeFile = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/resume/upload`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const replaceResumeFile = async (resumeId: number, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await authApi.post(`${PROFILE_URL}/resume/replace/${resumeId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+export const deleteResume = async (resumeId: number) => {
+  const response = await authApi.delete(`${PROFILE_URL}/resume/${resumeId}`);
+  return response.data;
+};
+
+
 
 

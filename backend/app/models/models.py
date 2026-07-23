@@ -195,14 +195,14 @@ class Resume(Base):
     file_url: Any = Column(String)
     file_name: Any = Column(String, nullable=True)
     file_size: Any = Column(Integer, nullable=True)  # in bytes
+    file_type: Any = Column(String, nullable=True)   # e.g. "PDF", "DOCX"
     version: Any = Column(Integer, default=1)
+    is_active: Any = Column(Boolean, default=True)
 
-    # Metadata and Parsing
+    # Reserved — AI / Parsing fields (not implemented yet)
     resume_score: Any = Column(Float, nullable=True)
     ats_score: Any = Column(Float, nullable=True)
-    parsing_status: Any = Column(
-        String, default="pending"
-    )  # pending, completed, failed
+    parsing_status: Any = Column(String, default="Ready")  # Ready, Processing, Completed
     ai_summary: Any = Column(Text, nullable=True)
 
     uploaded_at: Any = Column(DateTime, default=datetime.utcnow)

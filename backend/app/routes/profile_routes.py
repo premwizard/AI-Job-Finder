@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
-from app.models.models import Certification, Education, Experience, Project, Skill, User
+from app.models.models import Certification, Education, Experience, Project, Resume, Skill, User
 from app.schemas import profile_schemas
 from app.services.profile_service import ProfileService
 
@@ -384,3 +384,49 @@ def delete_project(
 ):
     service._delete_item(Project, item_id, current_user.id)
 
+
+# --- Resume Center ---
+@router.get(
+    "/resume",
+    response_model=List[profile_schemas.ResumeResponse],
+)
+def get_resumes(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_resumes(current_user.id)
+
+
+@router.post(
+    "/resume/upload",
+    response_model=profile_schemas.ResumeResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def upload_resume(
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.upload_resume(current_user.id, file)
+
+
+@router.post(
+    "/resume/replace/{resume_id}",
+    response_model=profile_schemas.ResumeResponse,
+)
+def replace_resume(
+    resume_id: int,
+    file: UploadFile = File(...),
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.replace_resume(current_user.id, resume_id, file)
+
+
+@router.delete("/resume/{resume_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_resume(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    service.delete_resume(current_user.id, resume_id)
