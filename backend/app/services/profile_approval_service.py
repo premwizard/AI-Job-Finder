@@ -57,6 +57,7 @@ class ProfileApprovalService:
             if not profile:
                 profile = UserProfile(user_id=user_id)
                 self.db.add(profile)
+                self.db.flush()
 
             for item in request.items:
                 cat = item.category.lower()
@@ -150,17 +151,18 @@ class ProfileApprovalService:
                         merged_count += 1
 
                 elif cat == "languages":
-                    lang_name = (val.get("language") or "").strip()
-                    if lang_name:
+                    lang_name = (val.get("language") or val.get("name") or "").strip()
+                    if lang_name and profile and profile.id:
                         existing = (
                             self.db.query(Language)
-                            .filter(Language.user_id == user_id, Language.language.ilike(lang_name))
+                            .filter(Language.user_id == user_id, Language.name.ilike(lang_name))
                             .first()
                         )
                         if not existing:
                             new_lang = Language(
                                 user_id=user_id,
-                                language=lang_name,
+                                profile_id=profile.id,
+                                name=lang_name,
                                 proficiency=val.get("proficiency") or "Professional",
                             )
                             self.db.add(new_lang)
