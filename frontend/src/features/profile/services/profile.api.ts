@@ -256,6 +256,17 @@ export const getATSHistory = async (resumeId: number) => {
   return response.data;
 };
 
+// Quality Analysis Endpoints
+export const analyzeResumeQuality = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/quality-analyze`);
+  return response.data;
+};
+
+export const getQualityHistory = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/quality-history`);
+  return response.data;
+};
+
 export const approveResumeMerge = async (resumeId: number, items: any[]) => {
   const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/approve-merge`, {
     resume_id: resumeId,

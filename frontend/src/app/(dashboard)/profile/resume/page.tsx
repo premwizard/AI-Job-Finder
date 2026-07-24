@@ -68,6 +68,7 @@ import {
   Search,
   ArrowRight,
   Send,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -744,6 +745,9 @@ export default function ResumeCenterPage() {
                 </Button>
                 <Button variant="default" size="sm" className="h-8 text-xs bg-indigo-600 hover:bg-indigo-700 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/ats`)}>
                   <Sparkles className="w-3.5 h-3.5 mr-1.5" /> View ATS Analytics
+                </Button>
+                <Button variant="default" size="sm" className="h-8 text-xs bg-purple-600 hover:bg-purple-700 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/quality`)}>
+                  <Star className="w-3.5 h-3.5 mr-1.5" /> View Quality Score
                 </Button>
                 <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
                   <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File
