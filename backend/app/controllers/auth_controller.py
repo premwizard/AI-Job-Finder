@@ -77,7 +77,7 @@ def login_user(
     if not user.is_active:
         raise HTTPException(status_code=400, detail="User is inactive")
 
-    if user.is_deleted:
+    if getattr(user, "is_deleted", False):
         raise HTTPException(status_code=403, detail="This account has been deleted")
 
     access_token = auth_service.create_access_token(

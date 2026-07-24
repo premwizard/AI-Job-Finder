@@ -87,7 +87,7 @@ def provider_callback(
                 )
                 db.commit()
 
-        if user.is_deleted:
+        if getattr(user, "is_deleted", False):
             return RedirectResponse(
                 url=f"{config.FRONTEND_URL}/login?error=Account is deleted"
             )

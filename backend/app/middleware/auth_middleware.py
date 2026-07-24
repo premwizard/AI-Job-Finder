@@ -24,13 +24,16 @@ def get_current_user(
         email: str = payload.get("sub")
         if email is None:
             raise credentials_exception
-    except JWTError:
+    except Exception:
         raise credentials_exception
 
     user = get_user_by_email(db, email)
     if user is None:
-        raise credentials_exception
-    if not user.is_active:
+        user = db.query(User).filter(User.id == str(email)).first()
+        if user is None:
+            raise credentials_exception
+
+    if not getattr(user, "is_active", True):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
