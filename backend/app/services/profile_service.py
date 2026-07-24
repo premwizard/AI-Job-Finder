@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 import shutil
 import uuid
 import hashlib
@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from app.models.models import (
     Achievement,
     AIPreference,
+    Analytics,
+    Application,
     CareerPreference,
     Certification,
     Education,
@@ -19,8 +21,10 @@ from app.models.models import (
     PrivacySetting,
     Project,
     Resume,
+    SavedJob,
     Skill,
     SocialProfile,
+    User,
     UserProfile,
     Language,
     User,
@@ -187,7 +191,7 @@ class ProfileService:
         )
 
         return profile_schemas.FullProfileResponse(
-            completion_percentage=completion_response.completion_percentage,
+            completion_percentage=completion_response.get("percentage", 0) if isinstance(completion_response, dict) else getattr(completion_response, "percentage", 0),
             personal_info=personal_info,
             professional_summary=prof_summary,
             skills=[profile_schemas.SkillResponse.model_validate(s) for s in skills],
@@ -1236,26 +1240,31 @@ class ProfileService:
 
     def calculate_completion_percentage(self, user_id: str) -> Dict[str, Any]:
         """Calculate percentage of completed sections in profile."""
-        full = self.get_full_profile(user_id)
+        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        user_obj = self.db.query(User).filter(User.id == user_id).first()
+        skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
+        experiences = self.db.query(Experience).filter(Experience.user_id == user_id).all()
+        educations = self.db.query(Education).filter(Education.user_id == user_id).all()
+
         sections = []
         missing = []
         
-        if full.personal_info and (full.personal_info.first_name or full.personal_info.headline):
+        if (user_obj and (user_obj.first_name or user_obj.last_name)) or (profile and (profile.headline or profile.bio)):
             sections.append("personal_info")
         else:
             missing.append("personal_info")
 
-        if full.experiences and len(full.experiences) > 0:
+        if experiences and len(experiences) > 0:
             sections.append("experiences")
         else:
             missing.append("experiences")
 
-        if full.educations and len(full.educations) > 0:
+        if educations and len(educations) > 0:
             sections.append("educations")
         else:
             missing.append("educations")
 
-        if full.skills and len(full.skills) > 0:
+        if skills and len(skills) > 0:
             sections.append("skills")
         else:
             missing.append("skills")
