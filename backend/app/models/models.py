@@ -343,20 +343,96 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id: Any = Column(Integer, primary_key=True, index=True)
-    job_hash: Any = Column(
-        String, unique=True, index=True, nullable=True
-    )  # To deduplicate
+    job_hash: Any = Column(String, unique=True, index=True, nullable=True)
+    source: Any = Column(String, index=True)
+    original_url: Any = Column(String, nullable=True)
+    
     company_name: Any = Column(String, index=True)
+    company_logo: Any = Column(String, nullable=True)
+    company_size: Any = Column(String, nullable=True)
+    company_industry: Any = Column(String, nullable=True)
+    company_website: Any = Column(String, nullable=True)
+    
     job_title: Any = Column(String, index=True)
-    location: Any = Column(String)
-    salary: Any = Column(String, nullable=True)
-    description: Any = Column(Text, nullable=True)
-    source: Any = Column(String)
-    job_url: Any = Column(String)
-    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    employment_type: Any = Column(String, nullable=True) # Full-time, Part-time, Contract
+    work_mode: Any = Column(String, nullable=True) # Remote, Hybrid, Onsite
+    industry: Any = Column(String, nullable=True)
+    
+    min_salary: Any = Column(Integer, nullable=True)
+    max_salary: Any = Column(Integer, nullable=True)
+    salary_currency: Any = Column(String, nullable=True)
+    salary_period: Any = Column(String, nullable=True)
+    salary_available: Any = Column(Boolean, default=False)
+    
+    min_experience: Any = Column(Integer, nullable=True)
+    max_experience: Any = Column(Integer, nullable=True)
+    career_level: Any = Column(String, nullable=True)
+    
+    description_raw: Any = Column(Text, nullable=True)
+    description_clean: Any = Column(Text, nullable=True)
+    description_markdown: Any = Column(Text, nullable=True)
+    description_summary: Any = Column(Text, nullable=True)
+    
+    # Metadata
+    posted_date: Any = Column(DateTime, nullable=True)
+    collected_date: Any = Column(DateTime, default=datetime.utcnow)
+    expiry_date: Any = Column(DateTime, nullable=True)
+    language: Any = Column(String, default="en")
+    source_confidence: Any = Column(Float, default=1.0)
+    parsing_status: Any = Column(String, default="pending")
+    embedding_status: Any = Column(Boolean, default=False)
+    ai_processed: Any = Column(Boolean, default=False)
+    
+    # Existing relationships
+    saved_by = relationship("SavedJob", back_populates="job", cascade="all, delete-orphan")
+    applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
+    
+    # New relationships
+    locations = relationship("JobLocation", back_populates="job", cascade="all, delete-orphan")
+    skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")
+    requirements = relationship("JobRequirement", back_populates="job", cascade="all, delete-orphan")
+    benefits = relationship("JobBenefit", back_populates="job", cascade="all, delete-orphan")
 
-    saved_by = relationship("SavedJob", back_populates="job")
-    applications = relationship("Application", back_populates="job")
+
+class JobLocation(Base):
+    __tablename__ = "job_locations"
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
+    country: Any = Column(String, nullable=True)
+    state: Any = Column(String, nullable=True)
+    city: Any = Column(String, nullable=True)
+    is_remote: Any = Column(Boolean, default=False)
+    is_hybrid: Any = Column(Boolean, default=False)
+    
+    job = relationship("Job", back_populates="locations")
+
+
+class JobSkill(Base):
+    __tablename__ = "job_skills"
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
+    skill_name: Any = Column(String, index=True)
+    category: Any = Column(String, nullable=True) # Required, Preferred, Soft, AI, etc.
+    
+    job = relationship("Job", back_populates="skills")
+
+
+class JobRequirement(Base):
+    __tablename__ = "job_requirements"
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
+    requirement_text: Any = Column(String)
+    
+    job = relationship("Job", back_populates="requirements")
+
+
+class JobBenefit(Base):
+    __tablename__ = "job_benefits"
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
+    benefit_text: Any = Column(String)
+    
+    job = relationship("Job", back_populates="benefits")
 
 
 class SavedJob(Base):

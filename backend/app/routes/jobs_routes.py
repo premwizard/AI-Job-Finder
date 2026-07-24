@@ -1,35 +1,52 @@
-from typing import List
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-
-from app.controllers.jobs_controller import get_job as ctrl_get_job
-from app.controllers.jobs_controller import get_jobs as ctrl_get_jobs
-from app.controllers.jobs_controller import (
-    get_recommended_jobs as ctrl_get_recommended_jobs,
-)
 from app.database.database import get_db
-from app.middleware.auth_middleware import (
-    get_current_user,
-)  # Need to check if it's core.security or api.deps
-from app.models import models
-from app.schemas import schemas
+from app.schemas.job_schemas import JobPaginationResponse, JobSchema, JobStatisticsResponse
+from app.repositories.job_repository import JobRepository
+from app.services.job_collection_service import JobCollectionService
+from typing import Optional
 
-router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
+router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
-
-@router.get("", response_model=List[schemas.JobResponse])
-def get_jobs(db: Session = Depends(get_db)):
-    return ctrl_get_jobs(db)
-
-
-@router.get("/recommended", response_model=List[schemas.JobResponse])
-def recommended_jobs(
-    db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)
+@router.get("", response_model=JobPaginationResponse)
+def get_jobs(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    search: Optional[str] = None,
+    company: Optional[str] = None,
+    role: Optional[str] = None,
+    location: Optional[str] = None,
+    is_remote: Optional[bool] = None,
+    source: Optional[str] = None,
+    db: Session = Depends(get_db)
 ):
-    return ctrl_get_recommended_jobs(db, current_user)
+    repo = JobRepository(db)
+    skip = (page - 1) * size
+    total, items = repo.get_jobs(
+        skip=skip, limit=size, search=search, company=company, 
+        role=role, location=location, is_remote=is_remote, source=source
+    )
+    pages = (total + size - 1) // size
+    return JobPaginationResponse(
+        total=total,
+        page=page,
+        size=size,
+        pages=pages,
+        items=items
+    )
 
+@router.get("/statistics", response_model=JobStatisticsResponse)
+def get_job_statistics(db: Session = Depends(get_db)):
+    repo = JobRepository(db)
+    return repo.get_statistics()
 
-@router.get("/{job_id}", response_model=schemas.JobDetailResponse)
+@router.get("/{job_id}", response_model=JobSchema)
 def get_job(job_id: int, db: Session = Depends(get_db)):
-    return ctrl_get_job(job_id, db)
+    repo = JobRepository(db)
+    return repo.get_job_by_id(job_id)
+
+@router.post("/refresh")
+def refresh_jobs(db: Session = Depends(get_db)):
+    service = JobCollectionService(db)
+    result = service.run_collection()
+    return {"message": "Job collection triggered", "result": result}
