@@ -653,6 +653,18 @@ class AgentDecision(Base):
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
 
+class ToolExecutionLog(Base):
+    __tablename__ = "tool_execution_logs"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    tool_name: Any = Column(String, nullable=False, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    success: Any = Column(Boolean, default=True)
+    latency_ms: Any = Column(Float, default=0.0)
+    error_message: Any = Column(Text, nullable=True)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

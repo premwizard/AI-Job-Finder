@@ -24,6 +24,8 @@ from app.routes import (
     agent_routes,
     multi_agent_routes,
     memory_routes,
+    planner_routes,
+    tool_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -67,6 +69,8 @@ app.include_router(resume_optimize_routes.router)
 app.include_router(agent_routes.router)
 app.include_router(multi_agent_routes.router)
 app.include_router(memory_routes.router)
+app.include_router(planner_routes.router)
+app.include_router(tool_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)
