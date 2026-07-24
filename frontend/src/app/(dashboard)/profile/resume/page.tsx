@@ -527,8 +527,11 @@ function ResumePreviewModal({ resume, onClose }: PreviewModalProps) {
 
 // ── Main Page Component ───────────────────────────────────────────────────────
 
+import { useRouter } from "next/navigation";
+
 export default function ResumeCenterPage() {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -738,6 +741,9 @@ export default function ResumeCenterPage() {
               <div className="flex flex-wrap gap-2">
                 <Button variant="default" size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 font-semibold" onClick={() => setViewMergeResume(activeResume)}>
                   <GitCompare className="w-3.5 h-3.5 mr-1.5" /> Review & Approve Profile Merge
+                </Button>
+                <Button variant="default" size="sm" className="h-8 text-xs bg-indigo-600 hover:bg-indigo-700 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/ats`)}>
+                  <Sparkles className="w-3.5 h-3.5 mr-1.5" /> View ATS Analytics
                 </Button>
                 <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
                   <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File

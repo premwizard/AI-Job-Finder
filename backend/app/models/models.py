@@ -208,6 +208,7 @@ class Resume(Base):
     raw_text: Any = Column(Text, nullable=True)
     clean_text: Any = Column(Text, nullable=True)
     parsed_data_json: Any = Column(Text, nullable=True)
+    ats_analysis_json: Any = Column(Text, nullable=True)
     processing_error: Any = Column(Text, nullable=True)
     processed_at: Any = Column(DateTime, nullable=True)
     cleaned_at: Any = Column(DateTime, nullable=True)
@@ -224,7 +225,22 @@ class Resume(Base):
     )
 
     user = relationship("User", back_populates="resumes")
+    ats_history = relationship("ATSAnalysisHistory", back_populates="resume", cascade="all, delete-orphan")
 
+
+class ATSAnalysisHistory(Base):
+    __tablename__ = "ats_analysis_history"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    overall_score: Any = Column(Integer, nullable=False)
+    category_scores_json: Any = Column(Text, nullable=True) # Contains category breakdown
+    full_analysis_json: Any = Column(Text, nullable=True) # Full JSON output
+    analyzed_at: Any = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+    resume = relationship("Resume", back_populates="ats_history")
 
 class Job(Base):
     __tablename__ = "jobs"

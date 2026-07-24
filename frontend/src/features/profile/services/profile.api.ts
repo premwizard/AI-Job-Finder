@@ -245,6 +245,17 @@ export const getResumeMergeSuggestions = async (resumeId: number) => {
   return response.data;
 };
 
+// ATS Analysis Endpoints
+export const analyzeResumeATS = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/ats-analyze`);
+  return response.data;
+};
+
+export const getATSHistory = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/ats-history`);
+  return response.data;
+};
+
 export const approveResumeMerge = async (resumeId: number, items: any[]) => {
   const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/approve-merge`, {
     resume_id: resumeId,

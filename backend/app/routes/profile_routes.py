@@ -780,6 +780,54 @@ def get_profile_analytics(
     return service.get_profile_analytics(current_user.id)
 
 
+# --- ATS Analysis Engine ---
+from app.services.ats_analysis_service import ATSAnalysisService
+from app.models.models import ATSAnalysisHistory
+import json
 
+@router.post("/resume/{resume_id}/ats-analyze")
+def analyze_resume_ats(
+    resume_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    target_text = resume.clean_text or resume.raw_text or ""
+    if not target_text:
+        raise HTTPException(status_code=400, detail="Resume has no parseable text")
+        
+    # Run analysis
+    result = ATSAnalysisService.analyze_resume(target_text)
+    
+    # Save JSON to resume
+    resume.ats_analysis_json = result.model_dump_json()
+    
+    # Save History
+    history_entry = ATSAnalysisHistory(
+        user_id=current_user.id,
+        resume_id=resume.id,
+        overall_score=result.overall_score,
+        category_scores_json=json.dumps({k: v.model_dump() for k, v in result.category_scores.items()}),
+        full_analysis_json=result.model_dump_json()
+    )
+    db.add(history_entry)
+    db.commit()
+    
+    return result
 
+@router.get("/resume/{resume_id}/ats-history")
+def get_ats_history(
+    resume_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    history = db.query(ATSAnalysisHistory).filter(ATSAnalysisHistory.resume_id == resume_id).order_by(ATSAnalysisHistory.analyzed_at.desc()).all()
+    return history
 
