@@ -259,6 +259,28 @@ class QualityAnalysisHistory(Base):
     user = relationship("User")
     resume = relationship("Resume", back_populates="quality_history")
 
+
+class ResumeImprovementSuggestion(Base):
+    __tablename__ = "resume_improvement_suggestions"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    
+    section: Any = Column(String, nullable=False) # e.g. "Experience", "Summary", "Skills"
+    original_text: Any = Column(Text, nullable=False)
+    suggested_text: Any = Column(Text, nullable=False)
+    improvement_type: Any = Column(String, nullable=False) # e.g. "Action Verb", "Quantification"
+    reason: Any = Column(Text, nullable=True) # Why this is better
+    
+    status: Any = Column(String, default="PENDING") # PENDING, ACCEPTED, REJECTED, EDITED
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    resolved_at: Any = Column(DateTime, nullable=True)
+
+    user = relationship("User")
+    resume = relationship("Resume")
+
 class Job(Base):
     __tablename__ = "jobs"
 

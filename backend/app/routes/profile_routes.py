@@ -883,3 +883,125 @@ def get_quality_history(
     history = db.query(QualityAnalysisHistory).filter(QualityAnalysisHistory.resume_id == resume_id).order_by(QualityAnalysisHistory.analyzed_at.desc()).all()
     return history
 
+
+# --- Improvement Engine ---
+from app.services.improvement_engine_service import ImprovementEngineService
+from app.models.models import ResumeImprovementSuggestion
+from pydantic import BaseModel
+
+class ResolveImprovementRequest(BaseModel):
+    action: str # "ACCEPT", "REJECT", "EDIT"
+    edited_text: str = None
+
+@router.post("/resume/{resume_id}/improvements/generate")
+def generate_resume_improvements(
+    resume_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    parsed_json = resume.parsed_data_json
+    if not parsed_json:
+        raise HTTPException(status_code=400, detail="Resume must be parsed first")
+        
+    suggestions = ImprovementEngineService.generate_improvements(parsed_json)
+    
+    # Save suggestions to DB
+    for s in suggestions:
+        # Check if already exists exactly
+        existing = db.query(ResumeImprovementSuggestion).filter(
+            ResumeImprovementSuggestion.resume_id == resume.id,
+            ResumeImprovementSuggestion.original_text == s.original_text,
+            ResumeImprovementSuggestion.status == "PENDING"
+        ).first()
+        if not existing:
+            new_sugg = ResumeImprovementSuggestion(
+                user_id=current_user.id,
+                resume_id=resume.id,
+                section=s.section,
+                original_text=s.original_text,
+                suggested_text=s.suggested_text,
+                improvement_type=s.improvement_type,
+                reason=s.reason
+            )
+            db.add(new_sugg)
+            
+    db.commit()
+    return {"message": "Improvements generated successfully"}
+
+
+@router.get("/resume/{resume_id}/improvements")
+def get_resume_improvements(
+    resume_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    suggestions = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.resume_id == resume_id).order_by(ResumeImprovementSuggestion.created_at.desc()).all()
+    return suggestions
+
+
+@router.post("/resume/{resume_id}/improvements/{suggestion_id}/resolve")
+def resolve_resume_improvement(
+    resume_id: int,
+    suggestion_id: str,
+    req: ResolveImprovementRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    suggestion = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.id == suggestion_id, ResumeImprovementSuggestion.resume_id == resume_id).first()
+    
+    if not resume or not suggestion:
+        raise HTTPException(status_code=404, detail="Not found")
+        
+    if req.action in ["ACCEPT", "EDIT"]:
+        final_text = req.edited_text if req.action == "EDIT" else suggestion.suggested_text
+        
+        # Apply to resume JSON via string replacement
+        if resume.parsed_data_json and suggestion.original_text in resume.parsed_data_json:
+            resume.parsed_data_json = resume.parsed_data_json.replace(suggestion.original_text, final_text)
+            
+            # Note: Also attempt to replace in raw/clean text to keep them somewhat in sync
+            if resume.clean_text:
+                resume.clean_text = resume.clean_text.replace(suggestion.original_text, final_text)
+            
+    suggestion.status = req.action
+    suggestion.resolved_at = datetime.utcnow()
+    db.commit()
+    
+    return {"message": f"Suggestion {req.action.lower()}ed successfully"}
+
+
+@router.post("/resume/{resume_id}/improvements/apply-all")
+def apply_all_resume_improvements(
+    resume_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    pending = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.resume_id == resume_id, ResumeImprovementSuggestion.status == "PENDING").all()
+    
+    applied = 0
+    for suggestion in pending:
+        if resume.parsed_data_json and suggestion.original_text in resume.parsed_data_json:
+            resume.parsed_data_json = resume.parsed_data_json.replace(suggestion.original_text, suggestion.suggested_text)
+            if resume.clean_text:
+                resume.clean_text = resume.clean_text.replace(suggestion.original_text, suggestion.suggested_text)
+            
+            suggestion.status = "ACCEPTED"
+            suggestion.resolved_at = datetime.utcnow()
+            applied += 1
+            
+    db.commit()
+    return {"message": f"Applied {applied} suggestions successfully"}
+

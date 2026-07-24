@@ -267,6 +267,27 @@ export const getQualityHistory = async (resumeId: number) => {
   return response.data;
 };
 
+// Improvement Engine Endpoints
+export const generateResumeImprovements = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/improvements/generate`);
+  return response.data;
+};
+
+export const getResumeImprovements = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}/improvements`);
+  return response.data;
+};
+
+export const resolveResumeImprovement = async (resumeId: number, suggestionId: string, data: any) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/improvements/${suggestionId}/resolve`, data);
+  return response.data;
+};
+
+export const applyAllResumeImprovements = async (resumeId: number) => {
+  const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/improvements/apply-all`);
+  return response.data;
+};
+
 export const approveResumeMerge = async (resumeId: number, items: any[]) => {
   const response = await authApi.post(`${PROFILE_URL}/resume/${resumeId}/approve-merge`, {
     resume_id: resumeId,
