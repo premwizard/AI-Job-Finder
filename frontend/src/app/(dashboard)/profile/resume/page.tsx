@@ -477,7 +477,7 @@ interface PreviewModalProps {
 function ResumePreviewModal({ resume, onClose }: PreviewModalProps) {
   if (!resume) return null;
 
-  const backendBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const backendBase = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') : "";
   const fileUrl = `${backendBase}${resume.file_url}`;
   const fileExt = (resume.file_type || "").toUpperCase();
   const isImage = ["PNG", "JPEG", "JPG", "WEBP"].includes(fileExt);

@@ -309,7 +309,7 @@ interface AchievementCardProps {
 
 function AchievementCard({ achievement, onEdit, onDelete, onUpload, isDeleting }: AchievementCardProps) {
   const meta = TYPE_META[achievement.type as AchievementType] ?? TYPE_META.Award;
-  const backendBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const backendBase = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') : "";
 
   return (
     <div className={`relative flex gap-0 group`}>
