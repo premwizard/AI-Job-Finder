@@ -974,6 +974,15 @@ def resolve_resume_improvement(
             
     suggestion.status = req.action
     suggestion.resolved_at = datetime.utcnow()
+    
+    if req.action in ["ACCEPT", "EDIT"]:
+        from app.services.version_service import VersionService
+        VersionService.create_snapshot(
+            resume=resume,
+            change_summary=f"Applied AI Improvement (Section: {suggestion.section})",
+            db=db
+        )
+        
     db.commit()
     
     return {"message": f"Suggestion {req.action.lower()}ed successfully"}
@@ -1001,6 +1010,14 @@ def apply_all_resume_improvements(
             suggestion.status = "ACCEPTED"
             suggestion.resolved_at = datetime.utcnow()
             applied += 1
+            
+    if applied > 0:
+        from app.services.version_service import VersionService
+        VersionService.create_snapshot(
+            resume=resume,
+            change_summary=f"Applied {applied} AI Improvements in bulk",
+            db=db
+        )
             
     db.commit()
     return {"message": f"Applied {applied} suggestions successfully"}

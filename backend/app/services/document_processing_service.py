@@ -306,6 +306,14 @@ class DocumentProcessingService:
             except Exception:
                 pass
 
+        # Create Version Snapshot
+        from app.services.version_service import VersionService
+        VersionService.create_snapshot(
+            resume=resume,
+            change_summary="Initial Parse" if resume.version == 1 else "File Replaced",
+            db=self.db
+        )
+
         self.db.commit()
         self.db.refresh(resume)
         return profile_schemas.ResumeResponse.model_validate(resume)
