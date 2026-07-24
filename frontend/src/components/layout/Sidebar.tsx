@@ -19,7 +19,8 @@ import {
   Sparkles,
   Database,
   LogOut,
-  Server
+  Server,
+  Search
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -38,6 +39,7 @@ const sidebarItems = [
   { name: "Saved Jobs", href: "/saved", icon: Bookmark },
   { name: "Profile", href: "/profile", icon: User },
   { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Advanced Search", href: "/search", icon: Search },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 
