@@ -30,6 +30,9 @@ authApi.interceptors.response.use(
     // On 401, clear the stale local token so the user is redirected to login.
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

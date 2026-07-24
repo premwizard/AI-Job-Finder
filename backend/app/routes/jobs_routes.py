@@ -15,7 +15,7 @@ from app.middleware.auth_middleware import (
 from app.models import models
 from app.schemas import schemas
 
-router = APIRouter(prefix="/jobs", tags=["Jobs"])
+router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
 
 
 @router.get("", response_model=List[schemas.JobResponse])

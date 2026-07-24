@@ -35,15 +35,15 @@ app.add_middleware(
 # Include Routers
 app.include_router(auth_routes.router)
 app.include_router(social_auth_routes.router)
-app.include_router(users.router)
+app.include_router(users.router, prefix="/api")
 app.include_router(jobs_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
-app.include_router(analytics.router)
-app.include_router(resume.router)
-app.include_router(saved_jobs.router)
-app.include_router(applications.router)
-app.include_router(work_experience.router)
+app.include_router(analytics.router, prefix="/api")
+app.include_router(resume.router, prefix="/api")
+app.include_router(saved_jobs.router, prefix="/api")
+app.include_router(applications.router, prefix="/api")
+app.include_router(work_experience.router, prefix="/api")
 
 from fastapi.staticfiles import StaticFiles
 
