@@ -536,6 +536,23 @@ class ChatMessage(Base):
     user = relationship("User")
 
 
+class CompanyProfile(Base):
+    __tablename__ = "company_profiles"
+
+    id: Any = Column(Integer, primary_key=True, index=True)
+    company_name: Any = Column(String, nullable=False, unique=True, index=True)
+    logo_url: Any = Column(String, nullable=True)
+    industry: Any = Column(String, nullable=True)
+    
+    tech_stack_json: Any = Column(Text, nullable=True) # JSON list/dict
+    benefits_json: Any = Column(Text, nullable=True) # JSON list
+    culture_json: Any = Column(Text, nullable=True) # JSON dict (mission, engineering_culture)
+    ai_summary: Any = Column(Text, nullable=True)
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

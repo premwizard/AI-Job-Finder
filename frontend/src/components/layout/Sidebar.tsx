@@ -20,7 +20,8 @@ import {
   Database,
   LogOut,
   Server,
-  Search
+  Search,
+  Building2
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -40,6 +41,7 @@ const sidebarItems = [
   { name: "Profile", href: "/profile", icon: User },
   { name: "Settings", href: "/settings", icon: Settings },
   { name: "Advanced Search", href: "/search", icon: Search },
+  { name: "Companies", href: "/companies", icon: Building2 },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 
