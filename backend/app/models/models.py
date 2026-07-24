@@ -467,6 +467,60 @@ class JobRecommendation(Base):
     job = relationship("Job")
 
 
+class JobExplanation(Base):
+    __tablename__ = "job_explanations"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    overall_summary: Any = Column(Text, nullable=True)
+    strengths_json: Any = Column(Text, nullable=True)
+    missing_skills_json: Any = Column(Text, nullable=True)
+    risk_factors_json: Any = Column(Text, nullable=True)
+    improvement_suggestions_json: Any = Column(Text, nullable=True)
+    
+    career_growth_analysis: Any = Column(Text, nullable=True)
+    confidence_explanation: Any = Column(Text, nullable=True)
+    confidence_score: Any = Column(Float, nullable=False, default=0.0)
+    
+    is_stale: Any = Column(Boolean, default=False)
+    generated_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+    job = relationship("Job")
+
+
+class JobLearningRoadmap(Base):
+    __tablename__ = "job_learning_roadmaps"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    roadmap_json: Any = Column(Text, nullable=False) # JSON array of learning phases/steps
+    projected_improvements_json: Any = Column(Text, nullable=False) # JSON mapping skill -> score improvement
+    career_growth_insights_json: Any = Column(Text, nullable=True)
+    
+    is_stale: Any = Column(Boolean, default=False)
+    generated_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+    job = relationship("Job")
+
+
+class RAGDocumentMetadata(Base):
+    __tablename__ = "rag_document_metadata"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    collection_name: Any = Column(String, nullable=False, index=True) # e.g. "jobs", "users", "learning"
+    entity_id: Any = Column(String, nullable=False, index=True) # e.g. job_id, user_id
+    chunk_type: Any = Column(String, nullable=False) # e.g. "skills", "experience", "requirements"
+    visibility: Any = Column(String, nullable=False, default="public") # "public" or "private"
+    
+    last_indexed: Any = Column(DateTime, default=datetime.utcnow)
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

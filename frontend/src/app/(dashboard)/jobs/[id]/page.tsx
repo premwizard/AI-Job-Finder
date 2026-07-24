@@ -3,7 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getJob } from "@/features/jobs/services/jobs.api";
 import { getParsedJob, parseSingleJob } from "@/features/jobs/services/job_parsing.api";
-import { Loader2, Briefcase, Building2, MapPin, Code, Star, CheckCircle2, ChevronRight, Zap } from "lucide-react";
+import { getJobExplanation, regenerateJobExplanation } from "@/features/jobs/services/explanations.api";
+import { Loader2, Briefcase, Building2, MapPin, Code, Star, CheckCircle2, ChevronRight, Zap, Target, TrendingUp, AlertTriangle, ShieldCheck, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,20 @@ export default function JobDetailsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['job', id] });
       queryClient.invalidateQueries({ queryKey: ['parsedJob', id] });
+    }
+  });
+
+  const { data: explanation, isLoading: explanationLoading } = useQuery({
+    queryKey: ['jobExplanation', id],
+    queryFn: () => getJobExplanation(id),
+    enabled: !!job?.ai_processed,
+    retry: false
+  });
+
+  const regenerateMutation = useMutation({
+    mutationFn: () => regenerateJobExplanation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobExplanation', id] });
     }
   });
 
@@ -100,11 +115,116 @@ export default function JobDetailsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main Content (2/3 width) */}
           <div className="md:col-span-2 space-y-6">
+            
+            {explanation && (
+              <Card className="border-indigo-200 shadow-md overflow-hidden bg-gradient-to-br from-indigo-50/50 to-white">
+                <CardHeader className="bg-indigo-600 text-white flex flex-row items-center justify-between py-4">
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Star className="w-5 h-5 text-indigo-200" />
+                    AI Insights & Recommendation
+                  </CardTitle>
+                  <Badge variant="outline" className="bg-indigo-500 border-indigo-400 text-white font-semibold">
+                    <ShieldCheck className="w-4 h-4 mr-1" />
+                    {explanation.confidence_score}% Confidence
+                  </Badge>
+                </CardHeader>
+                <CardContent className="p-6 space-y-8">
+                  <div>
+                    <h4 className="text-lg font-semibold text-indigo-900 mb-2">Overall Summary</h4>
+                    <p className="text-indigo-800/80 leading-relaxed">{explanation.overall_summary}</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="flex items-center gap-2 font-semibold text-green-800">
+                        <CheckCircle2 className="w-5 h-5 text-green-600" /> Strengths
+                      </h4>
+                      <ul className="space-y-2">
+                        {explanation.strengths.map((strength: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-green-900/80">
+                            <span className="text-green-500 mt-0.5">•</span> {strength}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="flex items-center gap-2 font-semibold text-amber-800">
+                        <AlertTriangle className="w-5 h-5 text-amber-600" /> Risk Factors
+                      </h4>
+                      <ul className="space-y-2">
+                        {explanation.risk_factors.map((risk: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-amber-900/80">
+                            <span className="text-amber-500 mt-0.5">•</span> {risk}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {explanation.missing_skills_analysis && explanation.missing_skills_analysis.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold text-indigo-900 mb-4 flex items-center gap-2">
+                        <Target className="w-5 h-5 text-indigo-500" /> Skill Gap Analysis
+                      </h4>
+                      <div className="grid gap-3">
+                        {explanation.missing_skills_analysis.map((skill: any, i: number) => (
+                          <div key={i} className="bg-white rounded-lg p-4 border border-indigo-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                              <span className="font-bold text-slate-800">{skill.skill}</span>
+                              <p className="text-sm text-slate-500 mt-1">{skill.impact}</p>
+                            </div>
+                            <Badge variant="outline" className={`shrink-0 ${skill.importance === 'High' ? 'border-red-200 text-red-700 bg-red-50' : skill.importance === 'Medium' ? 'border-amber-200 text-amber-700 bg-amber-50' : 'border-blue-200 text-blue-700 bg-blue-50'}`}>
+                              {skill.importance} Priority
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid md:grid-cols-2 gap-6 bg-white p-5 rounded-lg border border-indigo-100">
+                    <div>
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-800 mb-2">
+                        <TrendingUp className="w-4 h-4 text-indigo-500" /> Career Growth
+                      </h4>
+                      <p className="text-sm text-slate-600 leading-relaxed">{explanation.career_growth_analysis}</p>
+                    </div>
+                    <div>
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-800 mb-2">
+                        <Zap className="w-4 h-4 text-indigo-500" /> Actionable Improvements
+                      </h4>
+                      <ul className="space-y-2">
+                        {explanation.improvement_suggestions.map((sug: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                            <ChevronRight className="w-4 h-4 shrink-0 text-indigo-400 mt-0.5" />
+                            {sug}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2">
+                    <Link href={`/jobs/${id}/roadmap`}>
+                      <Button variant="outline" className="border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100">
+                        View Learning Roadmap
+                      </Button>
+                    </Link>
+                    <Button variant="ghost" onClick={() => regenerateMutation.mutate()} disabled={regenerateMutation.isPending} className="text-indigo-600 hover:text-indigo-800 bg-white shadow-sm border border-indigo-100">
+                      {regenerateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                      Regenerate Insights
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardHeader className="pb-3 border-b">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Star className="w-5 h-5 text-amber-500" />
-                  AI Summary
+                  Parsed Summary
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">

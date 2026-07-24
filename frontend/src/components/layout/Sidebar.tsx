@@ -18,7 +18,8 @@ import {
   BrainCircuit,
   Sparkles,
   Database,
-  LogOut
+  LogOut,
+  Server
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -37,6 +38,7 @@ const sidebarItems = [
   { name: "Saved Jobs", href: "/saved", icon: Bookmark },
   { name: "Profile", href: "/profile", icon: User },
   { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 
 import { useRestrictedFeature } from "@/hooks/useRestrictedFeature";
