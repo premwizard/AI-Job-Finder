@@ -418,6 +418,32 @@ class JobChunkMetadata(Base):
     job = relationship("Job", back_populates="chunks")
 
 
+class JobMatchResult(Base):
+    __tablename__ = "job_match_results"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    overall_score: Any = Column(Float, nullable=False)
+    semantic_score: Any = Column(Float, nullable=True)
+    skills_score: Any = Column(Float, nullable=True)
+    experience_score: Any = Column(Float, nullable=True)
+    salary_score: Any = Column(Float, nullable=True)
+    
+    missing_skills_json: Any = Column(Text, nullable=True)
+    matched_skills_json: Any = Column(Text, nullable=True)
+    
+    explanation_summary: Any = Column(Text, nullable=True)
+    explanation_missing: Any = Column(Text, nullable=True)
+    
+    is_stale: Any = Column(Boolean, default=False)
+    calculated_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+    job = relationship("Job")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)
