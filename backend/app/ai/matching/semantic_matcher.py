@@ -1,8 +1,7 @@
 import numpy as np
-import json
-from typing import List, Dict, Any
+from typing import List
 from sqlalchemy.orm import Session
-from app.models.models import JobChunkMetadata, UserProfile, Skill
+from app.models.models import UserProfile, Skill
 from app.ai.embeddings.providers import GeminiEmbeddingProvider
 
 def cosine_similarity(v1: List[float], v2: List[float]) -> float:

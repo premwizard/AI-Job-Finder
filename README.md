@@ -4,9 +4,9 @@ An automated job finder and career management platform that searches for AI/ML/S
 
 ---
 
-## 🏛️ Architecture
+## 🏛️ Updated AI Architecture
 
-Frontend
+User
 ↓
 Authentication
 ↓
@@ -35,6 +35,18 @@ Hybrid Retrieval
 Company Intelligence
 ↓
 Resume Optimization
+↓
+AI Career Agent
+↓
+Multi-Agent System
+↓
+Memory Engine
+↓
+Planning & Reasoning Engine
+↓
+Tool Registry
+↓
+Opportunity Monitoring Agent
 
 ---
 
@@ -395,6 +407,83 @@ Generates evidence-based, section-by-section resume rewrites.
 
 ---
 
+## 🚀 Phase 6 — AI Career Agent Platform
+
+Phase 6 transforms the platform from an AI-powered job finder into an autonomous, agent-based career platform. It introduces an AI Career Agent capable of planning, reasoning, orchestrating specialized agents, maintaining long-term memory, coordinating tools, and proactively monitoring career opportunities. This phase builds directly on the intelligence layers developed in Phases 1–5.
+
+### 1. Module 1 — AI Career Agent Core
+The AI Career Agent acts as the central orchestrator for the entire platform.
+* Goal-based career planning
+* Goal creation and management
+* Execution plan generation
+* Task decomposition & dependency management
+* Goal progress tracking & execution monitoring
+* Reflection logging & planning history
+* Goal analytics
+* Background execution support
+* Manual and semi-autonomous execution modes
+
+### 2. Module 2 — Multi-Agent Architecture
+A Supervisor-Worker architecture where specialized agents reuse existing business services without duplicating logic.
+**Specialized Agents:**
+* **Resume Agent:** Optimizes and analyzes resumes.
+* **Job Search Agent:** Discovers and filters relevant jobs.
+* **Company Intelligence Agent:** Evaluates company culture and tech stacks.
+* **Learning Agent:** Generates skill-gap roadmaps.
+* **Interview Agent:** Prepares the user for interviews.
+* **Recommendation Agent:** Generates personalized opportunity feeds.
+* **Career Strategy Agent:** Advises on long-term career moves.
+
+**Features:**
+* Shared context & agent communication
+* Agent registry & health monitoring
+* Parallel execution & orchestration
+* Structured messaging & execution timelines
+
+### 3. Module 3 — Persistent Memory & Context Engine
+Provides personalized continuity across sessions. All agents retrieve user context from this centralized Memory Engine.
+**Memory Types:**
+* **Working Memory:** Immediate task context.
+* **Short-Term Memory:** Recent conversation history.
+* **Long-Term Memory:** Persistent user facts.
+* **Episodic Memory:** Past career events and milestones.
+* **Semantic Memory:** Concept relationships (e.g., skill affinities).
+
+**Features:**
+* Personalized AI & career timeline
+* Preference learning & resume/application/interview/learning history
+* Memory consolidation & semantic search
+* Context building & importance scoring
+
+### 4. Module 4 — Planning, Reasoning & Reflection Engine
+The cognitive core of the AI Career Agent. Model-agnostic and supports interchangeable LLM providers.
+**Planning:** Dynamic execution planning, goal decomposition, task prioritization, dependency management, milestone generation.
+**Reasoning:** Multi-step reasoning, structured decision making, evidence-based reasoning, confidence scoring, alternative strategies.
+**Reflection:** Self-evaluation, execution feedback, replanning, risk analysis, reflection history.
+
+### 5. Module 5 — Unified Tool Registry & Tool Calling Framework
+AI agents never call services directly; they execute all capabilities through this unified interface.
+* Centralized Tool Registry
+* Internal Tool Support & External Tool Support
+* Future MCP compatibility
+* Tool discovery, registration, validation, and execution
+* Permission management & health monitoring
+* Retry handling & execution logging
+* Tool analytics & versioned tools
+
+### 6. Module 6 — Autonomous Job Search & Opportunity Monitoring Agent
+Transforms the platform from a scheduled scraper into an intelligent career opportunity monitor.
+* Intelligent job discovery & continuous opportunity monitoring
+* Multi-provider job search & duplicate detection
+* Semantic job evaluation
+* Company intelligence & skill-gap analysis integration
+* Opportunity ranking & career impact analysis
+* Personalized recommendations & intelligent notifications
+* Opportunity timeline & market trend monitoring
+* Adaptive search strategies
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
@@ -446,51 +535,68 @@ Generates evidence-based, section-by-section resume rewrites.
 * `GET /api/resume/optimization/history`
 * `GET /api/resume/optimization/statistics`
 
+### Career Agent & Multi-Agent (Phase 6)
+* `POST /api/agents/goals`
+* `GET /api/agents/goals`
+* `POST /api/agents/execute`
+* `GET /api/agents/dashboard`
+
+### Persistent Memory (Phase 6)
+* `GET /api/memory`
+* `POST /api/memory`
+* `POST /api/memory/search`
+* `POST /api/memory/consolidate`
+
+### Planning & Reasoning (Phase 6)
+* `POST /api/planner/create`
+* `POST /api/planner/decision`
+* `GET /api/planner/evaluate/{goal_id}`
+* `GET /api/planner/history/{goal_id}`
+
+### Unified Tool Registry (Phase 6)
+* `GET /api/tools`
+* `POST /api/tools/execute`
+* `GET /api/tools/statistics`
+
+### Opportunity Monitoring (Phase 6)
+* `POST /api/job-monitor/monitor`
+* `GET /api/job-monitor/opportunities`
+* `PATCH /api/job-monitor/opportunities/{id}`
+* `GET /api/job-monitor/statistics`
+
 ---
 
 ## 🌟 Core AI Features
 
-* Resume Intelligence
-* ATS Analysis
-* Career Profile Intelligence
-* Job Intelligence
-* Job Embeddings
-* Semantic Matching
-* Recommendation Engine
-* Explainable AI
-* Skill Gap Analysis
-* Learning Roadmaps
-* Conversational Career RAG
-* Hybrid Retrieval
-* Company Intelligence
-* Resume Optimization
+* Resume Intelligence & ATS Analysis
+* Career Profile Intelligence & Job Intelligence
+* Job Embeddings & Semantic Matching
+* Recommendation Engine & Explainable AI
+* Skill Gap Analysis & Learning Roadmaps
+* Conversational Career RAG & Hybrid Retrieval
+* Company Intelligence & Resume Optimization
+* **[NEW] AI Career Agent (Autonomous Planning & Execution)**
+* **[NEW] Multi-Agent System (Supervisor-Worker Architecture)**
+* **[NEW] Persistent Memory Engine (Semantic & Episodic)**
+* **[NEW] Cognitive Reasoning & Decision Engine**
+* **[NEW] Unified Tool Registry**
+* **[NEW] Autonomous Opportunity Monitoring (Intelligent Recruiter)**
 
 ---
 
 ## 🚀 Roadmap
 
 ### ✅ Completed
-* Authentication System
-* OAuth Login
-* Career Profile
-* Resume Intelligence
-* ATS Analysis
-* Resume Quality Analysis
-* Resume Versioning
-* AI Job Intelligence
-* Semantic Job Matching
-* Personalized Recommendations
-* RAG Infrastructure
-* Conversational RAG
-* Hybrid Retrieval
-* Company Intelligence
-* Resume Optimization RAG
+* Phase 1 — Authentication & User Management
+* Phase 2 — Career Profile & Resume Intelligence
+* Phase 3 — Job Intelligence
+* Phase 4 — AI Intelligence Layer
+* Phase 5 — RAG Intelligence Layer
+* Phase 6 — AI Career Agent Platform
 
 ### 🚧 Coming Next
-* AI Career Agent
-* MCP Integrations
-* Auto Apply
-* Interview Preparation
+* Phase 7 — MCP Integration Layer
+* Phase 8 — Enterprise SaaS & Production Platform
 
 ---
 
@@ -509,6 +615,18 @@ Generates evidence-based, section-by-section resume rewrites.
 | *(Screenshot coming soon)* | *(Screenshot coming soon)* |
 
 | Company Intelligence | Resume Optimization |
+| :---: | :---: |
+| *(Screenshot coming soon)* | *(Screenshot coming soon)* |
+
+| AI Career Agent Dashboard | Goal Planner |
+| :---: | :---: |
+| *(Screenshot coming soon)* | *(Screenshot coming soon)* |
+
+| Memory Center | Planning Center |
+| :---: | :---: |
+| *(Screenshot coming soon)* | *(Screenshot coming soon)* |
+
+| Tool Center | Opportunity Monitoring |
 | :---: | :---: |
 | *(Screenshot coming soon)* | *(Screenshot coming soon)* |
 

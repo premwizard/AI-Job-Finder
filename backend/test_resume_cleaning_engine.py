@@ -24,7 +24,7 @@ from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Resume
 from app.services.profile_service import ProfileService
-from app.services.resume_cleaning_service import ResumeCleaner, ResumeCleaningService
+from app.services.resume_cleaning_service import ResumeCleaner
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:
@@ -138,7 +138,7 @@ def test_resume_cleaning_engine():
         recleaned = service.clean_resume_text(user_id, res.id)
         assert recleaned.clean_text is not None
         assert recleaned.cleaned_at is not None
-        print(f"[SUCCESS] Re-clean endpoint verified — cleaned_at timestamp updated")
+        print("[SUCCESS] Re-clean endpoint verified — cleaned_at timestamp updated")
 
         # Cleanup
         db.query(Resume).filter(Resume.user_id == user_id).delete()

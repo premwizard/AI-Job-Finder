@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.models import Job, Opportunity
+from app.models.models import Opportunity
 
 class DuplicateDetector:
     def __init__(self, db: Session):

@@ -3,12 +3,10 @@ from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.reasoning.planner import CognitivePlanner
 from app.reasoning.decision import DecisionEngine
-from app.reasoning.reflection import ReflectionEngine
 from app.reasoning.evaluation import EvaluationEngine
 from app.routes.auth_routes import get_current_user
 from app.models.models import User, AgentGoal, AgentTask, AgentReflection, AgentDecision
 from pydantic import BaseModel
-from typing import List, Optional
 
 router = APIRouter(prefix="/api/planner", tags=["planner"])
 

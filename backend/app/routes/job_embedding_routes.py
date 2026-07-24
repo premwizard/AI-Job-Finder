@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.services.job_embedding_service import JobEmbeddingService
-from typing import Dict, Any
 
 router = APIRouter(prefix="/api/jobs", tags=["job_embeddings"])
 
@@ -33,7 +32,7 @@ def generate_job_embedding(job_id: int, db: Session = Depends(get_db)):
         return {"message": "Job successfully embedded", "data": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Internal server error during embedding")
 
 @router.delete("/{job_id}/embeddings")

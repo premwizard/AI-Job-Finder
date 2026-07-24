@@ -1,4 +1,3 @@
-from typing import Dict, Any
 
 class IntentDetector:
     def __init__(self):

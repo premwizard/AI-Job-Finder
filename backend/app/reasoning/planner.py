@@ -1,7 +1,7 @@
 import os
 import json
 import google.generativeai as genai
-from typing import Dict, Any, List
+from typing import Dict, Any
 from app.memory.context_builder import MemoryContextBuilder
 
 class CognitivePlanner:

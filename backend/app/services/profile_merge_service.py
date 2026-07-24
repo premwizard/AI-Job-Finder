@@ -7,7 +7,7 @@ Generates Merge Suggestions for user review without modifying database records a
 
 import json
 import uuid
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Any
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from fastapi import HTTPException

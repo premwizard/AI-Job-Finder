@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_, desc
 from app.models.models import Job, JobLocation, JobSkill, JobRequirement, JobBenefit
 from typing import List, Optional, Tuple, Dict
-from datetime import datetime, date
+from datetime import date
 
 class JobRepository:
     def __init__(self, db: Session):

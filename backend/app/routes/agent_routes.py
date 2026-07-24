@@ -5,7 +5,7 @@ from app.agents.orchestrator import Orchestrator
 from app.routes.auth_routes import get_current_user
 from app.models.models import User, AgentGoal, AgentTask
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 
 router = APIRouter(prefix="/api/agent", tags=["career_agent"])
 

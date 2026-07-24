@@ -1,7 +1,7 @@
 import json
 import os
 import google.generativeai as genai
-from typing import Dict, Any, List
+from typing import Dict, Any
 from app.models.models import Job, JobRecommendation, JobExplanation, JobMatchResult
 
 class LearningEngine:
@@ -67,7 +67,7 @@ class LearningEngine:
                 
             parsed = json.loads(text.strip())
             return parsed
-        except Exception as e:
+        except Exception:
             # Fallback
             return {
                 "roadmap": [

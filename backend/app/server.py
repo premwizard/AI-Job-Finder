@@ -26,6 +26,7 @@ from app.routes import (
     memory_routes,
     planner_routes,
     tool_routes,
+    job_monitor_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -33,7 +34,6 @@ from app.routes import (
     version_routes,
     embedding_routes,
 )
-from src.api.routers import analytics, applications, resume, saved_jobs, users, work_experience
 
 
 app = FastAPI(
@@ -71,6 +71,7 @@ app.include_router(multi_agent_routes.router)
 app.include_router(memory_routes.router)
 app.include_router(planner_routes.router)
 app.include_router(tool_routes.router)
+app.include_router(job_monitor_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)

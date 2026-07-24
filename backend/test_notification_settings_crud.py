@@ -90,7 +90,7 @@ def test_notification_settings_crud():
         # Channels and frequency preserved
         assert updated.email_channel is True
         assert updated.notification_frequency == "Hourly"
-        print(f"[SUCCESS] PUT update — select all off verified, channels preserved")
+        print("[SUCCESS] PUT update — select all off verified, channels preserved")
 
         # Cleanup
         setting_record = db.query(NotificationSetting).filter(NotificationSetting.user_id == user_id).first()

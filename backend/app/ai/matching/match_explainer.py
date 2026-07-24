@@ -1,7 +1,7 @@
 import json
 import os
 import google.generativeai as genai
-from typing import Dict, Any, List
+from typing import Dict, List
 
 class MatchExplainer:
     def __init__(self):
@@ -39,7 +39,7 @@ class MatchExplainer:
                 "explanation_summary": parsed.get("explanation_summary", "Strong match based on your core skills."),
                 "explanation_missing": parsed.get("explanation_missing", "Consider reviewing the job description for specific requirements.")
             }
-        except Exception as e:
+        except Exception:
             return {
                 "explanation_summary": "✓ Good alignment with your professional background.",
                 "explanation_missing": "Review the job description to identify specific missing skills."

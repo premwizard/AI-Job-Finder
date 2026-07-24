@@ -1,7 +1,6 @@
 import json
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
-from app.models.models import Job, UserProfile, JobMatchResult
+from app.models.models import Job, JobMatchResult
 from app.ai.matching.semantic_matcher import SemanticMatcher
 from app.ai.matching.structured_matcher import StructuredMatcher
 from app.ai.matching.match_scorer import MatchScorer

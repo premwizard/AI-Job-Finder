@@ -9,7 +9,7 @@ import uuid
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app.database.database import SessionLocal, engine, Base
-from app.models.models import User, Skill, Experience, Project, Certification
+from app.models.models import User, Skill, Project, Certification
 from app.services.profile_service import ProfileService
 
 
@@ -55,7 +55,7 @@ def test_profile_analytics():
         assert analytics.career_readiness_score >= 0
         assert len(analytics.section_breakdown) > 0
 
-        print(f"[SUCCESS] Analytics metrics computed successfully:")
+        print("[SUCCESS] Analytics metrics computed successfully:")
         print(f"          Completion: {analytics.profile_completion}%")
         print(f"          Skills: {analytics.skills_count}")
         print(f"          Projects: {analytics.projects_count}")

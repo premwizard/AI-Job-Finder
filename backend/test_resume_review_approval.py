@@ -11,11 +11,9 @@ Tests:
 import sys
 import os
 import uuid
-from typing import Dict, Any
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Resume, UserProfile, Skill, Experience, Education, Project, Certification, Language
 from app.services.profile_approval_service import ProfileApprovalService, ApproveMergeRequest, MergeApprovedItem

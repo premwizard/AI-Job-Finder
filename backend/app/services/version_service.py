@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from app.models.models import Resume, ResumeVersion
-from datetime import datetime
 
 class VersionService:
     @staticmethod

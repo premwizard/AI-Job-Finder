@@ -52,7 +52,7 @@ class ExplanationEngine:
                 
             parsed = json.loads(text.strip())
             return parsed
-        except Exception as e:
+        except Exception:
             # Fallback
             return {
                 "overall_summary": "A good opportunity based on your profile.",

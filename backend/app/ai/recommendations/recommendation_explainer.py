@@ -42,7 +42,7 @@ class RecommendationExplainer:
                 "weaknesses": parsed.get("weaknesses", ["Review specific job requirements"]),
                 "summary": parsed.get("summary", "This job is highly recommended based on your profile.")
             }
-        except Exception as e:
+        except Exception:
             return {
                 "strengths": ["✓ Good alignment with your professional background."],
                 "weaknesses": ["Review the job description to identify specific missing skills."],

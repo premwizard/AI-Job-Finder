@@ -25,7 +25,7 @@ from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Resume
 from app.services.profile_service import ProfileService
-from app.services.document_processing_service import DocumentProcessingEngine, DocumentProcessingService
+from app.services.document_processing_service import DocumentProcessingService
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:

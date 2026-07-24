@@ -4,8 +4,7 @@ Performs transactional approval and merge of reviewed parsed resume data into us
 Ensures zero automatic data updates and guarantees atomic rollback on error.
 """
 
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+from typing import List, Dict, Any
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from fastapi import HTTPException

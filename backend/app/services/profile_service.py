@@ -24,7 +24,6 @@ from app.models.models import (
     SavedJob,
     Skill,
     SocialProfile,
-    User,
     UserProfile,
     Language,
     User,
@@ -870,7 +869,6 @@ class ProfileService:
 
     def _trigger_embedding_update(self, user_id: str, item_type: str, item: Any):
         from app.services.embedding_service import EmbeddingService
-        import json
         
         # Serialize item to dict and format it nicely for the embedding model
         # Note: In a real system, you might build a specific prose representation for each type

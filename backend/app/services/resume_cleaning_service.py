@@ -6,7 +6,6 @@ extra spaces, and broken sentences, and normalizing dates, bullet points, emails
 
 import re
 from datetime import datetime
-from typing import Optional, List
 from sqlalchemy.orm import Session
 
 from app.models.models import Resume

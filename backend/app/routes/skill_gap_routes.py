@@ -1,9 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
-import json
-from datetime import datetime
 
 from app.database.database import get_db
 from app.models.models import User, Resume, SkillGapAnalysis

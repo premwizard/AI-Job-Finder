@@ -1,7 +1,7 @@
 import json
 import os
 import google.generativeai as genai
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 class OptimizerEngine:
     def __init__(self):

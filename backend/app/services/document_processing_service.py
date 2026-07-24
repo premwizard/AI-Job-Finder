@@ -61,7 +61,7 @@ class DocumentProcessingEngine:
                     txt = page.extract_text()
                     if txt:
                         extracted_pages.append(txt)
-            except Exception as e:
+            except Exception:
                 pass
 
         # If pypdf yielded text, return it
@@ -155,7 +155,7 @@ class DocumentProcessingEngine:
                 text = pytesseract.image_to_string(image)
                 if text and text.strip():
                     return cls.clean_text(text)
-            except Exception as e:
+            except Exception:
                 # OCR binary not found on host environment fallback
                 pass
 

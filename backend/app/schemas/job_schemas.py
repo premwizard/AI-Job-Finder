@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional, Any
+from pydantic import BaseModel
+from typing import List, Optional
 from datetime import datetime
 
 class JobLocationSchema(BaseModel):

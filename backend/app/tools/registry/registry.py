@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 from app.tools.base_tool import BaseTool
 
 class ToolRegistry:

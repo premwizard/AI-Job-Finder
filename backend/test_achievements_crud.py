@@ -5,7 +5,6 @@ Tests: GET (empty), POST (create each type), GET (verify), PUT (update), filter 
 import sys
 import os
 import uuid
-from datetime import date
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -109,7 +108,7 @@ def test_achievements_crud():
         assert len(remaining) == 7
         types_left = [a.type for a in remaining]
         assert "Speaking Engagement" not in types_left
-        print(f"[SUCCESS] DELETE — 7 achievements remain, Speaking Engagement removed")
+        print("[SUCCESS] DELETE — 7 achievements remain, Speaking Engagement removed")
 
         # ── 7. DELETE non-existent (404) ──────────────────────────────────
         try:

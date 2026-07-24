@@ -51,7 +51,7 @@ def test_career_preferences_crud():
         empty_prefs = service.get_career_preferences(user_id)
         assert empty_prefs is not None
         assert empty_prefs.preferred_roles is None
-        print(f"[SUCCESS] GET empty prefs — returned default empty response")
+        print("[SUCCESS] GET empty prefs — returned default empty response")
 
         # ── 2. PUT — create initial preferences ───────────────────────────
         create_data = CareerPreferenceUpdate(

@@ -24,7 +24,6 @@ from app.models.models import User, Resume, UserProfile
 from app.services.profile_service import ProfileService
 from app.services.ai_resume_parser_service import (
     AIResumeParserService,
-    AIResumeParserBackendService,
     ParsedResumeData,
 )
 

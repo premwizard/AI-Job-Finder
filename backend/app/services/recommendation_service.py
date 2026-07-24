@@ -1,7 +1,6 @@
 import json
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
-from app.models.models import Job, UserProfile, JobMatchResult, JobRecommendation
+from app.models.models import Job, JobMatchResult, JobRecommendation
 from app.ai.recommendations.ranking_engine import RankingEngine
 from app.ai.recommendations.career_growth import CareerGrowthCalculator
 from app.ai.recommendations.recommendation_explainer import RecommendationExplainer

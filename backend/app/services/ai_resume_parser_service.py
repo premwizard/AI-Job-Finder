@@ -9,7 +9,7 @@ import os
 import re
 import json
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -283,7 +283,7 @@ JSON SCHEMA REQUIREMENT:
                 raw_json = cls._clean_json_markdown(response.text)
                 json_dict = json.loads(raw_json)
                 return ParsedResumeData.model_validate(json_dict)
-            except Exception as e:
+            except Exception:
                 if attempt == 1:
                     # Fallback on 2nd failure
                     return cls.parse_rule_based_fallback(resume_text)

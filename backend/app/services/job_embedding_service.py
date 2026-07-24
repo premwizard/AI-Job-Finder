@@ -1,6 +1,5 @@
 import logging
 import json
-from datetime import datetime
 from sqlalchemy.orm import Session
 from app.models.models import Job, JobChunkMetadata
 from app.ai.embeddings.chunker import ChunkGenerator

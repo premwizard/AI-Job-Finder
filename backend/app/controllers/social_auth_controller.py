@@ -24,7 +24,7 @@ def login_via_provider(provider: AuthProvider):
         return RedirectResponse(
             url=f"{config.FRONTEND_URL}/login?error={e.detail}"
         )
-    except Exception as e:
+    except Exception:
         return RedirectResponse(
             url=f"{config.FRONTEND_URL}/login?error={provider.value.title()} login is currently unavailable"
         )

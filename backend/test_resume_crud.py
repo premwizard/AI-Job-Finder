@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
-from app.models.models import User, Resume
+from app.models.models import User
 from app.services.profile_service import ProfileService
 
 
@@ -112,7 +112,7 @@ def test_resume_center_crud():
         service.delete_resume(user_id, uploaded_v1.id)
         remaining = service.get_resumes(user_id)
         assert len(remaining) == 0
-        print(f"[SUCCESS] DELETE last resume — no resumes remain")
+        print("[SUCCESS] DELETE last resume — no resumes remain")
 
         # Cleanup
         db.delete(user)

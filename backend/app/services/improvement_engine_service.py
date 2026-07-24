@@ -1,7 +1,7 @@
 import json
 import os
 from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
+from typing import List
 import google.generativeai as genai
 
 # Setup Gemini API key

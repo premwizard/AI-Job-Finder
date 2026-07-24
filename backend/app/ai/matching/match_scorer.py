@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict
 
 class MatchScorer:
     def __init__(self):

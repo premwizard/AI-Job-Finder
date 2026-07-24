@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.services.job_parser_service import JobParserService
-from typing import Dict, Any
 
 router = APIRouter(prefix="/api/jobs", tags=["job_parsing"])
 
@@ -32,7 +31,7 @@ def parse_single_job(job_id: int, db: Session = Depends(get_db)):
         return {"message": "Job successfully parsed", "data": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Internal server error during parsing")
 
 @router.post("/parse-all")

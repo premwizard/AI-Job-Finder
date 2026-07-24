@@ -1,7 +1,6 @@
 import os
 from abc import ABC, abstractmethod
 import google.generativeai as genai
-from typing import Dict, Any
 
 class BaseAIProvider(ABC):
     @abstractmethod

@@ -1,7 +1,6 @@
-import json
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
-from app.models.models import Job, UserProfile, RAGDocumentMetadata
+from typing import Dict, Any
+from app.models.models import Job
 from app.rag.providers.vector_store import ChromaMultiCollectionStore
 from app.rag.retrievers.hybrid_retriever import HybridRetriever
 from app.rag.rerankers.semantic_reranker import SemanticReranker

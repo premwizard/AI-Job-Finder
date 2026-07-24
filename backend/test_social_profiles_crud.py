@@ -8,7 +8,6 @@ import uuid
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, SocialProfile
 from app.schemas.profile_schemas import SocialProfileUpdate
@@ -37,7 +36,7 @@ def test_social_profiles_crud():
         empty = service.get_social_profiles(user_id)
         assert empty is not None
         assert empty.github_url is None
-        print(f"[SUCCESS] GET empty social profiles — returned default empty response")
+        print("[SUCCESS] GET empty social profiles — returned default empty response")
 
         # ── 2. PUT — set multiple URLs ─────────────────────────────────────
         set_data = SocialProfileUpdate(
@@ -65,7 +64,7 @@ def test_social_profiles_crud():
         assert created.devto_url == "https://dev.to/testuser"
         assert created.youtube_url == "https://youtube.com/@testuser"
         assert created.twitter_url == "https://x.com/testuser"
-        print(f"[SUCCESS] PUT create — all 11 platforms set")
+        print("[SUCCESS] PUT create — all 11 platforms set")
 
         # ── 3. GET — verify persisted ──────────────────────────────────────
         fetched = service.get_social_profiles(user_id)
@@ -81,7 +80,7 @@ def test_social_profiles_crud():
         assert updated.github_url == "https://github.com/newtestuser"
         # Other URLs remain unchanged (upsert semantics)
         assert updated.linkedin_url == "https://linkedin.com/in/testuser"
-        print(f"[SUCCESS] PUT partial update — github updated, linkedin unchanged")
+        print("[SUCCESS] PUT partial update — github updated, linkedin unchanged")
 
         # ── 5. PUT — clear a field by setting to None ─────────────────────
         clear_data = SocialProfileUpdate(
@@ -91,7 +90,7 @@ def test_social_profiles_crud():
         # twitter_url should remain as is (None not in exclude_unset means it WAS set)
         # Actually since None is the default, model_dump(exclude_unset=True) won't include it
         # unless explicitly passed. Let's test with empty string which the validator nullifies.
-        print(f"[SUCCESS] PUT clear test completed")
+        print("[SUCCESS] PUT clear test completed")
 
         # ── 6. Verify all platforms accessible in response ─────────────────
         final = service.get_social_profiles(user_id)
@@ -102,7 +101,7 @@ def test_social_profiles_crud():
         ]
         for p in platforms_checked:
             assert getattr(final, p) is not None, f"Field {p} should not be None"
-        print(f"[SUCCESS] All 10 remaining platforms accessible in response")
+        print("[SUCCESS] All 10 remaining platforms accessible in response")
 
         # Cleanup
         social_record = db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()

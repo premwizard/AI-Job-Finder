@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from app.routes.auth_routes import get_current_user
 from app.models.models import User
 from app.agents.registry.agent_registry import AgentRegistry

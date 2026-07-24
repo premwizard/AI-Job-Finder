@@ -1,4 +1,4 @@
-from typing import Dict, Any, List
+from typing import List
 
 class CareerGrowthCalculator:
     def __init__(self):

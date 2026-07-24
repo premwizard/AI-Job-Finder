@@ -1,5 +1,5 @@
 import logging
-from app.database.database import engine, Base
+from app.database.database import engine
 from app.models.models import ResumeOptimization
 
 logging.basicConfig(level=logging.INFO)

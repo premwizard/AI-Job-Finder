@@ -15,8 +15,7 @@ import sys
 import os
 import uuid
 import io
-import time
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,7 +24,7 @@ from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Resume
 from app.services.profile_service import ProfileService
-from app.services.ocr_service import OcrEngineService, OcrStructureParser, OcrImagePreprocessor
+from app.services.ocr_service import OcrEngineService, OcrStructureParser
 
 
 def create_synthetic_resume_image(

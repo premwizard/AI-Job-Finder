@@ -154,7 +154,7 @@ def test_resume_upload_engine():
         resumes_after_act = service.get_resumes(user_id)
         v2_check = next(r for r in resumes_after_act if r.id == res_v2.id)
         assert v2_check.is_active is False
-        print(f"[SUCCESS] Switched active version back to v1 (v1 active, v2 inactive)")
+        print("[SUCCESS] Switched active version back to v1 (v1 active, v2 inactive)")
 
         # 11. Delete resume v1
         service.delete_resume(user_id, res_v1.id)

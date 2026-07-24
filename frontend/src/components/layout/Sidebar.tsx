@@ -25,7 +25,8 @@ import {
   Network,
   DatabaseZap,
   Lightbulb,
-  Wrench
+  Wrench,
+  Radar
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -52,6 +53,7 @@ const sidebarItems = [
   { name: "Memory Center", href: "/memory-center", icon: DatabaseZap },
   { name: "Planning Center", href: "/planning-center", icon: Lightbulb },
   { name: "Tool Center", href: "/tool-center", icon: Wrench },
+  { name: "Opportunity Center", href: "/opportunity-center", icon: Radar },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 

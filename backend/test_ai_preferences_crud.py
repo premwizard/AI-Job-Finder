@@ -50,7 +50,7 @@ def test_ai_preferences_crud():
         assert empty is not None
         assert empty.dream_companies is None
         assert empty.preferred_learning_resources is None
-        print(f"[SUCCESS] GET empty — returned default empty response")
+        print("[SUCCESS] GET empty — returned default empty response")
 
         # ── 2. PUT — create all 9 required fields ─────────────────────────
         data = AIPreferenceUpdate(
@@ -76,7 +76,7 @@ def test_ai_preferences_crud():
         assert created.target_countries == "United States,United Kingdom,Remote / Worldwide"
         assert "frontier AI lab" in created.career_objectives
         assert created.career_growth_priorities == "Technical Leadership,Research Publications,Open Source Contributions"
-        print(f"[SUCCESS] PUT create — all 9 fields set correctly")
+        print("[SUCCESS] PUT create — all 9 fields set correctly")
 
         # ── 3. GET — verify persistence ────────────────────────────────────
         fetched = service.get_ai_preferences(user_id)
@@ -96,7 +96,7 @@ def test_ai_preferences_crud():
         # Unchanged fields must be preserved
         assert updated.dream_roles == "AI Researcher,Staff Engineer"
         assert updated.preferred_learning_resources == "Fast.ai,ArXiv Papers,Deeplearning.ai"
-        print(f"[SUCCESS] PUT partial update — dream_companies updated, dream_roles preserved")
+        print("[SUCCESS] PUT partial update — dream_companies updated, dream_roles preserved")
 
         # ── 5. Verify updated_at is populated ─────────────────────────────
         final = service.get_ai_preferences(user_id)

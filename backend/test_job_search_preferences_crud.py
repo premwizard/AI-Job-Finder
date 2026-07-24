@@ -8,7 +8,6 @@ import uuid
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from sqlalchemy import text
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, JobSearchPreference
 from app.schemas.profile_schemas import JobSearchPreferenceUpdate
