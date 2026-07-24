@@ -553,6 +553,25 @@ class CompanyProfile(Base):
     updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+class ResumeOptimization(Base):
+    __tablename__ = "resume_optimizations"
+
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    suggestions_json: Any = Column(Text, nullable=False) # JSON list of suggestion objects
+    projected_ats_score: Any = Column(Integer, nullable=True)
+    projected_match_score: Any = Column(Integer, nullable=True)
+    
+    status: Any = Column(String, default="pending") # "pending", "applied"
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+    job = relationship("Job")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

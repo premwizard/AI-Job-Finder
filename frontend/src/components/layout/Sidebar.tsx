@@ -42,6 +42,7 @@ const sidebarItems = [
   { name: "Settings", href: "/settings", icon: Settings },
   { name: "Advanced Search", href: "/search", icon: Search },
   { name: "Companies", href: "/companies", icon: Building2 },
+  { name: "Resume Optimizer", href: "/resume/optimizer", icon: FileSearch },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 

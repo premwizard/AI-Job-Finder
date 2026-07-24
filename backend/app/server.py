@@ -20,6 +20,7 @@ from app.routes import (
     chat_routes,
     search_routes,
     company_routes,
+    resume_optimize_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -59,6 +60,7 @@ app.include_router(rag_routes.router)
 app.include_router(chat_routes.router)
 app.include_router(search_routes.router)
 app.include_router(company_routes.router)
+app.include_router(resume_optimize_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)
