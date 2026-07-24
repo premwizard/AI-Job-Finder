@@ -15,13 +15,13 @@ import {
   Bookmark,
   User,
   Settings,
-  BrainCircuit,
   Sparkles,
   Database,
   LogOut,
   Server,
   Search,
-  Building2
+  Building2,
+  BrainCircuit
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -43,6 +43,7 @@ const sidebarItems = [
   { name: "Advanced Search", href: "/search", icon: Search },
   { name: "Companies", href: "/companies", icon: Building2 },
   { name: "Resume Optimizer", href: "/resume/optimizer", icon: FileSearch },
+  { name: "Career Agent", href: "/career-agent", icon: BrainCircuit },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 

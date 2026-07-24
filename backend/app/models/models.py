@@ -572,6 +572,40 @@ class ResumeOptimization(Base):
     job = relationship("Job")
 
 
+class AgentGoal(Base):
+    __tablename__ = "agent_goals"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title: Any = Column(String, nullable=False)
+    description: Any = Column(Text, nullable=True)
+    status: Any = Column(String, default="pending") # pending, planning, active, completed, failed
+    progress: Any = Column(Integer, default=0)
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    user = relationship("User")
+    tasks = relationship("AgentTask", back_populates="goal", cascade="all, delete-orphan")
+
+
+class AgentTask(Base):
+    __tablename__ = "agent_tasks"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    goal_id: Any = Column(Integer, ForeignKey("agent_goals.id", ondelete="CASCADE"), nullable=False, index=True)
+    task_type: Any = Column(String, nullable=False) # e.g. ANALYZE_RESUME
+    description: Any = Column(Text, nullable=False)
+    status: Any = Column(String, default="pending") # pending, running, completed, failed
+    result_summary: Any = Column(Text, nullable=True)
+    priority: Any = Column(Integer, default=1)
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    completed_at: Any = Column(DateTime, nullable=True)
+    
+    goal = relationship("AgentGoal", back_populates="tasks")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)
