@@ -9,15 +9,21 @@ class ContextBuilder:
         current_tokens = 0
         context_parts = []
         
+        seen_content = set()
         for doc in documents:
             content = doc.get("content", "")
+            if content in seen_content:
+                continue
+            seen_content.add(content)
+            
             tokens = len(content) // 4
             
             if current_tokens + tokens > self.max_tokens:
                 break
                 
             source_meta = doc.get("metadata", {}).get("chunk_type", "Document")
-            context_parts.append(f"--- {source_meta} ---\n{content}\n")
+            collection = doc.get("collection_source", "Unknown")
+            context_parts.append(f"--- {collection} | {source_meta} ---\n{content}\n")
             current_tokens += tokens
             
         return "\n".join(context_parts)

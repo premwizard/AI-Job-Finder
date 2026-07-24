@@ -18,6 +18,7 @@ from app.routes import (
     learning_routes,
     rag_routes,
     chat_routes,
+    search_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
