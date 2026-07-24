@@ -1,4 +1,4 @@
-import { authApi } from "@/api/axiosInstance";
+import { authApi } from "@/features/auth/services/auth.api";
 import { ResumeVersion } from "../types/version.types";
 
 export const getResumeVersions = async (resumeId: number): Promise<ResumeVersion[]> => {

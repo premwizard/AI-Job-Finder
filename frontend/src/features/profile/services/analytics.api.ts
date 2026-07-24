@@ -1,4 +1,4 @@
-import { authApi } from "@/api/axiosInstance";
+import { authApi } from "@/features/auth/services/auth.api";
 
 export interface TrendDataPoint {
   date: string;

@@ -1,4 +1,4 @@
-import { authApi } from "@/api/axiosInstance";
+import { authApi } from "@/features/auth/services/auth.api";
 
 const SKILL_GAP_URL = "/profile/skill-gap";
 
