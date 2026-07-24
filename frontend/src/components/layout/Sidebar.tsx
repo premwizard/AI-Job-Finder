@@ -16,14 +16,16 @@ import {
   User, 
   Settings,
   BrainCircuit,
-  LogOut
+  LogOut,
+  Sparkles
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
 
 const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Jobs", href: "/jobs", icon: Briefcase },
+  { name: "Jobs Explorer", href: "/jobs", icon: Briefcase },
+  { name: "Job Analytics", href: "/jobs/analytics", icon: Sparkles },
   { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
   { name: "Skill Gap", href: "/profile/skill-gap", icon: Target },
   { name: "Interview Prep", href: "/interview", icon: Users },

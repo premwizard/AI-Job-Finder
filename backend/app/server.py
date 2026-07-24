@@ -10,6 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.routes import (
     auth_routes,
     jobs_routes,
+    job_parsing_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -39,6 +40,7 @@ app.add_middleware(
 app.include_router(auth_routes.router)
 app.include_router(social_auth_routes.router)
 app.include_router(jobs_routes.router)
+app.include_router(job_parsing_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)

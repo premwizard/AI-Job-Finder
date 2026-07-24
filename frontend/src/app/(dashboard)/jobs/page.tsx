@@ -15,11 +15,13 @@ import {
   FileText,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getJobs, Job, refreshJobs } from "@/features/jobs/services/jobs.api";
+import { parseAllJobs } from "@/features/jobs/services/job_parsing.api";
 import { useState } from "react";
 import { jobsService } from "@/services/jobs";
 
@@ -54,6 +56,21 @@ export default function JobsPage() {
     }
   });
 
+  const parseAllJobsMutation = useMutation({
+    mutationFn: () => parseAllJobs(),
+    onSuccess: () => {
+      alert("Background parsing job started successfully!");
+    }
+  });
+
+  const refreshJobsMutation = useMutation({
+    mutationFn: () => refreshJobs(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      alert("New jobs fetched successfully!");
+    }
+  });
+
   if (isLoading && !data) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -75,15 +92,25 @@ export default function JobsPage() {
             We found {totalJobs} jobs that match your profile.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href="/jobs/analytics">
             <Button variant="outline" className="gap-2">
-              <Loader2 className="w-4 h-4" /> {/* Use a different icon like BarChart if available, but Loader2 works for now or just text */}
-              View Analytics
+              <Sparkles className="w-4 h-4 text-indigo-500" /> 
+              Job Parsing Analytics
             </Button>
           </Link>
-          <Button onClick={() => refreshJobs()} className="gap-2">
-            Refresh Jobs
+          <Button 
+            variant="outline"
+            className="gap-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+            onClick={() => parseAllJobsMutation.mutate()}
+            disabled={parseAllJobsMutation.isPending}
+          >
+            {parseAllJobsMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            Parse Unprocessed Jobs with AI
+          </Button>
+          <Button onClick={() => refreshJobsMutation.mutate()} disabled={refreshJobsMutation.isPending} className="gap-2">
+            {refreshJobsMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            Fetch New Jobs
           </Button>
         </div>
       </div>

@@ -383,6 +383,14 @@ class Job(Base):
     embedding_status: Any = Column(Boolean, default=False)
     ai_processed: Any = Column(Boolean, default=False)
     
+    # AI Parsing Data
+    parsed_data_json: Any = Column(Text, nullable=True)
+    ai_summary: Any = Column(Text, nullable=True)
+    confidence_scores_json: Any = Column(Text, nullable=True)
+    processing_version: Any = Column(Integer, default=0)
+    ai_model_used: Any = Column(String, nullable=True)
+    prompt_version: Any = Column(String, nullable=True)
+    
     # Existing relationships
     saved_by = relationship("SavedJob", back_populates="job", cascade="all, delete-orphan")
     applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
