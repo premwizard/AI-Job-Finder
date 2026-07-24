@@ -319,6 +319,26 @@ class ResumeVersion(Base):
     resume = relationship("Resume")
 
 
+class ProfileEmbedding(Base):
+    __tablename__ = "profile_embeddings"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    
+    item_type: Any = Column(String, nullable=False, index=True) # e.g. "resume", "skill", "project"
+    item_id: Any = Column(String, nullable=False, index=True)   # The string or int ID of the original record
+    
+    chunk_index: Any = Column(Integer, default=0)
+    text_chunk: Any = Column(Text, nullable=False)
+    embedding_vector: Any = Column(Text, nullable=False) # JSON array of floats
+    metadata_json: Any = Column(Text, nullable=True)     # JSON object for additional context
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")
+
+
 class Job(Base):
     __tablename__ = "jobs"
 

@@ -868,6 +868,34 @@ class ProfileService:
         self.db.refresh(exp)
         return exp
 
+    def _trigger_embedding_update(self, user_id: str, item_type: str, item: Any):
+        from app.services.embedding_service import EmbeddingService
+        import json
+        
+        # Serialize item to dict and format it nicely for the embedding model
+        # Note: In a real system, you might build a specific prose representation for each type
+        item_dict = {k: v for k, v in item.__dict__.items() if not k.startswith('_')}
+        
+        # Build text representation
+        text_lines = []
+        for k, v in item_dict.items():
+            if v is not None and v != "" and k not in ("id", "user_id", "created_at", "updated_at"):
+                text_lines.append(f"{k.replace('_', ' ').title()}: {v}")
+                
+        text_rep = "\n".join(text_lines)
+        
+        try:
+            EmbeddingService(self.db).embed_item(
+                user_id=user_id,
+                item_type=item_type,
+                item_id=str(item.id),
+                text=text_rep,
+                metadata=item_dict,
+                chunk_large_text=False
+            )
+        except Exception as e:
+            print(f"Warning: Failed to generate embedding for {item_type} {item.id}: {e}")
+
     # --- Generic List CRUD Helpers ---
     def _create_item(self, model_class, user_id: str, data):
         # Prevent duplicates for skills
@@ -883,6 +911,7 @@ class ProfileService:
         self.db.add(item)
         self.db.commit()
         self.db.refresh(item)
+        self._trigger_embedding_update(user_id, model_class.__name__.lower(), item)
         return item
 
     def _update_item(self, model_class, item_id, user_id, data):
@@ -897,6 +926,7 @@ class ProfileService:
             setattr(item, key, value)
         self.db.commit()
         self.db.refresh(item)
+        self._trigger_embedding_update(user_id, model_class.__name__.lower(), item)
         return item
 
     def _delete_item(self, model_class, item_id, user_id):
@@ -907,6 +937,11 @@ class ProfileService:
         )
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
+            
+        # Delete embedding
+        from app.services.embedding_service import EmbeddingService
+        EmbeddingService(self.db).delete_item_embeddings(user_id, model_class.__name__.lower(), str(item_id))
+        
         self.db.delete(item)
         self.db.commit()
         return True

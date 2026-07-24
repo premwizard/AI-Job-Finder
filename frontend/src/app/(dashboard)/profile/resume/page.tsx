@@ -752,6 +752,9 @@ export default function ResumeCenterPage() {
                 <Button variant="default" size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/improvements`)}>
                   <Wand2 className="w-3.5 h-3.5 mr-1.5" /> Improve Resume
                 </Button>
+                <Button variant="default" size="sm" className="h-8 text-xs bg-slate-700 hover:bg-slate-800 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/versions`)}>
+                  <History className="w-3.5 h-3.5 mr-1.5" /> Version History
+                </Button>
                 <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
                   <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File
                 </Button>

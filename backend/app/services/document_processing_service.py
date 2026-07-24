@@ -314,6 +314,20 @@ class DocumentProcessingService:
             db=self.db
         )
 
+        # Generate Resume Embeddings
+        try:
+            from app.services.embedding_service import EmbeddingService
+            if resume.clean_text:
+                EmbeddingService(self.db).embed_item(
+                    user_id=user_id,
+                    item_type="resume",
+                    item_id=str(resume.id),
+                    text=resume.clean_text,
+                    chunk_large_text=True
+                )
+        except Exception as e:
+            print(f"Warning: Failed to generate embedding for resume {resume.id}: {e}")
+
         self.db.commit()
         self.db.refresh(resume)
         return profile_schemas.ResumeResponse.model_validate(resume)
