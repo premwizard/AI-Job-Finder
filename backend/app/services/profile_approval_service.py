@@ -269,13 +269,21 @@ class ProfileApprovalService:
             )
 
     def deduplicate_user_profile(self, user_id: str):
-        """Remove any existing duplicate items from the user's career profile."""
+        """Remove any existing duplicate items from the user's career profile using aggressive normalization."""
+        import re
+
+        def _norm(val) -> str:
+            if not val:
+                return ""
+            # Strip all non-alphanumeric characters for a robust duplicate check
+            return re.sub(r'[^a-zA-Z0-9]', '', str(val)).lower()
+
         # 1. Deduplicate Skills
         skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
         seen_skills = set()
         for sk in skills:
-            norm = (sk.skill_name or "").strip().lower()
-            if norm in seen_skills:
+            norm = _norm(sk.skill_name)
+            if norm in seen_skills and norm != "":
                 self.db.delete(sk)
             else:
                 seen_skills.add(norm)
@@ -284,8 +292,8 @@ class ProfileApprovalService:
         exps = self.db.query(Experience).filter(Experience.user_id == user_id).all()
         seen_exps = set()
         for e in exps:
-            norm = f"{(e.role or '').strip().lower()}|{(e.company_name or '').strip().lower()}"
-            if norm in seen_exps:
+            norm = f"{_norm(e.role)}|{_norm(e.company_name)}"
+            if norm in seen_exps and norm != "|":
                 self.db.delete(e)
             else:
                 seen_exps.add(norm)
@@ -294,8 +302,8 @@ class ProfileApprovalService:
         edus = self.db.query(Education).filter(Education.user_id == user_id).all()
         seen_edus = set()
         for ed in edus:
-            norm = f"{(ed.degree or '').strip().lower()}|{(ed.institution_name or '').strip().lower()}"
-            if norm in seen_edus:
+            norm = f"{_norm(ed.degree)}|{_norm(ed.institution_name)}"
+            if norm in seen_edus and norm != "|":
                 self.db.delete(ed)
             else:
                 seen_edus.add(norm)
@@ -304,8 +312,8 @@ class ProfileApprovalService:
         projs = self.db.query(Project).filter(Project.user_id == user_id).all()
         seen_projs = set()
         for p in projs:
-            norm = (p.name or "").strip().lower()
-            if norm in seen_projs:
+            norm = _norm(p.name)
+            if norm in seen_projs and norm != "":
                 self.db.delete(p)
             else:
                 seen_projs.add(norm)
@@ -314,8 +322,8 @@ class ProfileApprovalService:
         certs = self.db.query(Certification).filter(Certification.user_id == user_id).all()
         seen_certs = set()
         for c in certs:
-            norm = (c.name or "").strip().lower()
-            if norm in seen_certs:
+            norm = _norm(c.name)
+            if norm in seen_certs and norm != "":
                 self.db.delete(c)
             else:
                 seen_certs.add(norm)
@@ -324,8 +332,8 @@ class ProfileApprovalService:
         langs = self.db.query(Language).filter(Language.user_id == user_id).all()
         seen_langs = set()
         for l in langs:
-            norm = (l.name or "").strip().lower()
-            if norm in seen_langs:
+            norm = _norm(l.name)
+            if norm in seen_langs and norm != "":
                 self.db.delete(l)
             else:
                 seen_langs.add(norm)
