@@ -98,11 +98,6 @@ def startup_event():
             "ALTER TABLE career_preferences ADD COLUMN negotiable_salary BOOLEAN DEFAULT 0",
             "ALTER TABLE ai_preferences ADD COLUMN preferred_learning_resources VARCHAR",
             "ALTER TABLE ai_preferences ADD COLUMN target_countries VARCHAR",
-            "ALTER TABLE skills ADD COLUMN created_at DATETIME",
-            "ALTER TABLE skills ADD COLUMN currently_working BOOLEAN DEFAULT 0",
-            "ALTER TABLE experiences ADD COLUMN created_at DATETIME",
-            "ALTER TABLE experiences ADD COLUMN currently_working BOOLEAN DEFAULT 0",
-            "ALTER TABLE projects ADD COLUMN created_at DATETIME",
         ]:
             try:
                 conn.execute(text(col_def))
