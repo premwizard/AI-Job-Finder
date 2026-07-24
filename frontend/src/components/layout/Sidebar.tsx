@@ -25,7 +25,7 @@ const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Jobs", href: "/jobs", icon: Briefcase },
   { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
-  { name: "Skill Gap", href: "/skill-gap", icon: Target },
+  { name: "Skill Gap", href: "/profile/skill-gap", icon: Target },
   { name: "Interview Prep", href: "/interview", icon: Users },
   { name: "Cover Letters", href: "/cover-letter", icon: FileText },
   { name: "Resume", href: "/resume", icon: FileSearch },

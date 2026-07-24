@@ -13,6 +13,7 @@ from app.routes import (
     profile_routes,
     settings_routes,
     social_auth_routes,
+    skill_gap_routes,
 )
 from src.api.routers import analytics, applications, resume, saved_jobs, users, work_experience
 
@@ -38,6 +39,7 @@ app.include_router(social_auth_routes.router)
 app.include_router(jobs_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
+app.include_router(skill_gap_routes.router)
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
 

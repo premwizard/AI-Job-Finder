@@ -281,6 +281,44 @@ class ResumeImprovementSuggestion(Base):
     user = relationship("User")
     resume = relationship("Resume")
 
+
+class SkillGapAnalysis(Base):
+    __tablename__ = "skill_gap_analyses"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="SET NULL"), nullable=True)
+    
+    target_role: Any = Column(String, nullable=False)
+    target_industry: Any = Column(String, nullable=False)
+    gap_percentage: Any = Column(Integer, nullable=False)
+    analysis_data_json: Any = Column(Text, nullable=False) # JSON structure with all the skills and roadmap
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+    resume = relationship("Resume")
+
+
+class ResumeVersion(Base):
+    __tablename__ = "resume_versions"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    
+    version_number: Any = Column(Integer, nullable=False)
+    change_summary: Any = Column(String, nullable=False)
+    
+    parsed_data_json: Any = Column(Text, nullable=True)
+    clean_text: Any = Column(Text, nullable=True)
+    ats_score: Any = Column(Float, nullable=True)
+    quality_score: Any = Column(Float, nullable=True)
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+    resume = relationship("Resume")
+
+
 class Job(Base):
     __tablename__ = "jobs"
 
