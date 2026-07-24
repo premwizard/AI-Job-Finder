@@ -548,6 +548,23 @@ def get_resume_merge_suggestions(
     return service.get_merge_suggestions(current_user.id, resume_id)
 
 
+@router.get("/resume/{resume_id}/download")
+def download_resume_file(
+    resume_id: int,
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    resumes = service.get_resumes(current_user.id)
+    target = next((r for r in resumes if r.id == resume_id), None)
+    if not target or not target.file_path or not os.path.exists(target.file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(
+        path=target.file_path,
+        filename=target.file_name or os.path.basename(target.file_path),
+        media_type="application/octet-stream"
+    )
+
+
 @router.post("/resume/{resume_id}/approve-merge")
 def approve_resume_merge(
     resume_id: int,

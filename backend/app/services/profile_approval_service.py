@@ -123,64 +123,116 @@ class ProfileApprovalService:
                         job_title = str(val.get("name"))
 
                     if job_title or company:
-                        new_exp = Experience(
-                            user_id=user_id,
-                            role=job_title or "Role",
-                            company_name=company or "Company",
-                            location=val.get("location"),
-                            description=val.get("description"),
-                            is_current=bool(val.get("is_current", False)),
+                        existing = (
+                            self.db.query(Experience)
+                            .filter(
+                                Experience.user_id == user_id,
+                                Experience.role.ilike(job_title or "Role"),
+                                Experience.company_name.ilike(company or "Company"),
+                            )
+                            .first()
                         )
-                        self.db.add(new_exp)
-                        merged_count += 1
+                        if existing:
+                            if val.get("description"):
+                                existing.description = val.get("description")
+                            if val.get("location"):
+                                existing.location = val.get("location")
+                        else:
+                            new_exp = Experience(
+                                user_id=user_id,
+                                role=job_title or "Role",
+                                company_name=company or "Company",
+                                location=val.get("location"),
+                                description=val.get("description"),
+                                is_current=bool(val.get("is_current", False)),
+                            )
+                            self.db.add(new_exp)
+                            merged_count += 1
 
                 elif cat == "education":
                     degree = (val.get("degree") or "").strip()
                     institution = (val.get("institution") or val.get("institution_name") or "").strip()
                     if degree or institution:
-                        new_edu = Education(
-                            user_id=user_id,
-                            degree=degree or "Degree",
-                            institution_name=institution or "Institution",
-                            major=val.get("field_of_study") or val.get("major"),
-                            cgpa=val.get("gpa") or val.get("cgpa"),
+                        existing = (
+                            self.db.query(Education)
+                            .filter(
+                                Education.user_id == user_id,
+                                Education.degree.ilike(degree or "Degree"),
+                                Education.institution_name.ilike(institution or "Institution"),
+                            )
+                            .first()
                         )
-                        self.db.add(new_edu)
-                        merged_count += 1
+                        if existing:
+                            if val.get("field_of_study") or val.get("major"):
+                                existing.major = val.get("field_of_study") or val.get("major")
+                            if val.get("gpa") or val.get("cgpa"):
+                                existing.cgpa = val.get("gpa") or val.get("cgpa")
+                        else:
+                            new_edu = Education(
+                                user_id=user_id,
+                                degree=degree or "Degree",
+                                institution_name=institution or "Institution",
+                                major=val.get("field_of_study") or val.get("major"),
+                                cgpa=val.get("gpa") or val.get("cgpa"),
+                            )
+                            self.db.add(new_edu)
+                            merged_count += 1
 
                 elif cat in ("projects", "project"):
                     title = (val.get("title") or val.get("name") or val.get("project_name") or "").strip()
                     if not title and val.get("title"):
                         title = str(val.get("title"))
                     if title:
+                        existing = (
+                            self.db.query(Project)
+                            .filter(Project.user_id == user_id, Project.name.ilike(title))
+                            .first()
+                        )
                         tech = val.get("technologies") or val.get("tech_stack")
                         tech_str = ", ".join(tech) if isinstance(tech, list) else (tech or "")
-                        new_proj = Project(
-                            user_id=user_id,
-                            name=title,
-                            description=val.get("description") or val.get("short_description"),
-                            tech_stack=tech_str,
-                            github_url=val.get("repo_url") or val.get("github_url"),
-                            live_demo_url=val.get("project_url") or val.get("live_demo_url"),
-                        )
-                        self.db.add(new_proj)
-                        merged_count += 1
+                        if existing:
+                            if val.get("description") or val.get("short_description"):
+                                existing.description = val.get("description") or val.get("short_description")
+                            if tech_str:
+                                existing.tech_stack = tech_str
+                        else:
+                            new_proj = Project(
+                                user_id=user_id,
+                                name=title,
+                                description=val.get("description") or val.get("short_description"),
+                                tech_stack=tech_str,
+                                github_url=val.get("repo_url") or val.get("github_url"),
+                                live_demo_url=val.get("project_url") or val.get("live_demo_url"),
+                            )
+                            self.db.add(new_proj)
+                            merged_count += 1
 
                 elif cat in ("certifications", "certification", "certs", "cert"):
                     name = (val.get("name") or val.get("title") or val.get("certificate_name") or "").strip()
                     if not name and val.get("title"):
                         name = str(val.get("title"))
                     if name:
-                        new_cert = Certification(
-                            user_id=user_id,
-                            name=name,
-                            issuer=val.get("issuing_organization") or val.get("issuer") or "Organization",
-                            credential_id=val.get("credential_id"),
-                            verification_url=val.get("credential_url") or val.get("verification_url"),
-                            category=val.get("category"),
+                        existing = (
+                            self.db.query(Certification)
+                            .filter(Certification.user_id == user_id, Certification.name.ilike(name))
+                            .first()
                         )
-                        self.db.add(new_cert)
-                        merged_count += 1
+                        if existing:
+                            if val.get("issuing_organization") or val.get("issuer"):
+                                existing.issuer = val.get("issuing_organization") or val.get("issuer")
+                            if val.get("credential_id"):
+                                existing.credential_id = val.get("credential_id")
+                        else:
+                            new_cert = Certification(
+                                user_id=user_id,
+                                name=name,
+                                issuer=val.get("issuing_organization") or val.get("issuer") or "Organization",
+                                credential_id=val.get("credential_id"),
+                                verification_url=val.get("credential_url") or val.get("verification_url"),
+                                category=val.get("category"),
+                            )
+                            self.db.add(new_cert)
+                            merged_count += 1
 
                 elif cat == "languages":
                     lang_name = (val.get("language") or val.get("name") or "").strip()
@@ -200,6 +252,7 @@ class ProfileApprovalService:
                             self.db.add(new_lang)
                             merged_count += 1
 
+            self.deduplicate_user_profile(user_id)
             self.db.commit()
             return {
                 "status": "success",
@@ -214,3 +267,65 @@ class ProfileApprovalService:
                 status_code=500,
                 detail=f"Transaction Failed. Rollback executed cleanly. Error: {str(err)}",
             )
+
+    def deduplicate_user_profile(self, user_id: str):
+        """Remove any existing duplicate items from the user's career profile."""
+        # 1. Deduplicate Skills
+        skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
+        seen_skills = set()
+        for sk in skills:
+            norm = (sk.skill_name or "").strip().lower()
+            if norm in seen_skills:
+                self.db.delete(sk)
+            else:
+                seen_skills.add(norm)
+
+        # 2. Deduplicate Experience
+        exps = self.db.query(Experience).filter(Experience.user_id == user_id).all()
+        seen_exps = set()
+        for e in exps:
+            norm = f"{(e.role or '').strip().lower()}|{(e.company_name or '').strip().lower()}"
+            if norm in seen_exps:
+                self.db.delete(e)
+            else:
+                seen_exps.add(norm)
+
+        # 3. Deduplicate Education
+        edus = self.db.query(Education).filter(Education.user_id == user_id).all()
+        seen_edus = set()
+        for ed in edus:
+            norm = f"{(ed.degree or '').strip().lower()}|{(ed.institution_name or '').strip().lower()}"
+            if norm in seen_edus:
+                self.db.delete(ed)
+            else:
+                seen_edus.add(norm)
+
+        # 4. Deduplicate Projects
+        projs = self.db.query(Project).filter(Project.user_id == user_id).all()
+        seen_projs = set()
+        for p in projs:
+            norm = (p.name or "").strip().lower()
+            if norm in seen_projs:
+                self.db.delete(p)
+            else:
+                seen_projs.add(norm)
+
+        # 5. Deduplicate Certifications
+        certs = self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        seen_certs = set()
+        for c in certs:
+            norm = (c.name or "").strip().lower()
+            if norm in seen_certs:
+                self.db.delete(c)
+            else:
+                seen_certs.add(norm)
+
+        # 6. Deduplicate Languages
+        langs = self.db.query(Language).filter(Language.user_id == user_id).all()
+        seen_langs = set()
+        for l in langs:
+            norm = (l.name or "").strip().lower()
+            if norm in seen_langs:
+                self.db.delete(l)
+            else:
+                seen_langs.add(norm)

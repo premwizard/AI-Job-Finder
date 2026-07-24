@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/uploads/:path*',
-        destination: 'http://localhost:8001/uploads/:path*',
+        destination: 'http://localhost:8000/uploads/:path*',
       },
     ];
   },
