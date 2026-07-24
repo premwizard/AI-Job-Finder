@@ -1022,3 +1022,13 @@ def apply_all_resume_improvements(
     db.commit()
     return {"message": f"Applied {applied} suggestions successfully"}
 
+
+@router.get("/resume/analytics")
+def get_resume_analytics(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.services.resume_analytics_service import ResumeAnalyticsService
+    service = ResumeAnalyticsService(db)
+    return service.get_resume_analytics(current_user.id)
+

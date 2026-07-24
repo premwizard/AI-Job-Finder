@@ -50,6 +50,7 @@ import {
   Layers,
   AlertCircle,
   Eye,
+  Activity,
   Check,
   RotateCw,
   Copy,
@@ -754,6 +755,9 @@ export default function ResumeCenterPage() {
                 </Button>
                 <Button variant="default" size="sm" className="h-8 text-xs bg-slate-700 hover:bg-slate-800 font-semibold" onClick={() => router.push(`/profile/resume/${activeResume.id}/versions`)}>
                   <History className="w-3.5 h-3.5 mr-1.5" /> Version History
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs bg-white text-slate-800 border-slate-300 hover:bg-slate-50 font-semibold" onClick={() => router.push(`/profile/resume/analytics`)}>
+                  <Activity className="w-3.5 h-3.5 mr-1.5" /> View Analytics
                 </Button>
                 <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
                   <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File
