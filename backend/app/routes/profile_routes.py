@@ -755,6 +755,14 @@ def update_notification_settings(
     return service.update_notification_settings(current_user.id, req)
 
 
+@router.get("/analytics")
+def get_profile_analytics(
+    service: ProfileService = Depends(get_profile_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.get_profile_analytics(current_user.id)
+
+
 
 
 

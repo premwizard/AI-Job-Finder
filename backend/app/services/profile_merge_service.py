@@ -327,6 +327,101 @@ class ProfileMergeService:
                     recommendation="Resume contains a different professional summary.",
                 ))
 
+        # ── 7. Personal Information (Name, Role/Headline, Location) Comparison ────────
+        res_personal = resume_data.get("personal_info") or {}
+        user_obj = self.db.query(User).filter(User.id == user_id).first()
+
+        res_full_name = res_personal.get("full_name") or res_personal.get("name")
+        res_headline = res_personal.get("headline") or res_personal.get("title") or res_personal.get("role")
+        res_location = res_personal.get("location") or res_personal.get("city")
+        res_phone = res_personal.get("phone") or res_personal.get("phone_number")
+
+        # Name Comparison
+        if res_full_name:
+            curr_name = f"{user_obj.first_name or ''} {user_obj.last_name or ''}".strip() if user_obj else ""
+            if not curr_name:
+                suggestions.append(MergeSuggestionItem(
+                    id=f"name_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="NEW",
+                    title="Full Name",
+                    existing_value=None,
+                    resume_value={"full_name": res_full_name},
+                    recommendation="Set full name from resume.",
+                ))
+            elif curr_name.lower() != res_full_name.strip().lower():
+                suggestions.append(MergeSuggestionItem(
+                    id=f"name_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="UPDATE",
+                    title="Full Name",
+                    existing_value=curr_name,
+                    resume_value={"full_name": res_full_name},
+                    recommendation="Update full name from resume.",
+                ))
+
+        # Headline / Role Comparison
+        if res_headline:
+            curr_headline = profile.headline or profile.current_job_title if profile else None
+            if not curr_headline:
+                suggestions.append(MergeSuggestionItem(
+                    id=f"head_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="NEW",
+                    title="Professional Role / Headline",
+                    existing_value=None,
+                    resume_value={"headline": res_headline, "title": res_headline},
+                    recommendation="Set role/headline from resume.",
+                ))
+            elif curr_headline.strip().lower() != res_headline.strip().lower():
+                suggestions.append(MergeSuggestionItem(
+                    id=f"head_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="UPDATE",
+                    title="Professional Role / Headline",
+                    existing_value=curr_headline,
+                    resume_value={"headline": res_headline, "title": res_headline},
+                    recommendation="Update role/headline from resume.",
+                ))
+
+        # Location Comparison
+        if res_location:
+            curr_loc = f"{profile.city or ''} {profile.country or ''}".strip() if profile else ""
+            if not curr_loc:
+                suggestions.append(MergeSuggestionItem(
+                    id=f"loc_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="NEW",
+                    title="Location",
+                    existing_value=None,
+                    resume_value={"location": res_location, "city": res_location},
+                    recommendation="Set location from resume.",
+                ))
+            elif curr_loc.lower() != res_location.strip().lower():
+                suggestions.append(MergeSuggestionItem(
+                    id=f"loc_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="UPDATE",
+                    title="Location",
+                    existing_value=curr_loc,
+                    resume_value={"location": res_location, "city": res_location},
+                    recommendation="Update location from resume.",
+                ))
+
+        # Phone Comparison
+        if res_phone:
+            curr_phone = profile.phone_number if profile else None
+            if not curr_phone:
+                suggestions.append(MergeSuggestionItem(
+                    id=f"phone_{uuid.uuid4().hex[:6]}",
+                    category="personal_info",
+                    status="NEW",
+                    title="Phone Number",
+                    existing_value=None,
+                    resume_value={"phone": res_phone},
+                    recommendation="Set phone number from resume.",
+                ))
+
         # Counts
         new_count = sum(1 for s in suggestions if s.status == "NEW")
         update_count = sum(1 for s in suggestions if s.status == "UPDATE")

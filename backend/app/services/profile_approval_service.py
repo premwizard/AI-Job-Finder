@@ -63,15 +63,32 @@ class ProfileApprovalService:
                 cat = item.category.lower()
                 val = item.value or {}
 
-                if cat in ("personal_info", "summary"):
+                if cat in ("personal_info", "personal", "summary", "name", "headline", "location"):
                     if "summary" in val and val["summary"]:
                         profile.professional_summary = val["summary"]
                     if "phone" in val and val["phone"]:
                         profile.phone_number = val["phone"]
-                    if "title" in val and val["title"]:
+                    if "headline" in val and val["headline"]:
+                        profile.headline = val["headline"]
+                        profile.current_job_title = val["headline"]
+                    elif "title" in val and val["title"]:
                         profile.headline = val["title"]
+                        profile.current_job_title = val["title"]
                     if "bio" in val and val["bio"]:
                         profile.bio = val["bio"]
+                    if "full_name" in val and val["full_name"]:
+                        user_obj = self.db.query(User).filter(User.id == user_id).first()
+                        if user_obj:
+                            parts = str(val["full_name"]).strip().split(" ", 1)
+                            user_obj.first_name = parts[0]
+                            if len(parts) > 1:
+                                user_obj.last_name = parts[1]
+                    if "location" in val and val["location"]:
+                        profile.city = str(val["location"])
+                    if "city" in val and val["city"]:
+                        profile.city = str(val["city"])
+                    if "country" in val and val["country"]:
+                        profile.country = str(val["country"])
                     merged_count += 1
 
                 elif cat == "skills":

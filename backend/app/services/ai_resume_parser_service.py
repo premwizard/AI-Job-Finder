@@ -303,12 +303,19 @@ JSON SCHEMA REQUIREMENT:
         # 1. Personal Info
         email_match = re.search(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", resume_text)
         phone_match = re.search(r"\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}", resume_text)
-        name = lines[0] if lines and len(lines[0].split()) <= 4 and not "@" in lines[0] else None
+        loc_match = re.search(r"\b([A-Z][a-zA-Za-z\s]+,\s*[A-Z]{2,3}(?:,\s*[A-Z][a-zA-Za-z\s]+)?)\b", resume_text)
+
+        name = lines[0] if lines and len(lines[0].split()) <= 4 and "@" not in lines[0] else None
+        headline_title = None
+        if len(lines) > 1 and len(lines[1].split()) <= 6 and "@" not in lines[1] and not re.search(r"\d", lines[1]):
+            headline_title = lines[1]
 
         personal = ParsedPersonalInfo(
             full_name=name,
             email=email_match.group(0) if email_match else None,
             phone=phone_match.group(0) if phone_match else None,
+            title=headline_title,
+            location=loc_match.group(0) if loc_match else None,
         )
 
         # 2. Skills

@@ -207,6 +207,8 @@ function ProfileMergeEngineModal({ resume, onClose }: MergeEngineModalProps) {
     mutationFn: ({ resumeId, items }: { resumeId: number; items: any[] }) => approveResumeMerge(resumeId, items),
     onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_completion"] });
+      queryClient.invalidateQueries({ queryKey: ["profile_strength"] });
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       queryClient.invalidateQueries({ queryKey: ["skills"] });
       queryClient.invalidateQueries({ queryKey: ["experiences"] });
@@ -214,6 +216,9 @@ function ProfileMergeEngineModal({ resume, onClose }: MergeEngineModalProps) {
       queryClient.invalidateQueries({ queryKey: ["educations"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["certifications"] });
+      queryClient.invalidateQueries({ queryKey: ["social-profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["socialProfiles"] });
+      queryClient.invalidateQueries({ queryKey: ["social_profiles"] });
       toast.success(res.message || "Career Profile updated successfully!");
       onClose();
     },

@@ -96,9 +96,18 @@ export default function CareerProfileOverviewPage() {
   const pSumm = profile?.professional_summary;
 
   const getInitials = () => {
+    const fn = pInfo?.first_name || "";
+    const ln = pInfo?.last_name || "";
+    if (fn || ln) {
+      return `${fn.charAt(0)}${ln.charAt(0)}`.toUpperCase();
+    }
     if (pInfo?.headline) return pInfo.headline.substring(0, 2).toUpperCase();
     return "US";
   };
+
+  const displayName = [pInfo?.first_name, pInfo?.last_name].filter(Boolean).join(" ") || pInfo?.headline || "Your Name";
+  const displayRole = pInfo?.current_job_title || pInfo?.headline || pSumm?.current_job_title || "Role";
+  const displayLocation = [pInfo?.city, pInfo?.state, pInfo?.country].filter(Boolean).join(", ") || "City, Country";
 
   return (
     <div className="w-full">
@@ -144,15 +153,15 @@ export default function CareerProfileOverviewPage() {
         <div className="flex flex-col md:flex-row justify-between items-start gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight">
-              {pInfo?.headline ? pInfo.headline.split(' at ')[0] : "Your Name"}
+              {displayName}
             </h1>
             <p className="text-lg text-muted-foreground flex items-center gap-2">
               <Briefcase className="w-4 h-4" /> 
-              {pSumm?.current_job_title || "Role"} {pSumm?.current_company ? `at ${pSumm.current_company}` : ""}
+              {displayRole} {pSumm?.current_company ? `at ${pSumm.current_company}` : ""}
             </p>
             <p className="text-sm text-muted-foreground flex items-center gap-2">
               <MapPin className="w-4 h-4" /> 
-              {pInfo?.city || "City"}, {pInfo?.country || "Country"}
+              {displayLocation}
             </p>
           </div>
           <div className="flex gap-2">

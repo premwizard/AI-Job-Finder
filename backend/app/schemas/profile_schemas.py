@@ -46,7 +46,7 @@ class PersonalInfoUpdate(BaseModel):
 class PersonalInfoResponse(PersonalInfoUpdate):
     email: Optional[str] = None
     is_verified: Optional[bool] = None
-    languages: List[LanguageResponse] = []
+    languages: Optional[Any] = None
     
     class Config:
         from_attributes = True
