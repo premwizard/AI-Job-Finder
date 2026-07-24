@@ -400,6 +400,22 @@ class Job(Base):
     skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")
     requirements = relationship("JobRequirement", back_populates="job", cascade="all, delete-orphan")
     benefits = relationship("JobBenefit", back_populates="job", cascade="all, delete-orphan")
+    chunks = relationship("JobChunkMetadata", back_populates="job", cascade="all, delete-orphan")
+
+
+class JobChunkMetadata(Base):
+    __tablename__ = "job_chunks_metadata"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
+    chunk_id: Any = Column(String, unique=True, index=True, nullable=False) # e.g. job_123_skills
+    chunk_type: Any = Column(String, nullable=False) # Overview, Skills, Responsibilities, etc.
+    chunk_order: Any = Column(Integer, default=0)
+    token_count: Any = Column(Integer, default=0)
+    embedding_version: Any = Column(String, nullable=True)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    job = relationship("Job", back_populates="chunks")
 
 
 class JobLocation(Base):

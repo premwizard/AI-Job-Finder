@@ -17,7 +17,8 @@ import {
   Settings,
   BrainCircuit,
   LogOut,
-  Sparkles
+  Sparkles,
+  Database
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -26,6 +27,7 @@ const sidebarItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Jobs Explorer", href: "/jobs", icon: Briefcase },
   { name: "Job Analytics", href: "/jobs/analytics", icon: Sparkles },
+  { name: "Vector Engine", href: "/jobs/embeddings", icon: Database },
   { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
   { name: "Skill Gap", href: "/profile/skill-gap", icon: Target },
   { name: "Interview Prep", href: "/interview", icon: Users },
