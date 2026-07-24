@@ -10,6 +10,7 @@ import uuid
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 from app.models.models import (
     Resume,
@@ -57,7 +58,7 @@ class ProfileMergeService:
             .first()
         )
         if not resume:
-            raise Exception("Resume not found")
+            raise HTTPException(status_code=404, detail="Resume not found")
 
         target_text = resume.clean_text or resume.raw_text or ""
         from app.services.ai_resume_parser_service import AIResumeParserService
