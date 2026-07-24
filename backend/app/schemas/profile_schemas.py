@@ -644,5 +644,17 @@ class NotificationSettingResponse(NotificationSettingUpdate):
         from_attributes = True
 
 
+class ProfileCompletionResponse(BaseModel):
+    percentage: int = 0
+    completed_sections: List[str] = []
+    missing_sections: List[str] = []
+
+
+class ProfileStrengthResponse(BaseModel):
+    score: int = 0
+    level: str = "Beginner"
+    suggestions: List[str] = []
+
+
 
 

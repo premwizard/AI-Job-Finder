@@ -78,43 +78,30 @@ export function LiveProof() {
   }, [nodes, userX, userY]);
 
   return (
-    <section className="w-full py-32 bg-[#0A0B0F] flex flex-col items-center">
+    <section className="w-full py-32 bg-[#f3f3f4] flex flex-col items-center">
       <div className="max-w-4xl w-full px-6 text-center mb-16">
-        <h2 className="text-3xl md:text-5xl font-bold text-[#E8F4FF] mb-6" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+        <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-6" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
           Real-time Match Strength
         </h2>
-        <p className="text-[#B8BCC8] text-lg">
+        <p className="text-[#7e7f83] text-lg font-medium">
           Move your profile node to see how distance to required skills dynamically calculates your fit.
         </p>
       </div>
 
       <div 
         ref={containerRef}
-        className="relative w-full max-w-4xl h-[500px] border border-white/5 rounded-xl bg-[#0A0B0F]/50 overflow-hidden mx-6"
+        className="relative w-full max-w-4xl h-[500px] border border-[#7e7f83]/20 rounded-xl bg-white shadow-[0_4px_20px_rgba(20,17,15,0.06)] overflow-hidden mx-6 backdrop-blur-md"
       >
-        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {lines.map(line => {
-            // Read current value via state, it's ok for react re-renders on drag if performance holds.
-            // For true 60fps, we'd use a canvas or framer-motion svg paths, but this is lightweight enough.
-            // Actually, to avoid react re-renders on drag, we can use framer motion SVG lines
-            return null; 
-          })}
-        </svg>
-
         {/* Framer motion SVG for 60fps lines without re-renders */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-          {nodes.map(node => {
-            // We can't easily use useTransform for path d attribute with multiple inputs in standard React.
-            // Let's use a specialized component or just rely on state (at 5 nodes, state update is fine).
-            return (
-              <MotionLine 
-                key={node.id} 
-                node={node} 
-                userX={userX} 
-                userY={userY} 
-              />
-            );
-          })}
+          {nodes.map(node => (
+            <MotionLine 
+              key={node.id} 
+              node={node} 
+              userX={userX} 
+              userY={userY} 
+            />
+          ))}
         </svg>
 
         {/* Static Roles */}
@@ -124,8 +111,8 @@ export function LiveProof() {
             className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
             style={{ left: node.x, top: node.y }}
           >
-            <div className="w-3 h-3 rounded-full bg-[#F2B84B] shadow-[0_0_15px_rgba(242,184,75,0.6)] mb-2" />
-            <span className="text-xs text-[#B8BCC8] font-medium whitespace-nowrap bg-black/50 px-2 py-1 rounded">
+            <div className="w-3.5 h-3.5 rounded-full bg-[#62466b] shadow-[0_0_12px_rgba(98,70,107,0.5)] mb-2" />
+            <span className="text-xs text-[#34312d] font-semibold whitespace-nowrap bg-[#f3f3f4] border border-[#7e7f83]/25 px-2.5 py-1 rounded-md shadow-sm">
               {node.label}
             </span>
           </div>
@@ -137,14 +124,16 @@ export function LiveProof() {
           dragConstraints={containerRef}
           dragElastic={0.1}
           dragMomentum={false}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.95 }}
           style={{ x: userX, y: userY }}
-          className="absolute top-0 left-0 -ml-4 -mt-4 w-8 h-8 rounded-full bg-[#E8F4FF] shadow-[0_0_20px_rgba(232,244,255,0.8)] cursor-grab active:cursor-grabbing flex items-center justify-center z-10"
+          className="absolute top-0 left-0 -ml-4 -mt-4 w-8 h-8 rounded-full bg-[#62466b] shadow-[0_0_20px_rgba(98,70,107,0.6)] cursor-grab active:cursor-grabbing flex items-center justify-center z-10"
         >
-          <div className="w-full h-full rounded-full animate-ping bg-[#E8F4FF] opacity-30 absolute inset-0" />
+          <div className="w-full h-full rounded-full animate-ping bg-[#7a5a85] opacity-40 absolute inset-0" />
         </motion.div>
         
         <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
-          <span className="text-[#8A8D98] text-sm uppercase tracking-widest font-medium opacity-50">Drag the glowing node</span>
+          <span className="text-[#7e7f83] text-sm uppercase tracking-widest font-semibold opacity-80">Drag the glowing node</span>
         </div>
       </div>
     </section>
@@ -180,7 +169,7 @@ function MotionLine({ node, userX, userY }: { node: any, userX: any, userY: any 
       y1={props.y1}
       x2={node.x}
       y2={node.y}
-      stroke="#F2B84B"
+      stroke="#62466b"
       strokeWidth={2}
       strokeOpacity={props.opacity}
     />

@@ -34,7 +34,7 @@ def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
-    if user.is_deleted:
+    if getattr(user, "is_deleted", False):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This account has been deleted",

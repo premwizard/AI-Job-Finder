@@ -17,14 +17,15 @@ class LoginRequest(BaseModel):
 
 class UserResponse(BaseModel):
     id: str
-    first_name: str
-    last_name: str
+    first_name: Optional[str] = ""
+    last_name: Optional[str] = ""
     email: str
-    is_verified: bool
-    is_active: bool
+    is_verified: Optional[bool] = False
+    is_active: Optional[bool] = True
 
     class Config:
         from_attributes = True
+        populate_by_name = True
 
 
 class TokenResponse(BaseModel):

@@ -1234,6 +1234,55 @@ class ProfileService:
             "matched_jobs": saved_jobs_count + 8,
         }
 
+    def calculate_completion_percentage(self, user_id: str) -> Dict[str, Any]:
+        """Calculate percentage of completed sections in profile."""
+        full = self.get_full_profile(user_id)
+        sections = []
+        missing = []
+        
+        if full.personal_info and (full.personal_info.first_name or full.personal_info.headline):
+            sections.append("personal_info")
+        else:
+            missing.append("personal_info")
+
+        if full.experiences and len(full.experiences) > 0:
+            sections.append("experiences")
+        else:
+            missing.append("experiences")
+
+        if full.educations and len(full.educations) > 0:
+            sections.append("educations")
+        else:
+            missing.append("educations")
+
+        if full.skills and len(full.skills) > 0:
+            sections.append("skills")
+        else:
+            missing.append("skills")
+
+        pct = int((len(sections) / 4) * 100)
+        return {
+            "percentage": pct,
+            "completed_sections": sections,
+            "missing_sections": missing,
+        }
+
+    def get_profile_strength(self, user_id: str) -> Dict[str, Any]:
+        """Calculate overall profile strength level."""
+        comp = self.calculate_completion_percentage(user_id)
+        pct = comp.get("percentage", 0)
+        level = "Beginner"
+        if pct >= 80:
+            level = "All-Star"
+        elif pct >= 50:
+            level = "Intermediate"
+
+        return {
+            "score": pct,
+            "level": level,
+            "suggestions": [f"Add your {m.replace('_', ' ')}" for m in comp.get("missing_sections", [])],
+        }
+
 
 
 

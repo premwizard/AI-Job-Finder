@@ -36,13 +36,13 @@ export function RolesShowcase() {
   const selectedRole = MOCK_ROLES.find(r => r.id === selectedId);
 
   return (
-    <section className="w-full py-32 bg-[#0A0B0F] relative">
+    <section className="w-full py-32 bg-[#d9c5b2]/30 relative">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#E8F4FF] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
             Curated For You
           </h2>
-          <p className="text-[#B8BCC8] text-lg max-w-2xl mx-auto">
+          <p className="text-[#7e7f83] text-lg max-w-2xl mx-auto font-medium">
             These aren't just job postings. They are high-confidence matches based on your specific skills and trajectory.
           </p>
         </div>
@@ -61,23 +61,23 @@ export function RolesShowcase() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-[#14110f]/60 backdrop-blur-sm"
               onClick={() => setSelectedId(null)}
             />
             <motion.div 
               layoutId={`card-${selectedRole.id}`}
-              className="bg-[#12141C] border border-[#F2B84B]/30 rounded-xl p-8 max-w-2xl w-full relative z-10 shadow-2xl"
+              className="bg-white border border-[#62466b]/40 rounded-xl p-8 max-w-2xl w-full relative z-10 shadow-2xl"
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <motion.h3 layoutId={`title-${selectedRole.id}`} className="text-2xl font-bold text-[#E8F4FF] mb-1">
+                  <motion.h3 layoutId={`title-${selectedRole.id}`} className="text-2xl font-bold text-[#14110f] mb-1">
                     {selectedRole.title}
                   </motion.h3>
-                  <motion.p layoutId={`company-${selectedRole.id}`} className="text-[#B8BCC8] text-lg">
+                  <motion.p layoutId={`company-${selectedRole.id}`} className="text-[#7e7f83] text-lg font-medium">
                     {selectedRole.company}
                   </motion.p>
                 </div>
-                <motion.div layoutId={`match-${selectedRole.id}`} className="bg-[#F2B84B]/20 text-[#F2B84B] px-3 py-1 rounded-sm font-semibold">
+                <motion.div layoutId={`match-${selectedRole.id}`} className="bg-[#62466b]/15 text-[#62466b] border border-[#62466b]/30 px-3 py-1 rounded-md font-semibold text-sm">
                   {selectedRole.match}% Match
                 </motion.div>
               </div>
@@ -89,24 +89,28 @@ export function RolesShowcase() {
               >
                 <div className="flex flex-wrap gap-2 mb-6">
                   {selectedRole.skills.map(skill => (
-                    <span key={skill} className="bg-white/5 border border-white/10 text-white/80 px-2 py-1 text-sm rounded-sm">
+                    <span key={skill} className="bg-[#f3f3f4] border border-[#7e7f83]/20 text-[#34312d] px-2.5 py-1 text-sm rounded-md font-medium">
                       {skill}
                     </span>
                   ))}
                 </div>
                 
-                <h4 className="text-[#E8F4FF] font-semibold mb-2">About the role</h4>
-                <p className="text-[#B8BCC8] mb-8 leading-relaxed">
+                <h4 className="text-[#14110f] font-semibold mb-2">About the role</h4>
+                <p className="text-[#34312d] mb-8 leading-relaxed font-normal">
                   {selectedRole.description}
                 </p>
 
                 <div className="flex justify-end gap-4">
-                  <button onClick={() => setSelectedId(null)} className="px-4 py-2 text-[#B8BCC8] hover:text-white transition-colors">
+                  <button onClick={() => setSelectedId(null)} className="px-4 py-2 text-[#7e7f83] hover:text-[#14110f] transition-colors font-medium">
                     Close
                   </button>
-                  <button className="bg-[#E8F4FF] text-[#0A0B0F] font-semibold px-6 py-2 rounded-sm hover:bg-white transition-colors">
+                  <motion.button 
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-6 py-2 rounded-md transition-colors shadow-md focus:outline-none focus:ring-2 focus:ring-[#62466b]"
+                  >
                     Apply Now
-                  </button>
+                  </motion.button>
                 </div>
               </motion.div>
             </motion.div>
@@ -145,32 +149,34 @@ function TiltCard({ role, onClick }: { role: any, onClick: () => void }) {
     <motion.div
       layoutId={`card-${role.id}`}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className="bg-[#12141C] border border-white/10 rounded-xl p-6 cursor-pointer hover:border-[#F2B84B]/30 transition-colors relative group"
+      className="bg-white border border-[#7e7f83]/20 rounded-xl p-6 cursor-pointer hover:border-[#62466b]/50 transition-all duration-300 relative group shadow-[0_4px_20px_rgba(20,17,15,0.06)] hover:shadow-[0_10px_25px_rgba(98,70,107,0.15)]"
     >
       {/* Glare effect */}
       <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" 
-           style={{ background: 'radial-gradient(circle at 50% 0%, rgba(242,184,75,0.1) 0%, transparent 70%)' }} 
+           style={{ background: 'radial-gradient(circle at 50% 0%, rgba(98,70,107,0.08) 0%, transparent 70%)' }} 
       />
 
       <div style={{ transform: "translateZ(30px)" }}>
         <div className="flex justify-between items-start mb-4">
-          <motion.div layoutId={`match-${role.id}`} className="bg-[#F2B84B]/10 text-[#F2B84B] px-2 py-1 rounded-sm text-sm font-semibold">
+          <motion.div layoutId={`match-${role.id}`} className="bg-[#62466b]/15 text-[#62466b] border border-[#62466b]/30 px-2.5 py-1 rounded-md text-xs font-semibold">
             {role.match}% Match
           </motion.div>
         </div>
-        <motion.h3 layoutId={`title-${role.id}`} className="text-xl font-bold text-[#E8F4FF] mb-1">
+        <motion.h3 layoutId={`title-${role.id}`} className="text-xl font-bold text-[#14110f] mb-1">
           {role.title}
         </motion.h3>
-        <motion.p layoutId={`company-${role.id}`} className="text-[#B8BCC8] text-sm mb-4">
+        <motion.p layoutId={`company-${role.id}`} className="text-[#7e7f83] text-sm mb-4 font-medium">
           {role.company}
         </motion.p>
         
         <div className="flex flex-wrap gap-2 mt-auto">
           {role.skills.slice(0, 3).map((skill: string) => (
-            <span key={skill} className="bg-white/5 text-white/70 text-xs px-2 py-1 rounded-sm">
+            <span key={skill} className="bg-[#f3f3f4] text-[#34312d] text-xs px-2.5 py-1 rounded-md border border-[#7e7f83]/20 font-medium">
               {skill}
             </span>
           ))}

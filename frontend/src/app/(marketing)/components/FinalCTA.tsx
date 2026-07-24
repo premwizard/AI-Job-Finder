@@ -76,7 +76,7 @@ export function FinalCTA() {
     }
 
     const draw = (time: number) => {
-      ctx.fillStyle = '#0A0B0F';
+      ctx.fillStyle = '#f3f3f4';
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
       // Pulse
@@ -89,8 +89,8 @@ export function FinalCTA() {
           ctx.beginPath();
           ctx.moveTo(userNode.x, userNode.y);
           ctx.lineTo(n.x, n.y);
-          ctx.strokeStyle = `rgba(242, 184, 75, ${((400 - dist) / 400) * 0.15})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = `rgba(98, 70, 107, ${((400 - dist) / 400) * 0.3})`;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         }
       });
@@ -101,16 +101,16 @@ export function FinalCTA() {
         
         ctx.beginPath();
         ctx.arc(n.x, n.y + driftY, n.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(242, 184, 75, ${n.alpha})`;
+        ctx.fillStyle = `rgba(52, 49, 45, ${n.alpha * 0.7})`; // Graphite nodes on platinum
         ctx.fill();
       });
 
       // Draw user node
       ctx.beginPath();
       ctx.arc(userNode.x, userNode.y, userNode.r * pulse, 0, Math.PI * 2);
-      ctx.fillStyle = '#E8F4FF';
+      ctx.fillStyle = '#62466b';
       ctx.shadowBlur = 20;
-      ctx.shadowColor = '#E8F4FF';
+      ctx.shadowColor = '#7a5a85';
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -132,7 +132,7 @@ export function FinalCTA() {
   }, []);
 
   return (
-    <section className="relative w-full h-screen bg-[#0A0B0F] overflow-hidden flex items-center justify-center">
+    <section className="relative w-full h-screen bg-[#f3f3f4] overflow-hidden flex items-center justify-center">
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 z-0 pointer-events-none"
@@ -144,7 +144,7 @@ export function FinalCTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold text-[#E8F4FF] mb-8"
+          className="text-4xl md:text-6xl font-extrabold text-[#14110f] mb-8"
           style={{ fontFamily: 'var(--font-space-grotesk)' }}
         >
           Your constellation awaits.
@@ -159,9 +159,11 @@ export function FinalCTA() {
           <motion.button
             ref={buttonRef}
             style={{ x: buttonX, y: buttonY }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
             onMouseMove={handleMouseMoveButton}
             onMouseLeave={handleMouseLeaveButton}
-            className="bg-[#E8F4FF] text-[#0A0B0F] font-semibold px-8 py-4 text-lg rounded-sm hover:bg-white transition-colors shadow-[0_0_30px_rgba(232,244,255,0.3)]"
+            className="bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-8 py-4 text-lg rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4]"
           >
             Find my matches
           </motion.button>

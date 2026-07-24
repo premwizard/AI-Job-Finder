@@ -120,7 +120,7 @@ export function Hero() {
     resize();
 
     const draw = (time: number) => {
-      ctx.fillStyle = '#0A0B0F';
+      ctx.fillStyle = '#f3f3f4';
       ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
       // Smooth parallax interpolation
@@ -143,7 +143,7 @@ export function Hero() {
 
         ctx.beginPath();
         ctx.arc(finalX, finalY, p.baseRadius * (1 + p.z * 0.5), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(242, 184, 75, ${p.alpha * (0.5 + p.z * 0.5)})`; // Secondary gold
+        ctx.fillStyle = `rgba(98, 70, 107, ${p.alpha * (0.3 + p.z * 0.4)})`; // Vintage Grape highlight on light background
         ctx.fill();
         
         // Store computed position for lines
@@ -160,9 +160,9 @@ export function Hero() {
       
       ctx.beginPath();
       ctx.arc(userPx, userPy, userParticle.baseRadius * pulse, 0, Math.PI * 2);
-      ctx.fillStyle = '#E8F4FF';
+      ctx.fillStyle = '#62466b';
       ctx.shadowBlur = 15;
-      ctx.shadowColor = '#E8F4FF';
+      ctx.shadowColor = '#7a5a85';
       ctx.fill();
       ctx.shadowBlur = 0; // reset
 
@@ -184,13 +184,12 @@ export function Hero() {
           ctx.beginPath();
           ctx.moveTo(userPx, userPy);
           ctx.lineTo(currentX, currentY);
-          ctx.strokeStyle = `rgba(232, 244, 255, ${0.4 * line.progress})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = `rgba(98, 70, 107, ${0.4 * line.progress})`;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         });
       }
 
-      // We expose this trigger via window or custom event ideally, but for demo, we'll use a hack to read state
       if ((window as any).__startConstellation) {
         (window as any).__startConstellation = false;
         
@@ -206,8 +205,6 @@ export function Hero() {
 
       if (!prefersReducedMotion) {
         animationFrameId = requestAnimationFrame(draw);
-      } else {
-        // Fallback for reduced motion: draw once
       }
     };
 
@@ -232,7 +229,7 @@ export function Hero() {
   };
 
   return (
-    <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#0A0B0F] flex items-center justify-center">
+    <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#f3f3f4] flex items-center justify-center">
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 pointer-events-none z-0"
@@ -243,18 +240,18 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-[#E8F4FF] tracking-tight mb-6"
+          className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[#14110f] tracking-tight mb-6"
           style={{ fontFamily: 'var(--font-space-grotesk)' }}
         >
           Your next role is already out there. <br/>
-          <span className="text-[#B8BCC8]">We just draw the line to it.</span>
+          <span className="text-[#62466b]">We just draw the line to it.</span>
         </motion.h1>
         
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg md:text-xl text-[#B8BCC8] mb-10 max-w-2xl"
+          className="text-lg md:text-xl text-[#7e7f83] mb-10 max-w-2xl font-normal leading-relaxed"
         >
           IC Job maps your unique skills directly to open positions. No filler, just the matches that matter.
         </motion.p>
@@ -269,17 +266,19 @@ export function Hero() {
           <input 
             type="text" 
             placeholder="Paste your role or skills..." 
-            className="flex-1 bg-white/5 border border-white/10 rounded-sm px-4 py-3 text-[#E8F4FF] focus:outline-none focus:border-white/20 transition-colors backdrop-blur-sm"
+            className="flex-1 bg-white border border-[#7e7f83]/30 rounded-md px-4 py-3 text-[#34312d] placeholder-[#7e7f83] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:border-[#62466b] transition-all shadow-sm"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
           />
           <motion.button
             ref={buttonRef}
             style={{ x: buttonX, y: buttonY }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.98 }}
             onMouseMove={handleMouseMoveButton}
             onMouseLeave={handleMouseLeaveButton}
             type="submit"
-            className="bg-[#E8F4FF] text-[#0A0B0F] font-semibold px-6 py-3 rounded-sm hover:bg-white transition-colors"
+            className="bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-6 py-3 rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4]"
           >
             Find my matches
           </motion.button>

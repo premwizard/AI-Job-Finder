@@ -64,7 +64,7 @@ export function HowItWorks() {
 
         ctx.beginPath();
         ctx.arc(currentX, currentY, node.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(242, 184, 75, ${0.3 + p * 0.7})`; // Fade in brightness
+        ctx.fillStyle = `rgba(98, 70, 107, ${0.4 + p * 0.6})`; // Vintage grape node on pale oak
         ctx.fill();
 
         // Draw connections if highly progressed
@@ -81,8 +81,8 @@ export function HowItWorks() {
                 ctx.beginPath();
                 ctx.moveTo(currentX, currentY);
                 ctx.lineTo(otherCurrentX, otherCurrentY);
-                ctx.strokeStyle = `rgba(242, 184, 75, ${((100 * p - dist) / 100) * 0.5 * (p - 0.5) * 2})`;
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = `rgba(52, 49, 45, ${((100 * p - dist) / 100) * 0.6 * (p - 0.5) * 2})`;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
               }
             }
@@ -148,7 +148,7 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section ref={containerRef} className="relative w-full h-screen bg-[#0A0B0F] overflow-hidden">
+    <section ref={containerRef} className="relative w-full h-screen bg-[#d9c5b2]/30 overflow-hidden">
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 z-0 pointer-events-none"
@@ -158,24 +158,24 @@ export function HowItWorks() {
         <div ref={stepsRef} className="relative w-full max-w-4xl text-center">
           
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#E8F4FF] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
               Understands you
             </h2>
-            <p className="text-[#B8BCC8] text-lg">We map your unique trajectory—not just keywords.</p>
+            <p className="text-[#34312d] text-lg font-medium">We map your unique trajectory—not just keywords.</p>
           </div>
           
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#E8F4FF] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
               Scans everything
             </h2>
-            <p className="text-[#B8BCC8] text-lg">Thousands of active roles processed in milliseconds.</p>
+            <p className="text-[#34312d] text-lg font-medium">Thousands of active roles processed in milliseconds.</p>
           </div>
 
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-bold text-[#E8F4FF] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
               Draws the match
             </h2>
-            <p className="text-[#B8BCC8] text-lg">You only see the roles where you're a definitive fit.</p>
+            <p className="text-[#34312d] text-lg font-medium">You only see the roles where you're a definitive fit.</p>
           </div>
           
         </div>

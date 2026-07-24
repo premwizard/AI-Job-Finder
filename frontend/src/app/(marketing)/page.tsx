@@ -6,7 +6,7 @@ import { FinalCTA } from './components/FinalCTA';
 
 export default function MarketingPage() {
   return (
-    <main className="bg-[#0A0B0F] min-h-screen text-[#B8BCC8] overflow-hidden">
+    <main className="bg-[#f3f3f4] min-h-screen text-[#34312d] overflow-hidden">
       <Hero />
       <HowItWorks />
       <LiveProof />
