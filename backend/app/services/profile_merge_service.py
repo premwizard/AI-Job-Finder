@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from app.models.models import (
+    User,
     Resume,
     UserProfile,
     Skill,

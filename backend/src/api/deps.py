@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from src.core.security import ALGORITHM, SECRET_KEY
+from app.config.config import ALGORITHM, SECRET_KEY
 from src.database.database import get_db
 from src.models import models
 from src.schemas import schemas
