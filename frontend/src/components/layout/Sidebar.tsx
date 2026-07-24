@@ -12,12 +12,13 @@ import {
   Users, 
   FileText, 
   FileSearch, 
-  Bookmark, 
-  User, 
+  Bookmark,
+  User,
   Settings,
   BrainCircuit,
   Sparkles,
-  Database
+  Database,
+  LogOut
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";

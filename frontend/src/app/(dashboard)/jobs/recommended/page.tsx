@@ -1,25 +1,25 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getRecommendedJobs, recalculateMatches } from "@/features/jobs/services/job_matching.api";
+import { getRecommendations, refreshRecommendations } from "@/features/jobs/services/recommendations.api";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Sparkles, MapPin, Building2, ChevronRight, RefreshCw, Target } from "lucide-react";
+import { Loader2, Sparkles, MapPin, Building2, ChevronRight, RefreshCw, Target, CheckCircle2, XCircle, TrendingUp, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default function RecommendedJobsPage() {
   const queryClient = useQueryClient();
 
   const { data: jobs, isLoading, refetch } = useQuery({
-    queryKey: ['recommendedJobs'],
-    queryFn: () => getRecommendedJobs(20)
+    queryKey: ['recommendations'],
+    queryFn: () => getRecommendations(20)
   });
 
   const recalculateMutation = useMutation({
-    mutationFn: () => recalculateMatches(),
+    mutationFn: () => refreshRecommendations(),
     onSuccess: () => {
-      alert("AI is recalculating your matches in the background!");
+      alert("AI is recalculating your personalized recommendations in the background!");
     }
   });
 
@@ -31,13 +31,22 @@ export default function RecommendedJobsPage() {
     );
   }
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Top Pick': return 'bg-indigo-600 hover:bg-indigo-700 text-white border-transparent';
+      case 'Highly Recommended': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      case 'Recommended': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">AI Recommended Jobs</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Recommended for You</h2>
           <p className="text-muted-foreground mt-1">
-            Jobs tailored specifically to your profile, skills, and experience.
+            Personalized AI rankings based on your career goals, behavior, and semantic profile.
           </p>
         </div>
         <div className="flex gap-2">
@@ -48,7 +57,7 @@ export default function RecommendedJobsPage() {
             className="gap-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50"
           >
             {recalculateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Recalculate Matches
+            Refresh Rankings
           </Button>
           <Button onClick={() => refetch()} className="gap-2">
             Refresh List
@@ -59,75 +68,101 @@ export default function RecommendedJobsPage() {
       {!jobs || jobs.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center">
           <Target className="w-12 h-12 text-muted-foreground mb-4 opacity-20" />
-          <h3 className="text-xl font-semibold">No matches calculated yet</h3>
+          <h3 className="text-xl font-semibold">No recommendations yet</h3>
           <p className="text-muted-foreground mt-2 max-w-sm">
-            We haven't calculated your AI matches yet. Click "Recalculate Matches" to run the semantic matching engine.
+            We haven't calculated your AI recommendations yet. Click "Refresh Rankings" to run the AI Ranking engine.
           </p>
-          <Button onClick={() => recalculateMutation.mutate()} className="mt-6 gap-2">
-            <Sparkles className="w-4 h-4" /> Start AI Matching
+          <Button onClick={() => recalculateMutation.mutate()} className="mt-6 gap-2 bg-indigo-600 hover:bg-indigo-700">
+            <Sparkles className="w-4 h-4" /> Start AI Ranking
           </Button>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {jobs.map((job) => (
-            <Card key={job.id} className="overflow-hidden border-l-4 border-l-indigo-500">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row justify-between gap-4">
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <h3 className="text-xl font-bold">{job.job_title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                        <span className="flex items-center gap-1">
-                          <Building2 className="w-4 h-4" /> {job.company_name}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" /> {job.location || "Remote"}
-                        </span>
-                      </div>
+            <Card key={job.id} className="overflow-hidden border-l-4 border-l-indigo-600 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row border-b border-border/50">
+                  <div className="p-6 flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge className={`mb-2 ${getCategoryColor(job.category)}`}>
+                        {job.category}
+                      </Badge>
+                      <Badge variant="outline" className="flex gap-1 items-center bg-slate-50 text-slate-600">
+                        <ShieldCheck className="w-3 h-3 text-green-600" /> {job.confidence_score}% Confidence
+                      </Badge>
                     </div>
-                    
-                    <div className="bg-indigo-50/50 p-4 rounded-lg border border-indigo-100/50">
-                      <div className="flex items-start gap-3">
-                        <Sparkles className="w-5 h-5 text-indigo-500 mt-0.5 shrink-0" />
-                        <div>
-                          <p className="font-medium text-sm text-indigo-900 mb-1">AI Recommendation Summary</p>
-                          <ul className="text-sm text-indigo-800 space-y-1 list-disc list-inside">
-                            {job.explanation_summary ? job.explanation_summary.split('\n').filter(s => s.trim().length > 0).map((bullet, i) => (
-                              <li key={i}>{bullet.replace(/^[-\*\✓]\s*/, '')}</li>
-                            )) : <li>Strong match based on semantic profile analysis.</li>}
-                          </ul>
-                        </div>
-                      </div>
+                    <h3 className="text-2xl font-bold">{job.job_title}</h3>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-2">
+                      <span className="flex items-center gap-1 font-medium text-foreground">
+                        <Building2 className="w-4 h-4" /> {job.company_name}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" /> {job.location || "Remote"}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4 text-green-600" /> 
+                        <span className="font-medium text-green-700">{job.career_growth_score}% Growth Potential</span>
+                      </span>
                     </div>
+                  </div>
+                  
+                  <div className="bg-indigo-50/50 p-6 flex flex-col items-center justify-center min-w-[200px] border-t md:border-t-0 md:border-l border-border/50">
+                    <div className="text-4xl font-black text-indigo-600 tracking-tighter">
+                      {Math.round(job.recommendation_score)}
+                    </div>
+                    <div className="text-xs font-semibold text-indigo-900/60 uppercase tracking-widest mt-1">
+                      Rank Score
+                    </div>
+                    <Link href={`/jobs/${job.id}`} className="mt-4 w-full">
+                      <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-sm">
+                        View Job <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
 
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {job.matched_skills.slice(0, 5).map(skill => (
-                        <Badge key={skill} variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200">
-                          {skill}
-                        </Badge>
-                      ))}
-                      {job.missing_skills.slice(0, 3).map(skill => (
-                        <Badge key={skill} variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">
-                          Missing: {skill}
-                        </Badge>
-                      ))}
+                <div className="p-6 bg-slate-50/50">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="flex items-center gap-2 text-sm font-semibold text-green-800 mb-3">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" /> Why we recommend this
+                      </h4>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        {job.strengths.map((strength, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span>{strength.replace(/^[-\*\✓]\s*/, '')}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="flex items-center gap-2 text-sm font-semibold text-amber-800 mb-3">
+                        <XCircle className="w-4 h-4 text-amber-600" /> Potential drawbacks
+                      </h4>
+                      <ul className="space-y-2 text-sm text-muted-foreground">
+                        {job.weaknesses.map((weakness, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>{weakness.replace(/^[-\*\✓]\s*/, '')}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end justify-between shrink-0 md:w-48">
-                    <div className="text-right">
-                      <div className="text-3xl font-black text-indigo-600">
-                        {Math.round(job.overall_score)}%
-                      </div>
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">
-                        Match Score
-                      </div>
-                    </div>
-                    <Link href={`/jobs/${job.id}`}>
-                      <Button className="w-full gap-2 mt-4 md:mt-0">
-                        View Details <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
+                  <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-border/50">
+                    <span className="text-xs font-semibold text-muted-foreground self-center mr-2 uppercase tracking-wider">Skills:</span>
+                    {job.matched_skills.slice(0, 4).map(skill => (
+                      <Badge key={skill} variant="secondary" className="bg-green-100/50 text-green-700 hover:bg-green-100 border-green-200">
+                        {skill}
+                      </Badge>
+                    ))}
+                    {job.missing_skills.slice(0, 3).map(skill => (
+                      <Badge key={skill} variant="outline" className="text-amber-700 border-amber-200 bg-amber-50/50">
+                        Missing: {skill}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               </CardContent>

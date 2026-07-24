@@ -444,6 +444,29 @@ class JobMatchResult(Base):
     job = relationship("Job")
 
 
+class JobRecommendation(Base):
+    __tablename__ = "job_recommendations"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    recommendation_score: Any = Column(Float, nullable=False)
+    confidence_score: Any = Column(Float, nullable=False)
+    career_growth_score: Any = Column(Float, nullable=False)
+    category: Any = Column(String, nullable=False) # Top Pick, Highly Recommended, Recommended
+    
+    explanation_strengths_json: Any = Column(Text, nullable=True)
+    explanation_weaknesses_json: Any = Column(Text, nullable=True)
+    explanation_summary: Any = Column(Text, nullable=True)
+    
+    is_stale: Any = Column(Boolean, default=False)
+    calculated_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+    job = relationship("Job")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

@@ -13,6 +13,7 @@ from app.routes import (
     job_parsing_routes,
     job_embedding_routes,
     job_matching_routes,
+    recommendation_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -45,6 +46,7 @@ app.include_router(jobs_routes.router)
 app.include_router(job_parsing_routes.router)
 app.include_router(job_embedding_routes.router)
 app.include_router(job_matching_routes.router)
+app.include_router(recommendation_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)
