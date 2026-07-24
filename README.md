@@ -637,21 +637,35 @@ Transforms the platform from a scheduled scraper into an intelligent career oppo
 * **Caching:** Heavy computations (like API queries) are cached to reduce latency.
 * **Incremental Indexing:** Vector databases update sequentially rather than bulk rebuilding on every change.
 * **Streaming:** Chat routes and AI generation support streaming outputs for near-instant UX.
-* **Background Jobs:** Heavy RAG indexing tasks operate asynchronously.
+* **Background Workers & Parallel Execution:** Heavy RAG indexing tasks and multi-agent coordination operate asynchronously in parallel.
 * **Embedding Optimization:** Dynamic batch sizing avoids rate limits while keeping latency low.
 * **Retrieval Optimization:** Hybrid keyword-vector search guarantees sub-second fetch speeds.
+* **Context Caching & Memory Consolidation:** AI reasoning efficiency is improved via token compression and long-term memory retrieval.
+* **Tool Execution Optimization:** Intelligent retries and fast failure via strict Pydantic validation boundaries.
 
 ---
 
 ## 🔒 Security
 
-* **JWT Authentication**
-* **OAuth**
-* **Email Verification**
-* **Password Reset**
-* **Role-based Authorization**
+* **JWT Authentication & OAuth**
+* **Email Verification & Password Reset**
+* **Role-based Authorization & Agent Authorization:** Ensures both users and internal agents have correct execution permissions.
+* **Tool Authorization:** Hardened boundaries preventing agents from executing arbitrary tools.
 * **Retrieval Authorization:** Ensures users can only query their own specific chunks within the multitenant RAG collections.
+* **Memory Isolation:** Secure isolation of short-term and episodic memory per user.
 * **Protected AI Endpoints:** Rate-limited and scoped to prevent abuse.
+* **Audit Logging:** Every autonomous agent decision, tool execution, and reflection is strictly audited and viewable in the UI.
+
+---
+
+## 📊 Analytics
+
+* **Profile & Resume Analytics:** ATS scores, quality trends, and skills growth.
+* **Goal & Task Analytics:** AI execution tracking, task completion rates, and planning efficiency.
+* **Agent Analytics:** Workload distribution, reasoning confidence, and multi-agent network health.
+* **Memory Analytics:** Knowledge graph density and consolidation metrics.
+* **Tool Analytics:** Usage frequency, failure rates, and execution latency across all registered tools.
+* **Opportunity Analytics:** AI match scores, recruiter funnel metrics, and autonomous discovery tracking.
 
 ---
 
