@@ -59,17 +59,30 @@ class ProfileMergeService:
         if not resume:
             raise Exception("Resume not found")
 
+        target_text = resume.clean_text or resume.raw_text or ""
+        from app.services.ai_resume_parser_service import AIResumeParserService
+
         if not resume.parsed_data_json:
-            # If AI parser hasn't run yet, parse with fallback
-            from app.services.ai_resume_parser_service import AIResumeParserService
-            target_text = resume.clean_text or resume.raw_text or ""
             parsed = AIResumeParserService.parse_with_gemini(target_text)
             resume_data = parsed.model_dump()
+            resume.parsed_data_json = parsed.model_dump_json()
+            self.db.commit()
         else:
             try:
                 resume_data = json.loads(resume.parsed_data_json)
             except Exception:
                 resume_data = {}
+
+        # Re-enrich projects or certifications if missing from stored JSON
+        if (not resume_data.get("projects") or not resume_data.get("certifications")) and target_text:
+            fresh_parsed = AIResumeParserService.parse_with_gemini(target_text)
+            fresh_dict = fresh_parsed.model_dump()
+            if not resume_data.get("projects") and fresh_dict.get("projects"):
+                resume_data["projects"] = fresh_dict["projects"]
+            if not resume_data.get("certifications") and fresh_dict.get("certifications"):
+                resume_data["certifications"] = fresh_dict["certifications"]
+            resume.parsed_data_json = json.dumps(resume_data)
+            self.db.commit()
 
         # Fetch existing profile records from DB
         profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
@@ -183,25 +196,26 @@ class ProfileMergeService:
 
         # ── 3. Education Comparison ───────────────────────────────────────
         edu_lookup = {
-            f"{(e.degree or '').strip().lower()}|{(e.institution or '').strip().lower()}": e
+            f"{(e.degree or '').strip().lower()}|{(getattr(e, 'institution_name', None) or getattr(e, 'institution', None) or '').strip().lower()}": e
             for e in existing_edu
         }
         resume_edu = resume_data.get("education", [])
         for ed in resume_edu:
             degree = (ed.get("degree") or "").strip()
-            institution = (ed.get("institution") or "").strip()
+            institution = (ed.get("institution") or ed.get("institution_name") or "").strip()
             if not degree and not institution:
                 continue
 
             key = f"{degree.lower()}|{institution.lower()}"
             if key in edu_lookup:
                 existing_item = edu_lookup[key]
+                inst_n = getattr(existing_item, "institution_name", None) or getattr(existing_item, "institution", "")
                 suggestions.append(MergeSuggestionItem(
                     id=f"edu_{uuid.uuid4().hex[:6]}",
                     category="education",
                     status="DUPLICATE",
                     title=f"{degree} - {institution}",
-                    existing_value=f"{existing_item.degree} at {existing_item.institution}",
+                    existing_value=f"{existing_item.degree} at {inst_n}",
                     resume_value=f"{degree} at {institution}",
                     recommendation="Education record already exists.",
                 ))
@@ -217,10 +231,13 @@ class ProfileMergeService:
                 ))
 
         # ── 4. Projects Comparison ────────────────────────────────────────
-        proj_lookup = {(p.title or "").strip().lower(): p for p in existing_proj}
-        resume_proj = resume_data.get("projects", [])
+        proj_lookup = {
+            (getattr(p, "name", None) or getattr(p, "title", None) or "").strip().lower(): p
+            for p in existing_proj
+        }
+        resume_proj = resume_data.get("projects") or resume_data.get("project_list") or []
         for pr in resume_proj:
-            title = (pr.get("title") or "").strip()
+            title = (pr.get("title") or pr.get("name") or pr.get("project_name") or "").strip()
             if not title:
                 continue
             if title.lower() in proj_lookup:
@@ -229,7 +246,7 @@ class ProfileMergeService:
                     category="projects",
                     status="DUPLICATE",
                     title=f"Project: {title}",
-                    existing_value=proj_lookup[title.lower()].title,
+                    existing_value=getattr(proj_lookup[title.lower()], "name", proj_lookup[title.lower()].id),
                     resume_value=title,
                     recommendation="Project already exists in profile.",
                 ))
@@ -245,10 +262,13 @@ class ProfileMergeService:
                 ))
 
         # ── 5. Certifications Comparison ──────────────────────────────────
-        cert_lookup = {(c.name or "").strip().lower(): c for c in existing_certs}
-        resume_certs = resume_data.get("certifications", [])
+        cert_lookup = {
+            (getattr(c, "name", None) or getattr(c, "title", None) or "").strip().lower(): c
+            for c in existing_certs
+        }
+        resume_certs = resume_data.get("certifications") or resume_data.get("certs") or []
         for ct in resume_certs:
-            name = (ct.get("name") or "").strip()
+            name = (ct.get("name") or ct.get("title") or ct.get("certificate_name") or "").strip()
             if not name:
                 continue
             if name.lower() in cert_lookup:

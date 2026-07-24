@@ -210,8 +210,10 @@ function ProfileMergeEngineModal({ resume, onClose }: MergeEngineModalProps) {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
       queryClient.invalidateQueries({ queryKey: ["skills"] });
       queryClient.invalidateQueries({ queryKey: ["experiences"] });
+      queryClient.invalidateQueries({ queryKey: ["workExperience"] });
       queryClient.invalidateQueries({ queryKey: ["educations"] });
       queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["certifications"] });
       toast.success(res.message || "Career Profile updated successfully!");
       onClose();
     },
@@ -261,10 +263,18 @@ function ProfileMergeEngineModal({ resume, onClose }: MergeEngineModalProps) {
     suggestions.forEach((s: any) => {
       const decision = decisions[s.id] || (s.status === "NEW" ? "accept" : "reject");
       if (decision === "accept" || decision === "edit") {
+        let valObj: any = {};
+        if (s.resume_value && typeof s.resume_value === "object") {
+          valObj = s.resume_value;
+        } else if (typeof s.resume_value === "string") {
+          valObj = { name: s.resume_value, title: s.title, job_title: s.title, description: s.resume_value };
+        } else {
+          valObj = { title: s.title, name: s.title };
+        }
         approvedItems.push({
           category: s.category,
           action: decision,
-          value: typeof s.resume_value === "object" ? s.resume_value : { name: s.resume_value, title: s.title },
+          value: valObj,
         });
       }
     });
@@ -514,14 +524,11 @@ function ResumePreviewModal({ resume, onClose }: PreviewModalProps) {
 
 export default function ResumeCenterPage() {
   const queryClient = useQueryClient();
-  const replaceInputRef = useRef<HTMLInputElement>(null);
-  const [replacingId, setReplacingId] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [previewResume, setPreviewResume] = useState<ResumeItem | null>(null);
-  const [viewTextResume, setViewTextResume] = useState<ResumeItem | null>(null);
-  const [viewParsedResume, setViewParsedResume] = useState<ResumeItem | null>(null);
   const [viewMergeResume, setViewMergeResume] = useState<ResumeItem | null>(null);
-  const [activatingId, setActivatingId] = useState<number | null>(null);
 
   const { data: resumes = [], isLoading } = useQuery<ResumeItem[]>({
     queryKey: ["resumes"],
@@ -530,6 +537,69 @@ export default function ResumeCenterPage() {
 
   const activeResume = resumes.find((r) => r.is_active);
   const historyResumes = resumes.filter((r) => !r.is_active);
+
+  // Upload Mutation
+  const uploadMutation = useMutation({
+    mutationFn: uploadResumeFile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Resume uploaded successfully! Parsing initiated.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    },
+    onError: (err: any) => {
+      const detail = err.response?.data?.detail || "Failed to upload resume.";
+      toast.error(detail);
+    },
+  });
+
+  // Activate Mutation
+  const activateMutation = useMutation({
+    mutationFn: activateResume,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Active resume version updated!");
+    },
+    onError: () => toast.error("Failed to set active resume."),
+  });
+
+  // Delete Mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteResume,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Resume deleted.");
+    },
+    onError: () => toast.error("Failed to delete resume."),
+  });
+
+  const handleFileSelect = (file: File) => {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size exceeds maximum limit of 10MB");
+      return;
+    }
+    uploadMutation.mutate(file);
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
 
   if (isLoading) {
     return (
@@ -554,36 +624,214 @@ export default function ResumeCenterPage() {
         </div>
       </div>
 
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={(e) => {
+          if (e.target.files && e.target.files[0]) {
+            handleFileSelect(e.target.files[0]);
+          }
+        }}
+        accept=".pdf,.docx,.doc,.txt,.rtf,.png,.jpg,.jpeg,.webp"
+        className="hidden"
+      />
+
+      {/* Upload Dropzone (Prominent when no active resume, or option below) */}
+      <Card
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        className={`border-2 border-dashed transition-all cursor-pointer ${
+          isDragging
+            ? "border-primary bg-primary/10 ring-2 ring-primary/20"
+            : "border-border/80 bg-card hover:bg-muted/20 hover:border-primary/50"
+        }`}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <CardContent className="p-8 md:p-10 flex flex-col items-center justify-center text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+            {uploadMutation.isPending ? (
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            ) : (
+              <UploadCloud className="w-8 h-8" />
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-foreground">
+              {uploadMutation.isPending
+                ? "Uploading & Extracting Resume..."
+                : activeResume
+                ? "Upload New Resume Version"
+                : "Upload Your Resume"}
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Drag and drop your resume file here, or click to browse. Automatically extracts skills, experience, education, and projects using AI.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <Badge variant="outline" className="text-xs">PDF</Badge>
+            <Badge variant="outline" className="text-xs">DOCX</Badge>
+            <Badge variant="outline" className="text-xs">TXT</Badge>
+            <Badge variant="outline" className="text-xs">PNG / JPG</Badge>
+            <span className="text-xs text-muted-foreground ml-1">(Max 10MB)</span>
+          </div>
+
+          <Button
+            type="button"
+            disabled={uploadMutation.isPending}
+            className="mt-2 shadow-sm font-semibold text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
+          >
+            {uploadMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...
+              </>
+            ) : (
+              <>
+                <UploadCloud className="w-4 h-4 mr-2" /> Browse Resume File
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Active Resume Card */}
       {activeResume && (
-        <Card className="border-emerald-500/30 ring-1 ring-emerald-500/15 shadow-sm bg-card overflow-hidden">
-          <CardHeader className="p-5 pb-4 bg-emerald-500/5 border-b border-emerald-500/10">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 shrink-0 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
-                <FileText className="w-7 h-7 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-bold text-base truncate max-w-xs">{activeResume.file_name || "Resume"}</h3>
-                  <VersionBadge version={activeResume.version} isActive={activeResume.is_active} />
-                  <FileTypeBadge type={activeResume.file_type} />
-                  <ProcessingStatusBadge status={activeResume.parsing_status} error={activeResume.processing_error} hasParsed={!!activeResume.parsed_data_json} />
+        <div className="space-y-3">
+          <h2 className="text-sm font-bold tracking-wider uppercase text-muted-foreground flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Current Active Resume
+          </h2>
+          <Card className="border-emerald-500/30 ring-1 ring-emerald-500/15 shadow-sm bg-card overflow-hidden">
+            <CardHeader className="p-5 pb-4 bg-emerald-500/5 border-b border-emerald-500/10">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 shrink-0 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-inner">
+                  <FileText className="w-7 h-7 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-base truncate max-w-xs">{activeResume.file_name || "Resume"}</h3>
+                    <VersionBadge version={activeResume.version} isActive={activeResume.is_active} />
+                    <FileTypeBadge type={activeResume.file_type} />
+                    <ProcessingStatusBadge status={activeResume.parsing_status} error={activeResume.processing_error} hasParsed={!!activeResume.parsed_data_json} />
+                  </div>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                    <span>Size: {formatFileSize(activeResume.file_size)}</span>
+                    {activeResume.uploaded_at && (
+                      <span>Uploaded: {format(new Date(activeResume.uploaded_at), "MMM d, yyyy")}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-5 space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Button variant="default" size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700" onClick={() => setViewMergeResume(activeResume)}>
-                <GitCompare className="w-3.5 h-3.5 mr-1.5" /> Review & Approve Profile Merge
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
-                <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="p-5 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <Button variant="default" size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 font-semibold" onClick={() => setViewMergeResume(activeResume)}>
+                  <GitCompare className="w-3.5 h-3.5 mr-1.5" /> Review & Approve Profile Merge
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => setPreviewResume(activeResume)}>
+                  <Eye className="w-3.5 h-3.5 mr-1.5" /> Preview File
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    if (confirm("Are you sure you want to delete this resume?")) {
+                      deleteMutation.mutate(activeResume.id);
+                    }
+                  }}
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
+
+      {/* History Resumes */}
+      {historyResumes.length > 0 && (
+        <div className="space-y-4 border-t pt-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold tracking-wider uppercase text-muted-foreground flex items-center gap-2">
+              <History className="w-4 h-4 text-muted-foreground" /> Resume History & Prior Versions ({historyResumes.length})
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              {showHistory ? <ChevronUp className="w-4 h-4 mr-1" /> : <ChevronDown className="w-4 h-4 mr-1" />}
+              {showHistory ? "Hide History" : "Show History"}
+            </Button>
+          </div>
+
+          {showHistory && (
+            <div className="space-y-3">
+              {historyResumes.map((item) => (
+                <Card key={item.id} className="p-4 flex items-center justify-between border bg-card/60">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm">{item.file_name || "Resume"}</span>
+                        <VersionBadge version={item.version} isActive={item.is_active} />
+                        <FileTypeBadge type={item.file_type} />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatFileSize(item.file_size)} • Uploaded {item.uploaded_at ? format(new Date(item.uploaded_at), "MMM d, yyyy") : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => activateMutation.mutate(item.id)}
+                    >
+                      Make Active
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs"
+                      onClick={() => setPreviewResume(item)}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                      onClick={() => {
+                        if (confirm("Delete this resume version?")) {
+                          deleteMutation.mutate(item.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* File Preview Modal */}
+      <ResumePreviewModal
+        resume={previewResume}
+        onClose={() => setPreviewResume(null)}
+      />
 
       {/* Profile Merge Engine Modal */}
       <ProfileMergeEngineModal
@@ -593,3 +841,4 @@ export default function ResumeCenterPage() {
     </div>
   );
 }
+

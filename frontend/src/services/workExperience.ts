@@ -1,23 +1,24 @@
-import { api } from './api';
+import { authApi } from '@/features/auth/services/auth.api';
 import { WorkExperience, WorkExperienceCreate, WorkExperienceUpdate } from '../types/workExperience';
 
 export const workExperienceService = {
   getAll: async (): Promise<WorkExperience[]> => {
-    const { data } = await api.get('/work-experience/');
+    const { data } = await authApi.get('/profile/experience');
     return data;
   },
 
   create: async (payload: WorkExperienceCreate): Promise<WorkExperience> => {
-    const { data } = await api.post('/work-experience/', payload);
+    const { data } = await authApi.post('/profile/experience', payload);
     return data;
   },
 
-  update: async (id: number, payload: WorkExperienceUpdate): Promise<WorkExperience> => {
-    const { data } = await api.put(`/work-experience/${id}`, payload);
+  update: async (id: number | string, payload: WorkExperienceUpdate): Promise<WorkExperience> => {
+    const { data } = await authApi.put(`/profile/experience/${id}`, payload);
     return data;
   },
 
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/work-experience/${id}`);
+  delete: async (id: number | string): Promise<void> => {
+    await authApi.delete(`/profile/experience/${id}`);
   },
 };
+

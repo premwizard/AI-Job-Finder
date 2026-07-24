@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # --- Languages ---
@@ -63,7 +63,8 @@ class ProfessionalSummaryUpdate(BaseModel):
 
 
 class ProfessionalSummaryResponse(ProfessionalSummaryUpdate):
-    pass
+    class Config:
+        from_attributes = True
 
 # --- Professional Information (New Module) ---
 class ProfessionalInfoUpdate(BaseModel):
@@ -241,6 +242,12 @@ class CertificationCreate(BaseModel):
     category: Optional[str] = None
     verification_status: Optional[str] = "unverified"
 
+    @field_validator("issue_date", "expiry_date", "credential_id", "verification_url", "certificate_image_url", "category", mode="before")
+    def empty_str_to_none(cls, v):
+        if v == "" or v is None:
+            return None
+        return v
+
 
 class CertificationUpdate(BaseModel):
     name: Optional[str] = None
@@ -253,6 +260,12 @@ class CertificationUpdate(BaseModel):
     certificate_image_url: Optional[str] = None
     category: Optional[str] = None
     verification_status: Optional[str] = None
+
+    @field_validator("issue_date", "expiry_date", "credential_id", "verification_url", "certificate_image_url", "category", mode="before")
+    def empty_str_to_none(cls, v):
+        if v == "" or v is None:
+            return None
+        return v
 
 
 class CertificationResponse(CertificationCreate):

@@ -346,7 +346,37 @@ JSON SCHEMA REQUIREMENT:
                     institution=edu_lines[1] if len(edu_lines) > 1 else "University",
                 ))
 
-        # 5. Social Links
+        # 5. Projects
+        projects: List[ParsedProject] = []
+        proj_match = re.search(r"(PROJECTS|PORTFOLIO|PERSONAL PROJECTS|KEY PROJECTS)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        if proj_match:
+            proj_text = proj_match.group(2).strip()
+            proj_blocks = [pb.strip() for pb in re.split(r"\n\s*\n", proj_text) if pb.strip()]
+            for block in proj_blocks:
+                p_lines = [pl.strip() for pl in block.split("\n") if pl.strip()]
+                if p_lines:
+                    p_title = p_lines[0]
+                    p_desc = "\n".join(p_lines[1:]) if len(p_lines) > 1 else None
+                    projects.append(ParsedProject(
+                        title=p_title,
+                        description=p_desc,
+                    ))
+
+        # 6. Certifications
+        certs: List[ParsedCertification] = []
+        cert_match = re.search(r"(CERTIFICATIONS|CERTIFICATES|LICENSES)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        if cert_match:
+            cert_text = cert_match.group(2).strip()
+            cert_lines = [cl.strip() for cl in cert_text.split("\n") if cl.strip()]
+            for line in cert_lines:
+                if len(line) < 120:
+                    parts = line.split(" - ")
+                    if len(parts) > 1:
+                        certs.append(ParsedCertification(name=parts[0].strip(), issuing_organization=parts[1].strip()))
+                    else:
+                        certs.append(ParsedCertification(name=line))
+
+        # 7. Social Links
         socials: List[ParsedSocialLink] = []
         url_matches = re.findall(r"(linkedin\.com/[^\s]+|github\.com/[^\s]+)", resume_text, re.IGNORECASE)
         for url in url_matches:
@@ -358,6 +388,8 @@ JSON SCHEMA REQUIREMENT:
             skills=skills,
             work_experience=work,
             education=edu,
+            projects=projects,
+            certifications=certs,
             social_links=socials,
         )
 

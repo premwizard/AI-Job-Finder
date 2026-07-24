@@ -170,12 +170,12 @@ class ProfileService:
 
         # Map UserProfile to PersonalInfo and ProfessionalSummary
         personal_info = (
-            profile_schemas.PersonalInfoResponse(**profile.__dict__)
+            profile_schemas.PersonalInfoResponse.model_validate(profile)
             if profile
             else None
         )
         prof_summary = (
-            profile_schemas.ProfessionalSummaryResponse(**profile.__dict__)
+            profile_schemas.ProfessionalSummaryResponse.model_validate(profile)
             if profile
             else None
         )
@@ -199,17 +199,19 @@ class ProfileService:
             projects=[
                 profile_schemas.ProjectResponse.model_validate(p) for p in projects
             ],
-            career_preferences=profile_schemas.CareerPreferenceResponse(
-                **career_pref.__dict__
+            career_preferences=profile_schemas.CareerPreferenceResponse.model_validate(
+                career_pref
             )
             if career_pref
             else None,
-            social_profiles=profile_schemas.SocialProfileResponse(
-                **social_prof.__dict__
+            social_profiles=profile_schemas.SocialProfileResponse.model_validate(
+                social_prof
             )
             if social_prof
             else None,
-            ai_preferences=profile_schemas.AIPreferenceResponse(**ai_pref.__dict__)
+            ai_preferences=profile_schemas.AIPreferenceResponse.model_validate(
+                ai_pref
+            )
             if ai_pref
             else None,
             resumes=[profile_schemas.ResumeResponse.model_validate(r) for r in resumes],

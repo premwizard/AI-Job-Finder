@@ -93,9 +93,18 @@ class ProfileApprovalService:
                             self.db.add(new_sk)
                             merged_count += 1
 
-                elif cat == "experience":
-                    job_title = (val.get("job_title") or val.get("role") or "").strip()
-                    company = (val.get("company") or val.get("company_name") or "").strip()
+                elif cat in ("experience", "work_experience", "experiences"):
+                    job_title = (val.get("job_title") or val.get("role") or val.get("title") or "").strip()
+                    company = (val.get("company") or val.get("company_name") or val.get("organization") or "").strip()
+                    
+                    if not job_title and not company and val.get("name"):
+                        parts = str(val.get("name")).split(" at ")
+                        job_title = parts[0].strip()
+                        if len(parts) > 1:
+                            company = parts[1].strip()
+                    if not job_title and val.get("name"):
+                        job_title = str(val.get("name"))
+
                     if job_title or company:
                         new_exp = Experience(
                             user_id=user_id,
@@ -122,15 +131,17 @@ class ProfileApprovalService:
                         self.db.add(new_edu)
                         merged_count += 1
 
-                elif cat == "projects":
-                    title = (val.get("title") or val.get("name") or "").strip()
+                elif cat in ("projects", "project"):
+                    title = (val.get("title") or val.get("name") or val.get("project_name") or "").strip()
+                    if not title and val.get("title"):
+                        title = str(val.get("title"))
                     if title:
-                        tech = val.get("technologies")
+                        tech = val.get("technologies") or val.get("tech_stack")
                         tech_str = ", ".join(tech) if isinstance(tech, list) else (tech or "")
                         new_proj = Project(
                             user_id=user_id,
                             name=title,
-                            description=val.get("description"),
+                            description=val.get("description") or val.get("short_description"),
                             tech_stack=tech_str,
                             github_url=val.get("repo_url") or val.get("github_url"),
                             live_demo_url=val.get("project_url") or val.get("live_demo_url"),
@@ -138,14 +149,18 @@ class ProfileApprovalService:
                         self.db.add(new_proj)
                         merged_count += 1
 
-                elif cat == "certifications":
-                    name = (val.get("name") or "").strip()
+                elif cat in ("certifications", "certification", "certs", "cert"):
+                    name = (val.get("name") or val.get("title") or val.get("certificate_name") or "").strip()
+                    if not name and val.get("title"):
+                        name = str(val.get("title"))
                     if name:
                         new_cert = Certification(
                             user_id=user_id,
                             name=name,
                             issuer=val.get("issuing_organization") or val.get("issuer") or "Organization",
                             credential_id=val.get("credential_id"),
+                            verification_url=val.get("credential_url") or val.get("verification_url"),
+                            category=val.get("category"),
                         )
                         self.db.add(new_cert)
                         merged_count += 1

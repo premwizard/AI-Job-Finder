@@ -47,21 +47,6 @@ export const updateProfessionalSummary = async (data: any) => {
   return response.data;
 };
 
-export const updateCareerPreferences = async (data: any) => {
-  const response = await authApi.put(`${PROFILE_URL}/career-preferences`, data);
-  return response.data;
-};
-
-export const updateSocialProfiles = async (data: any) => {
-  const response = await authApi.put(`${PROFILE_URL}/social`, data);
-  return response.data;
-};
-
-export const updateAIPreferences = async (data: any) => {
-  const response = await authApi.put(`${PROFILE_URL}/ai-preferences`, data);
-  return response.data;
-};
-
 // Generic Lists (Placeholder for now until endpoints are created in next phase)
 export const addListItem = async (endpoint: string, data: any) => {
   // e.g. endpoint = "/api/profile/skills" -> we need full url if not provided
@@ -93,6 +78,7 @@ export const createEducation = async (data: any) => {
   return response.data;
 };
 
+
 export const updateEducation = async (id: string, data: any) => {
   const response = await authApi.put(`${PROFILE_URL}/education/${id}`, data);
   return response.data;
@@ -119,12 +105,30 @@ export const getCertifications = async () => {
 };
 
 export const createCertification = async (data: any) => {
-  const response = await authApi.post(`${PROFILE_URL}/certifications`, data);
+  const payload = {
+    ...data,
+    credential_id: data.credential_id || null,
+    issue_date: data.issue_date || null,
+    expiry_date: data.expiry_date || null,
+    verification_url: data.verification_url || null,
+    certificate_image_url: data.certificate_image_url || null,
+    category: data.category || null,
+  };
+  const response = await authApi.post(`${PROFILE_URL}/certifications`, payload);
   return response.data;
 };
 
 export const updateCertification = async (id: string, data: any) => {
-  const response = await authApi.put(`${PROFILE_URL}/certifications/${id}`, data);
+  const payload = {
+    ...data,
+    credential_id: data.credential_id || null,
+    issue_date: data.issue_date || null,
+    expiry_date: data.expiry_date || null,
+    verification_url: data.verification_url || null,
+    certificate_image_url: data.certificate_image_url || null,
+    category: data.category || null,
+  };
+  const response = await authApi.put(`${PROFILE_URL}/certifications/${id}`, payload);
   return response.data;
 };
 
