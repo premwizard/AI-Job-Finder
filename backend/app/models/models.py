@@ -521,6 +521,21 @@ class RAGDocumentMetadata(Base):
     last_indexed: Any = Column(DateTime, default=datetime.utcnow)
 
 
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    role: Any = Column(String, nullable=False) # "user" or "assistant"
+    content: Any = Column(Text, nullable=False)
+    citations_json: Any = Column(Text, nullable=True) # JSON list of citations
+    suggested_actions_json: Any = Column(Text, nullable=True) # JSON list of suggested actions
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    
+    user = relationship("User")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

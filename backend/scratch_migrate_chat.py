@@ -1,0 +1,13 @@
+import logging
+from app.database.database import engine, Base
+from app.models.models import ChatMessage
+
+logging.basicConfig(level=logging.INFO)
+
+def migrate():
+    # Only create tables that don't exist
+    ChatMessage.__table__.create(bind=engine, checkfirst=True)
+    logging.info("Created chat_messages table.")
+
+if __name__ == "__main__":
+    migrate()

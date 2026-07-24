@@ -17,6 +17,7 @@ from app.routes import (
     explanation_routes,
     learning_routes,
     rag_routes,
+    chat_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
@@ -53,6 +54,7 @@ app.include_router(recommendation_routes.router)
 app.include_router(explanation_routes.router)
 app.include_router(learning_routes.router)
 app.include_router(rag_routes.router)
+app.include_router(chat_routes.router)
 app.include_router(profile_routes.router)
 app.include_router(settings_routes.router)
 app.include_router(skill_gap_routes.router)
