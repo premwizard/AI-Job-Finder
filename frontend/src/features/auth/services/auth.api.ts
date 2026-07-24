@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { RegisterRequest, LoginRequest, AuthResponse, UserResponse } from '../types/auth.types';
 
-const API_URL = '/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export const authApi = axios.create({
   baseURL: API_URL,

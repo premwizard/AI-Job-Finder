@@ -102,7 +102,7 @@ export const useAuthStore = create<AuthState>()(
           
           // Only clear session and logout if we get an explicit 401/403 meaning unauthorized.
           // For network errors (500, timeout), we retain the session so we don't aggressively log users out.
-          if (error?.response?.status === 401 || error?.response?.status === 403) {
+          if (error?.response?.status === 401 || error?.response?.status === 403 || error?.response?.status === 404) {
              localStorage.removeItem('auth_token');
              set({ user: null, token: null, isAuthenticated: false, loading: false });
           } else {

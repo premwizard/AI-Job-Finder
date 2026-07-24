@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -17,8 +17,17 @@ social_auth_repo = SocialAuthRepository()
 @router.get("/auth/{provider}")
 def login_via_provider(provider: AuthProvider):
     # Generates URL and redirects user to provider
-    auth_url = social_auth_service.get_authorization_url(provider)
-    return RedirectResponse(url=auth_url)
+    try:
+        auth_url = social_auth_service.get_authorization_url(provider)
+        return RedirectResponse(url=auth_url)
+    except HTTPException as e:
+        return RedirectResponse(
+            url=f"{config.FRONTEND_URL}/login?error={e.detail}"
+        )
+    except Exception as e:
+        return RedirectResponse(
+            url=f"{config.FRONTEND_URL}/login?error={provider.value.title()} login is currently unavailable"
+        )
 
 
 @router.get("/auth/{provider}/callback")

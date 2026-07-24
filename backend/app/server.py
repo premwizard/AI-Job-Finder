@@ -1,7 +1,7 @@
 import os
 import sys
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 # Ensure the backend directory is in the path
@@ -50,6 +50,10 @@ from fastapi.staticfiles import StaticFiles
 # Ensure the uploads directory exists
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return Response(status_code=204)
 
 from app.database.database import engine, Base
 from sqlalchemy import text
