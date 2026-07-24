@@ -665,6 +665,19 @@ class ToolExecutionLog(Base):
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
 
+class Opportunity(Base):
+    __tablename__ = "opportunities"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    match_score: Any = Column(Float, default=0.0)
+    category: Any = Column(String, default="Unknown")
+    reasoning: Any = Column(Text, nullable=True)
+    status: Any = Column(String, default="new") # new, saved, ignored, applied
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)
