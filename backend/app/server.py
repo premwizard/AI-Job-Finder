@@ -22,6 +22,7 @@ from app.routes import (
     company_routes,
     resume_optimize_routes,
     agent_routes,
+    multi_agent_routes,
     profile_routes,
     settings_routes,
     social_auth_routes,
