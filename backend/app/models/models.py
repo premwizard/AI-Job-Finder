@@ -606,6 +606,26 @@ class AgentTask(Base):
     goal = relationship("AgentGoal", back_populates="tasks")
 
 
+class UserMemory(Base):
+    __tablename__ = "user_memories"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    memory_type: Any = Column(String, nullable=False) # short_term, long_term, episodic, semantic, working
+    title: Any = Column(String, nullable=True)
+    content: Any = Column(Text, nullable=False)
+    importance_score: Any = Column(Integer, default=3) # 1-5
+    source: Any = Column(String, nullable=True)
+    tags: Any = Column(String, nullable=True) # comma separated
+    
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_accessed: Any = Column(DateTime, default=datetime.utcnow)
+    access_count: Any = Column(Integer, default=0)
+    
+    user = relationship("User")
+
+
 class JobLocation(Base):
     __tablename__ = "job_locations"
     id: Any = Column(Integer, primary_key=True, index=True)

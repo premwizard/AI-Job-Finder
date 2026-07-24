@@ -21,7 +21,8 @@ import {
   Server,
   Search,
   Building2,
-  BrainCircuit
+  BrainCircuit,
+  Network
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -44,6 +45,7 @@ const sidebarItems = [
   { name: "Companies", href: "/companies", icon: Building2 },
   { name: "Resume Optimizer", href: "/resume/optimizer", icon: FileSearch },
   { name: "Career Agent", href: "/career-agent", icon: BrainCircuit },
+  { name: "Agent Network", href: "/agents", icon: Network },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 
