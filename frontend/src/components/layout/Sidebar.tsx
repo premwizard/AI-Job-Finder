@@ -22,7 +22,8 @@ import {
   Search,
   Building2,
   BrainCircuit,
-  Network
+  Network,
+  DatabaseZap
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth";
@@ -46,6 +47,7 @@ const sidebarItems = [
   { name: "Resume Optimizer", href: "/resume/optimizer", icon: FileSearch },
   { name: "Career Agent", href: "/career-agent", icon: BrainCircuit },
   { name: "Agent Network", href: "/agents", icon: Network },
+  { name: "Memory Center", href: "/memory-center", icon: DatabaseZap },
   { name: "Admin RAG", href: "/admin/rag", icon: Server },
 ];
 

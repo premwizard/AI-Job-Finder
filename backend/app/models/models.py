@@ -599,6 +599,8 @@ class AgentTask(Base):
     status: Any = Column(String, default="pending") # pending, running, completed, failed
     result_summary: Any = Column(Text, nullable=True)
     priority: Any = Column(Integer, default=1)
+    retries: Any = Column(Integer, default=0)
+    max_retries: Any = Column(Integer, default=3)
     
     created_at: Any = Column(DateTime, default=datetime.utcnow)
     completed_at: Any = Column(DateTime, nullable=True)
@@ -624,6 +626,31 @@ class UserMemory(Base):
     access_count: Any = Column(Integer, default=0)
     
     user = relationship("User")
+
+
+class AgentReflection(Base):
+    __tablename__ = "agent_reflections"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    task_id: Any = Column(Integer, ForeignKey("agent_tasks.id", ondelete="CASCADE"), nullable=False, index=True)
+    success: Any = Column(Boolean, default=False)
+    confidence: Any = Column(Float, default=0.0)
+    reasoning: Any = Column(Text, nullable=False)
+    mitigation: Any = Column(Text, nullable=True)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
+
+
+class AgentDecision(Base):
+    __tablename__ = "agent_decisions"
+    
+    id: Any = Column(Integer, primary_key=True, index=True)
+    goal_id: Any = Column(Integer, ForeignKey("agent_goals.id", ondelete="CASCADE"), nullable=False, index=True)
+    question: Any = Column(String, nullable=False)
+    decision: Any = Column(String, nullable=False)
+    reasoning: Any = Column(Text, nullable=False)
+    confidence: Any = Column(Float, default=0.0)
+    alternatives_considered: Any = Column(Text, nullable=True)
+    created_at: Any = Column(DateTime, default=datetime.utcnow)
 
 
 class JobLocation(Base):
