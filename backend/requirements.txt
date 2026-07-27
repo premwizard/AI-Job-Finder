@@ -30,3 +30,4 @@ slowapi
 secure
 stripe
 chromadb
+jinja2
