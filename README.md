@@ -1454,6 +1454,176 @@ The final result should provide a robust asynchronous execution platform capable
 
 ---
 
+## 🚀 Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
+
+### Goal
+Build a production-grade distributed caching platform for AI Job Finder that significantly improves response times, reduces database load, minimizes external API calls, lowers AI inference costs, and supports high-concurrency workloads.
+
+The caching layer should be transparent to business logic and reusable across all modules.
+Do not modify existing features.
+Instead, introduce intelligent caching throughout the platform.
+
+### Objectives
+Implement a centralized caching platform supporting:
+* API Responses
+* Database Queries
+* AI Responses
+* Vector Search Results
+* Embeddings
+* Resume Intelligence
+* Company Intelligence
+* GitHub Intelligence
+* Gmail Intelligence
+* Calendar Intelligence
+* ATS Synchronization
+* Google Drive Metadata
+* Career Copilot Planning
+* User Sessions
+* Feature Flags
+
+### Architecture
+Client
+↓
+API Gateway
+↓
+Cache Layer
+↓
+Business Services
+↓
+Database
+↓
+Redis
+↓
+Vector Database
+↓
+External APIs
+↓
+LLMs
+
+### Folder Structure
+`server/`, `cache/`, `providers/`, `strategies/`, `policies/`, `keys/`, `middleware/`, `metrics/`, `warmup/`, `invalidations/`, `decorators/`, `services/`
+
+### Cache Provider
+Use Redis as the primary cache.
+Support future providers: Redis Cluster, Valkey, Memcached, Cloud-managed Redis.
+Provider abstraction should allow future replacement without affecting business logic.
+
+### Cache Categories
+Implement dedicated cache regions: Authentication Cache, Session Cache, Profile Cache, Resume Cache, Job Cache, Company Cache, GitHub Cache, Email Cache, Calendar Cache, ATS Cache, Drive Cache, Vector Cache, Embedding Cache, Recommendation Cache, Analytics Cache, Configuration Cache, Feature Flag Cache.
+
+### Cache Strategies
+Support multiple strategies: Cache Aside, Read Through, Write Through, Write Behind, Refresh Ahead.
+Choose the appropriate strategy for each module.
+
+### Cache Keys
+Adopt standardized naming.
+Examples: `user:{id}`, `resume:{id}`, `company:{id}`, `job:{id}`, `application:{id}`, `embedding:{id}`, `github:{username}`, `email:{threadId}`, `calendar:{eventId}`, `recommendation:{userId}`.
+Maintain a documented key convention.
+
+### Time-To-Live (TTL)
+Configure TTL policies.
+Examples: Authentication: Short, Profile: Medium, Company Data: Long, Embeddings: Long, GitHub Analysis: Medium, AI Responses: Configurable, Calendar Events: Medium, Job Listings: Short.
+Support configurable TTL values.
+
+### Intelligent Cache Invalidation
+Automatically invalidate when: Resume changes, Profile updates, Application status changes, Company data refreshes, GitHub sync completes, Email synchronization finishes, Calendar updates, AI recommendations regenerate.
+Never rely solely on expiration.
+
+### Cache Warming
+Implement proactive cache warming.
+Examples: User dashboard, Career Health Score, Top recommendations, Resume metadata, Frequently accessed companies, Recent applications, Upcoming interviews, Recently viewed jobs.
+Run during startup and scheduled intervals.
+
+### Distributed Session Cache
+Store: Authentication sessions, OAuth state, Refresh tokens (where appropriate), User preferences, Temporary workflow state.
+Support multi-instance deployments.
+
+### AI Response Cache
+Cache: LLM responses, Prompt templates, Prompt embeddings, Model metadata, Reasoning outputs (where deterministic).
+Prevent repeated AI calls for identical requests when appropriate.
+
+### Vector Cache
+Cache: Embedding lookups, Semantic search results, Similarity calculations, Nearest-neighbor queries, Knowledge retrieval metadata.
+Reduce vector database load.
+
+### API Response Cache
+Support: GET response caching, Conditional requests, ETag support, Cache-Control headers, Compression compatibility, Selective endpoint caching.
+
+### Performance Middleware
+Implement middleware for: Cache lookup, Cache population, Timing metrics, Hit/miss tracking, Compression, Request optimization, Graceful fallback.
+
+### Metrics
+Track: Cache hits, Cache misses, Hit ratio, Memory usage, Evictions, Latency reduction, Saved database queries, Saved API requests, Saved AI requests, Cache warm-up success.
+Expose Prometheus-compatible metrics.
+
+### Dashboard
+Create a Cache Monitoring page.
+Include: Hit Ratio, Miss Ratio, Redis Health, Memory Usage, Hot Keys, Evictions, Cache Regions, TTL Distribution, Performance Gains.
+Dark mode. Responsive design.
+
+### APIs
+* `GET /api/cache/statistics`
+* `GET /api/cache/health`
+* `POST /api/cache/invalidate`
+* `POST /api/cache/warmup`
+* `GET /api/cache/keys`
+* `DELETE /api/cache/flush`
+
+Restrict administrative operations to authorized users.
+
+### Performance Targets
+Aim for: 90%+ cache hit rate on frequently accessed resources, Sub-100 ms cached API responses, Significant reduction in external API usage, Reduced LLM inference requests, Lower database query volume.
+Support high-concurrency workloads without degradation.
+
+### Security
+Ensure: Encrypted Redis connections (where applicable), Role-based cache administration, Sensitive data exclusion, Secure serialization, Audit cache operations, Safe key naming.
+Never cache secrets or confidential credentials.
+
+### Documentation
+Document: Caching architecture, Key naming conventions, TTL policies, Invalidation rules, Warm-up process, Performance metrics, Administration, Troubleshooting, Developer guidelines.
+
+### Deliverables
+At the end of this module the platform should provide:
+* ✓ Centralized cache service
+* ✓ Redis integration
+* ✓ Multiple caching strategies
+* ✓ Intelligent cache invalidation
+* ✓ Cache warming
+* ✓ Session caching
+* ✓ AI response caching
+* ✓ Vector search caching
+* ✓ API response caching
+* ✓ Monitoring dashboard
+* ✓ Performance metrics
+* ✓ Comprehensive documentation
+
+### Testing
+**Verify:**
+* ✓ Cache hits and misses
+* ✓ TTL expiration
+* ✓ Invalidation rules
+* ✓ Cache warming
+* ✓ Redis failover behavior
+* ✓ Session persistence
+* ✓ API response caching
+* ✓ AI response reuse
+* ✓ Vector cache accuracy
+* ✓ Dashboard metrics
+* ✓ Concurrent access
+* ✓ High-load performance
+* ✓ Graceful degradation when Redis is unavailable
+
+Resolve all issues before considering this module complete.
+
+### Important
+Do not introduce new user-facing functionality.
+Maintain complete backward compatibility.
+Ensure the caching layer remains transparent to existing services.
+Optimize for scalability, low latency, and reduced infrastructure costs.
+The final result should provide a high-performance distributed caching platform that enables AI Job Finder to deliver fast, reliable, and cost-efficient AI-powered experiences while supporting future enterprise-scale deployments.
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
@@ -1577,6 +1747,7 @@ The final result should provide a robust asynchronous execution platform capable
 * Phase 8 — Module 2: Docker & Containerization
 * Phase 8 — Module 3: Kubernetes, Helm & Cloud-Native Deployment
 * Phase 8 — Module 4: Background Jobs, Task Queue & Workflow Processing
+* Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
 * Phase 9 — Advanced Agentic Integrations
 
 ---

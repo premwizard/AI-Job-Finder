@@ -19,3 +19,4 @@ google-auth-oauthlib
 celery
 redis
 flower
+fastapi-cache2[redis]

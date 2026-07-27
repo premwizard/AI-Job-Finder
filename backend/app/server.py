@@ -47,6 +47,8 @@ from app.routes import (
 
 from app.modules.auth.controllers import auth_controller as auth_v2_controller
 from app.modules.queue.controllers import queue_controller
+from app.modules.cache.controllers import cache_controller
+from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
 from app.shared.logger.logger import app_logger
 import time
 
@@ -113,6 +115,7 @@ app.include_router(copilot_routes.router)
 # V2 Modular Routers
 app.include_router(auth_v2_controller.router)
 app.include_router(queue_controller.router)
+app.include_router(cache_controller.router)
 
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
@@ -132,7 +135,14 @@ from app.database.database import engine, Base
 from sqlalchemy import text
 
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
+    # Initialize caching
+    try:
+        await init_redis_cache()
+        app_logger.info("Redis cache initialized successfully.")
+    except Exception as e:
+        app_logger.error(f"Failed to initialize Redis cache: {e}")
+
     Base.metadata.create_all(bind=engine)
     with engine.connect() as conn:
         for col_def in [
@@ -174,6 +184,10 @@ def startup_event():
                 conn.commit()
             except Exception:
                 pass
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await close_redis_cache()
 
 
 @app.get("/")
