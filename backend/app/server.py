@@ -48,7 +48,11 @@ from app.routes import (
 from app.modules.auth.controllers import auth_controller as auth_v2_controller
 from app.modules.queue.controllers import queue_controller
 from app.modules.cache.controllers import cache_controller
+from app.modules.observability.controllers import observability_controller
 from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
+from app.modules.observability.logging.structured_logger import structured_logger
+from app.modules.observability.tracing.tracer import init_tracer
+from app.modules.observability.middleware.metrics_middleware import init_metrics
 from app.shared.logger.logger import app_logger
 import time
 
@@ -57,6 +61,12 @@ app = FastAPI(
     description="Backend API for the AI Job Finder application.",
     version="1.0.0",
 )
+
+# Initialize OpenTelemetry Tracing
+init_tracer(app)
+
+# Initialize Prometheus Metrics (Exposes /metrics)
+init_metrics(app)
 
 # Configure CORS for Next.js frontend
 app.add_middleware(
@@ -72,7 +82,15 @@ async def log_requests(request: Request, call_next):
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
-    app_logger.info(f"{request.method} {request.url.path} - {response.status_code} - {process_time:.4f}s")
+    structured_logger.info(
+        f"{request.method} {request.url.path} completed in {process_time:.4f}s",
+        extra={
+            "http.method": request.method,
+            "http.url": str(request.url),
+            "http.status_code": response.status_code,
+            "http.duration_seconds": process_time
+        }
+    )
     return response
 
 # Include Routers
@@ -116,6 +134,7 @@ app.include_router(copilot_routes.router)
 app.include_router(auth_v2_controller.router)
 app.include_router(queue_controller.router)
 app.include_router(cache_controller.router)
+app.include_router(observability_controller.router)
 
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)

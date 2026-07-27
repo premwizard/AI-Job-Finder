@@ -1624,6 +1624,171 @@ The final result should provide a high-performance distributed caching platform 
 
 ---
 
+## 🚀 Phase 8 — Module 6: Enterprise Observability, Monitoring & Diagnostics Platform
+
+### Goal
+Build a production-grade observability platform that provides complete visibility into AI Job Finder's infrastructure, services, AI agents, MCP providers, workflows, queues, APIs, databases, and user interactions.
+
+The observability platform should enable developers and administrators to detect, diagnose, troubleshoot, and optimize the system in real time.
+This module focuses on visibility and diagnostics only.
+Do not modify existing business logic.
+
+### Objectives
+Implement a unified observability platform covering:
+* Application Monitoring
+* Infrastructure Monitoring
+* AI Agent Monitoring
+* MCP Provider Monitoring
+* API Monitoring
+* Queue Monitoring
+* Database Monitoring
+* Cache Monitoring
+* Authentication Monitoring
+* User Activity Monitoring
+* Workflow Monitoring
+* Security Monitoring
+
+### Architecture
+Application
+↓
+OpenTelemetry
+↓
+Metrics, Logs, Traces
+↓
+Observability Layer
+↓
+Grafana, Prometheus, Loki, Jaeger
+↓
+Admin Dashboard
+
+### Folder Structure
+`server/`, `observability/`, `metrics/`, `logging/`, `tracing/`, `alerts/`, `health/`, `diagnostics/`, `dashboards/`, `middleware/`, `collectors/`, `services/`, `exporters/`, `config/`
+
+### Structured Logging
+Replace all unstructured logging.
+Every log should include: Timestamp, Request ID, Correlation ID, Trace ID, User ID (if authenticated), Module, Service, Worker, Agent, Provider, Execution Time, Log Level, Message, Metadata, Error Stack (when applicable).
+Use structured JSON logs.
+
+### Distributed Tracing
+Implement end-to-end tracing.
+Trace: Frontend Request -> API Gateway -> Backend Service -> Database -> Redis -> Background Worker -> LLM -> MCP Provider -> Response
+Every request should have a unique trace.
+
+### Metrics Collection
+Collect metrics for: HTTP Requests, API Latency, Error Rate, Database Queries, Cache Hits, Cache Misses, Worker Throughput, Queue Size, AI Requests, Token Usage, LLM Latency, MCP Calls, Authentication Events, CPU, Memory, Disk, Network.
+
+### AI Monitoring
+Track: Agent execution time, Planning duration, Reasoning duration, Memory retrieval, RAG latency, Embedding generation, Resume analysis, Interview generation, Recommendation generation, Career Copilot execution, Success rate, Failure rate.
+
+### MCP Monitoring
+Track every provider: GitHub, Gmail, Google Calendar, Google Drive, ATS, Future providers.
+Metrics: Availability, Latency, Rate limits, Authentication, Failures, Retries, Request volume, Health.
+
+### Queue Monitoring
+Display: Pending jobs, Running jobs, Failed jobs, Retry queue, Dead letter queue, Worker utilization, Queue throughput, Processing latency.
+
+### Database Monitoring
+Monitor: Connection pool, Slow queries, Query duration, Deadlocks, Locks, Index usage, Storage, Transactions, Replication readiness.
+
+### Cache Monitoring
+Track: Hit ratio, Miss ratio, Memory usage, Evictions, TTL expiration, Redis latency, Key distribution, Connection health.
+
+### Health Center
+Create a centralized system health page.
+Display: Application, Database, Redis, Workers, MCP Providers, AI Services, Storage, API Gateway, Queues, Overall Platform Health Score.
+
+### Alert System
+Support configurable alerts.
+Examples: High CPU, High Memory, Queue backlog, Worker failure, Database unavailable, Redis unavailable, MCP outage, Authentication failures, LLM timeout, High API latency, Excessive error rate.
+Allow multiple severity levels.
+
+### Diagnostics Center
+Create a diagnostics dashboard.
+Include: Live Logs, Live Metrics, Live Traces, Service Status, Dependency Graph, Incident Timeline, Worker Health, Provider Health, Recent Failures, System Events.
+Dark mode. Responsive layout.
+
+### OpenTelemetry
+Instrument: API, Workers, Redis, Database, External APIs, MCP, AI Services, Background Jobs.
+Expose standard OTLP endpoints.
+
+### Prometheus Metrics
+Expose: `/metrics`
+Include: Application metrics, Business metrics, AI metrics, Infrastructure metrics, Queue metrics, Worker metrics, MCP metrics.
+
+### Grafana Dashboards
+Prepare dashboards for: System Overview, API Performance, AI Performance, Queue Health, MCP Health, Database, Redis, Authentication, User Activity, Career Copilot.
+
+### Incident Tracking
+Automatically record: Critical failures, Service outages, Provider failures, Queue failures, Worker crashes, Authentication incidents, Major API failures.
+Generate incident reports.
+
+### APIs
+* `GET /api/observability/health`
+* `GET /api/observability/metrics`
+* `GET /api/observability/logs`
+* `GET /api/observability/traces`
+* `GET /api/observability/incidents`
+* `GET /api/observability/dashboard`
+
+Restrict access to administrators.
+
+### Performance Goals
+Target: Real-time metrics, Sub-second dashboard refresh, Low-overhead instrumentation, Minimal logging overhead, Efficient trace sampling, Scalable metric collection.
+
+### Security
+Restrict observability endpoints.
+Mask sensitive data.
+Never log: Passwords, Tokens, OAuth secrets, Private documents, Personally identifiable sensitive information.
+Support audit logging for administrator access.
+
+### Documentation
+Document: Observability architecture, Logging standards, Trace propagation, Metrics, Alert configuration, Grafana dashboards, Prometheus integration, OpenTelemetry setup, Troubleshooting guide, Incident response workflow.
+
+### Deliverables
+At the end of this module the platform should provide:
+* ✓ Structured logging
+* ✓ Distributed tracing
+* ✓ OpenTelemetry instrumentation
+* ✓ Prometheus metrics
+* ✓ Grafana-ready dashboards
+* ✓ Centralized diagnostics
+* ✓ AI monitoring
+* ✓ MCP monitoring
+* ✓ Queue monitoring
+* ✓ Database monitoring
+* ✓ Cache monitoring
+* ✓ Alert framework
+* ✓ Incident tracking
+* ✓ Health center
+* ✓ Comprehensive documentation
+
+### Testing
+**Verify:**
+* ✓ Trace propagation
+* ✓ Structured log generation
+* ✓ Metrics collection
+* ✓ Prometheus scraping
+* ✓ Queue monitoring
+* ✓ AI monitoring
+* ✓ MCP monitoring
+* ✓ Alert triggering
+* ✓ Dashboard rendering
+* ✓ Incident recording
+* ✓ Performance overhead
+* ✓ High-load monitoring
+* ✓ Failure visibility
+
+Resolve all observability issues before considering this module complete.
+
+### Important
+Do not introduce new end-user features.
+Do not modify business logic.
+Instrumentation should remain transparent to application functionality.
+Ensure observability components are modular, extensible, and production-ready.
+The final result should provide complete operational visibility into AI Job Finder, enabling rapid debugging, proactive monitoring, performance optimization, and enterprise-grade incident management while preparing the platform for large-scale cloud deployments.
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
@@ -1748,6 +1913,7 @@ The final result should provide a high-performance distributed caching platform 
 * Phase 8 — Module 3: Kubernetes, Helm & Cloud-Native Deployment
 * Phase 8 — Module 4: Background Jobs, Task Queue & Workflow Processing
 * Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
+* Phase 8 — Module 6: Enterprise Observability, Monitoring & Diagnostics Platform
 * Phase 9 — Advanced Agentic Integrations
 
 ---
