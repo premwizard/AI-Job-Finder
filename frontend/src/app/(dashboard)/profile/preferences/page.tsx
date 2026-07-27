@@ -341,7 +341,7 @@ export default function JobSearchPreferencesPage() {
             </label>
             <Select
               value={searchFrequency}
-              onValueChange={(v) => { setSearchFrequency(v); markDirty(); }}
+              onValueChange={(v) => { setSearchFrequency(v as string); markDirty(); }}
             >
               <SelectTrigger className="h-9">
                 <SelectValue />
@@ -360,7 +360,7 @@ export default function JobSearchPreferencesPage() {
             </label>
             <Select
               value={digestFrequency}
-              onValueChange={(v) => { setDigestFrequency(v); markDirty(); }}
+              onValueChange={(v) => { setDigestFrequency(v as string); markDirty(); }}
             >
               <SelectTrigger className="h-9">
                 <SelectValue />
@@ -399,7 +399,7 @@ export default function JobSearchPreferencesPage() {
           </div>
           <Slider
             value={[minMatchScore]}
-            onValueChange={(val) => { setMinMatchScore(val[0]); markDirty(); }}
+            onValueChange={(val) => { setMinMatchScore((val as number[])[0]); markDirty(); }}
             min={50}
             max={95}
             step={5}

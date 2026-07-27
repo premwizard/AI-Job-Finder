@@ -32,7 +32,7 @@ const workExperienceSchema = z.object({
   location: z.string().optional(),
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().optional(),
-  is_current: z.boolean().default(false),
+  is_current: z.boolean(),
   description: z.string().optional(),
 });
 

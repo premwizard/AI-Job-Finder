@@ -149,7 +149,7 @@ export default function PrivacySettingsPage() {
               </label>
               <Select
                 value={accountVisibility}
-                onValueChange={(val) => handleToggle("account_visibility", val, setAccountVisibility)}
+                onValueChange={(val) => handleToggle("account_visibility", val as string, setAccountVisibility)}
               >
                 <SelectTrigger className="h-9">
                   <SelectValue />
@@ -168,7 +168,7 @@ export default function PrivacySettingsPage() {
               </label>
               <Select
                 value={resumeVisibility}
-                onValueChange={(val) => handleToggle("resume_visibility", val, setResumeVisibility)}
+                onValueChange={(val) => handleToggle("resume_visibility", val as string, setResumeVisibility)}
               >
                 <SelectTrigger className="h-9">
                   <SelectValue />

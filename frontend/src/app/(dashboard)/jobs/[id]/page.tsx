@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function JobDetailsPage() {
   const params = useParams();

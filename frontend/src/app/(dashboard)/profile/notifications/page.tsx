@@ -259,8 +259,8 @@ export default function NotificationSettingsPage() {
             <Select
               value={frequency}
               onValueChange={(val) => {
-                setFrequency(val);
-                mutation.mutate({ notification_frequency: val });
+                setFrequency(val as string);
+                mutation.mutate({ notification_frequency: val as string });
               }}
             >
               <SelectTrigger className="h-9">

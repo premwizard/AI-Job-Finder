@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, RefreshCw, Check, X, Edit3, Sparkles, AlertCircle, Wand2, Lightbulb, Save } from "lucide-react";
+import { ArrowLeft, RefreshCw, Check, X, Edit3, Sparkles, AlertCircle, Wand2, Lightbulb, Save, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { generateResumeImprovements, getResumeImprovements, resolveResumeImprovement, applyAllResumeImprovements } from "@/features/profile/services/profile.api";
@@ -153,13 +153,13 @@ export default function ImprovementsDashboardPage() {
             </Button>
             {sections.map(section => (
               <Button 
-                key={section}
+                key={section as string}
                 variant={activeFilter === section ? "default" : "outline"} 
                 size="sm"
                 className={activeFilter === section ? "bg-slate-800" : ""}
-                onClick={() => setActiveFilter(section)}
+                onClick={() => setActiveFilter(section as string)}
               >
-                {section}
+                {section as string}
               </Button>
             ))}
           </div>

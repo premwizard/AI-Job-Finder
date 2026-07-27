@@ -108,7 +108,7 @@ export default function SkillGapPage() {
             </div>
             <div className="space-y-2 flex-1">
               <label className="text-sm font-medium text-slate-700">Baseline Resume</label>
-              <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
+              <Select value={selectedResumeId} onValueChange={(v) => setSelectedResumeId(v as string)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select resume" />
                 </SelectTrigger>

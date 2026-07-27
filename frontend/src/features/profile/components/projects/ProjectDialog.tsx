@@ -46,7 +46,7 @@ const projectSchema = z.object({
   challenges: z.string().optional(),
   achievements: z.string().optional(),
   status: z.string().default("Completed"),
-  is_featured: z.boolean().default(false),
+  is_featured: z.boolean(),
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;

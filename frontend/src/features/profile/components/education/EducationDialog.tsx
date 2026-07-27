@@ -38,7 +38,7 @@ const educationSchema = z
     cgpa: z.string().optional(),
     start_date: z.string().optional(),
     end_date: z.string().optional(),
-    is_current: z.boolean().default(false),
+    is_current: z.boolean(),
     activities: z.string().optional(),
     honors_awards: z.string().optional(),
     relevant_coursework: z.string().optional(),

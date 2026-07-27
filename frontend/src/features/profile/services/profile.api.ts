@@ -182,6 +182,11 @@ export const getResumes = async () => {
   return response.data;
 };
 
+export const getResumeDetails = async (resumeId: number) => {
+  const response = await authApi.get(`${PROFILE_URL}/resume/${resumeId}`);
+  return response.data;
+};
+
 export const uploadResumeFile = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);

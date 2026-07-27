@@ -256,7 +256,7 @@ export default function ProjectsPage() {
         {/* Status Filter */}
         <div className="flex items-center gap-1.5">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as string)}>
             <SelectTrigger className="text-xs h-9 w-full">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -284,7 +284,7 @@ export default function ProjectsPage() {
         {/* Sort dropdown */}
         <div className="flex items-center gap-1.5">
           <ArrowUpDown className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
-          <Select value={sortBy} onValueChange={(val: ProjectSortOption) => setSortBy(val)}>
+          <Select value={sortBy} onValueChange={(val) => setSortBy(val as ProjectSortOption)}>
             <SelectTrigger className="text-xs h-9 w-full">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>

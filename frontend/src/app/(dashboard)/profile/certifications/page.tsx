@@ -276,7 +276,7 @@ export default function CertificationsPage() {
         {/* Category Filter */}
         <div className="flex items-center gap-1.5">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as string)}>
             <SelectTrigger className="text-xs h-9 w-full">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
@@ -292,7 +292,7 @@ export default function CertificationsPage() {
 
         {/* Status Filter */}
         <div>
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <Select value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as string)}>
             <SelectTrigger className="text-xs h-9 w-full">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -309,7 +309,7 @@ export default function CertificationsPage() {
         {/* Sort dropdown */}
         <div className="flex items-center gap-1.5">
           <ArrowUpDown className="w-4 h-4 text-muted-foreground shrink-0 hidden sm:block" />
-          <Select value={sortBy} onValueChange={(val: CertificationSortOption) => setSortBy(val)}>
+          <Select value={sortBy} onValueChange={(val) => setSortBy(val as CertificationSortOption)}>
             <SelectTrigger className="text-xs h-9 w-full">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>

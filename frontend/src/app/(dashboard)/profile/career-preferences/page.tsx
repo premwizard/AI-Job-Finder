@@ -518,7 +518,7 @@ export default function CareerPreferencesPage() {
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-semibold">Currency</label>
-            <Select value={currency} onValueChange={(v) => { setCurrency(v); markDirty(); }}>
+            <Select value={currency} onValueChange={(v) => { setCurrency(v as string); markDirty(); }}>
               <SelectTrigger className="h-9">
                 <SelectValue />
               </SelectTrigger>
@@ -599,7 +599,7 @@ export default function CareerPreferencesPage() {
             <label className="text-sm font-semibold flex items-center gap-1.5">
               <Plane className="w-3.5 h-3.5 text-muted-foreground" /> Travel Preference
             </label>
-            <Select value={travel} onValueChange={(v) => { setTravel(v); markDirty(); }}>
+            <Select value={travel} onValueChange={(v) => { setTravel(v as string); markDirty(); }}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>
@@ -615,7 +615,7 @@ export default function CareerPreferencesPage() {
             <label className="text-sm font-semibold flex items-center gap-1.5">
               <Moon className="w-3.5 h-3.5 text-muted-foreground" /> Preferred Shift
             </label>
-            <Select value={shift} onValueChange={(v) => { setShift(v); markDirty(); }}>
+            <Select value={shift} onValueChange={(v) => { setShift(v as string); markDirty(); }}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>
@@ -631,7 +631,7 @@ export default function CareerPreferencesPage() {
             <label className="text-sm font-semibold flex items-center gap-1.5">
               <CalendarClock className="w-3.5 h-3.5 text-muted-foreground" /> Availability
             </label>
-            <Select value={availability} onValueChange={(v) => { setAvailability(v); markDirty(); }}>
+            <Select value={availability} onValueChange={(v) => { setAvailability(v as string); markDirty(); }}>
               <SelectTrigger className="h-9">
                 <SelectValue placeholder="Select…" />
               </SelectTrigger>

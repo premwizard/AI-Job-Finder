@@ -47,7 +47,7 @@ const certificationSchema = z
     credential_id: z.string().optional(),
     issue_date: z.string().optional(),
     expiry_date: z.string().optional(),
-    does_not_expire: z.boolean().default(false),
+    does_not_expire: z.boolean(),
     verification_url: z.string().optional(),
     certificate_image_url: z.string().optional(),
   })

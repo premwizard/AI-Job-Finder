@@ -42,6 +42,7 @@ export interface Job {
   description_clean?: string;
   posted_date?: string;
   collected_date?: string;
+  ai_processed?: boolean;
   locations: JobLocation[];
   skills: JobSkill[];
   requirements: JobRequirement[];

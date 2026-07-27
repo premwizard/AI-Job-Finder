@@ -224,7 +224,7 @@ export default function EducationPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <ListFilter className="w-4 h-4 text-muted-foreground hidden sm:block" />
-            <Select value={sortBy} onValueChange={(val: EducationSortOption) => setSortBy(val)}>
+            <Select value={sortBy} onValueChange={(val) => setSortBy(val as EducationSortOption)}>
               <SelectTrigger className="w-[150px] text-xs h-9">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>

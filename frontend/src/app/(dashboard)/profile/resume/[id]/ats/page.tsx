@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, XCircle, Info, Sparkles, TrendingUp, ScanText } from "lucide-react";
 
 import { analyzeResumeATS, getATSHistory } from "@/features/profile/services/profile.api";
 import { ATSAnalysisResult } from "@/features/profile/types/ats.types";
