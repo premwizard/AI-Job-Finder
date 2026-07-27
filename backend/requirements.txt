@@ -27,7 +27,7 @@ opentelemetry-sdk
 opentelemetry-instrumentation-fastapi
 python-json-logger
 slowapi
-secure
+secure==0.2.1
 stripe
 chromadb
 jinja2
