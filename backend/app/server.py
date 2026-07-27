@@ -3,6 +3,8 @@ import sys
 
 from fastapi import FastAPI, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 # Ensure the backend directory is in the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -52,6 +54,7 @@ from app.modules.observability.controllers import observability_controller
 from app.modules.security.controllers import security_controller
 from app.modules.admin.controllers import admin_controller
 from app.modules.billing.controllers import billing_controller
+from app.modules.system.controllers import health_controller
 from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
 from app.modules.observability.logging.structured_logger import structured_logger
 from app.modules.observability.tracing.tracer import init_tracer
@@ -77,9 +80,18 @@ init_metrics(app)
 init_rate_limiter(app)
 
 # Configure CORS for Next.js frontend
+# Add TrustProxy middleware for Render rate limiting accuracy
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
+# Add Gzip compression for performance
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+cors_origins_env = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
+cors_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -150,6 +162,7 @@ app.include_router(observability_controller.router)
 app.include_router(security_controller.router)
 app.include_router(admin_controller.router)
 app.include_router(billing_controller.router)
+app.include_router(health_controller.router)
 
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)

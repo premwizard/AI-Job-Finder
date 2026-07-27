@@ -2375,6 +2375,134 @@ The final result should transform AI Job Finder into a fully production-ready, c
 
 ---
 
+## 🚀 AI Job Finder — Production Readiness & Deployment (Vercel + Render)
+
+### Goal
+Prepare the entire AI Job Finder platform for a production deployment using:
+* **Frontend:** Vercel
+* **Backend API:** Render
+* **Database:** Existing Production Database (PostgreSQL/Supabase/Neon)
+* **Redis:** Existing Production Redis (Upstash/Render Redis)
+* **Object Storage:** Existing Storage Provider
+* **Vector Database:** Existing Vector Database (if enabled)
+
+This task focuses on **production readiness**, **deployment configuration**, **security**, **performance**, **reliability**, and **successful deployment**.
+Do **NOT** introduce new application features.
+The objective is to make the current platform production-ready.
+
+### Mission
+Perform a complete production audit of the project.
+Review every part of the codebase.
+Fix everything required for production.
+The application should deploy successfully to Vercel and Render without manual code modifications after deployment.
+
+### Step 1 — Project Audit
+Perform a complete audit. Review Frontend, Backend, API, Authentication, OAuth, Resume Intelligence, AI Agents, MCP, RAG, Database, Redis, Queues, Storage, Logging, Error Handling, Security, Performance.
+Generate a checklist of anything preventing production deployment and fix every issue.
+
+### Step 2 — Environment Variables
+Create production-ready environment handling. Provide `.env.example`.
+Separate variables into: Frontend, Backend, Database, OAuth, JWT, Redis, Storage, AI Providers, Email, Calendar, GitHub, MCP, Billing, Analytics, Monitoring.
+Validate all required variables during application startup. Fail fast when variables are missing. Never hardcode secrets.
+
+### Step 3 — Backend Configuration
+Prepare Render deployment. Configure: PORT, HOST, Production CORS, Compression, Helmet, Rate Limiting, Trust Proxy, Request Limits, Secure Cookies, Logging, Graceful Shutdown, Health Endpoints, Environment Detection, Production Error Handling.
+Disable development-only code.
+
+### Step 4 — Frontend Configuration
+Prepare Vercel deployment. Configure: Environment Variables, API Base URL, Production Build, Image Optimization, Caching, Code Splitting, Tree Shaking, Bundle Optimization, Lazy Loading, Dynamic Imports, Error Boundaries, 404 Page, 500 Page, SEO Metadata, Open Graph, Twitter Cards, Favicon, Manifest, Robots.txt, Sitemap, Loading Screens.
+
+### Step 5 — API Integration
+Ensure the frontend automatically connects to the Render backend. Replace every localhost reference. Use configurable API URLs. Verify all endpoints use production endpoints.
+
+### Step 6 — Database
+Validate Connection Pool, Timeouts, Indexes, Migration Status, Production Schema, Transactions, Connection Retry, Graceful Failure, Health Check, Database Backup Readiness.
+
+### Step 7 — Redis
+Validate Connection, Reconnect Logic, Timeout, Health Check, Queue Support, Caching, Session Storage.
+
+### Step 8 — Storage
+Validate Resume Upload, Document Upload, Profile Images, Temporary Files, Cleanup, Signed URLs, Security, Storage Limits.
+
+### Step 9 — Authentication
+Verify Email Login, Google Login, GitHub Login, JWT, Refresh Token, Remember Me, Logout, Session Persistence, Password Reset, Email Verification, Protected Routes, Role Authorization, Production Cookies, Secure Cookie Settings, SameSite, HTTPS Compatibility.
+
+### Step 10 — Security
+Enable Helmet, CSP, HSTS, Secure Headers, CORS, Rate Limiting, Request Validation, Output Sanitization, XSS Protection, CSRF Protection, Secret Validation, Audit Logging. Remove every security warning.
+
+### Step 11 — Performance
+Optimize Frontend Bundle, Backend Startup, Database Queries, Redis Usage, Caching, Compression, Lazy Loading, Images, Fonts, JavaScript, CSS, API Response Times, Worker Throughput.
+
+### Step 12 — Error Handling
+Create production error pages (404, 500, Offline).
+Backend: Consistent Error Responses, Logging, Error IDs, Correlation IDs, Friendly User Messages.
+
+### Step 13 — Logging
+Production logging should include Request ID, User ID, Execution Time, Route, Method, Status, Error Stack, Correlation ID. Do not expose internal errors to users.
+
+### Step 14 — Health Endpoints
+Create `GET /health`, `GET /ready`, `GET /live`. Return Application Status, Database Status, Redis Status, Storage Status, AI Provider Status, Version, Environment, Uptime, Memory, CPU.
+
+### Step 15 — Deployment Configuration
+Create `vercel.json`, `render.yaml`.
+Ensure Correct Build Commands, Correct Start Commands, SPA Routing, Environment Variables, Health Check Path, Static Assets, Cache Rules, Compression.
+
+### Step 16 — CI Compatibility
+Ensure compatibility with GitHub Actions, Automatic Deployment, Preview Deployments, Production Deployments. No manual deployment steps should be required.
+
+### Step 17 — Production Validation
+Test every feature. Every feature should work exactly as expected.
+
+### Step 18 — Bug Fixes
+Identify and resolve Broken Links, UI Issues, API Errors, Console Errors, Memory Leaks, Unhandled Exceptions, Duplicate Requests, Loading Problems, Responsive Issues, Accessibility Problems, Race Conditions, Slow Queries, Security Warnings.
+
+### Step 19 — Production Documentation
+Update documentation. Include Deployment Guide, Environment Variables, Render Setup, Vercel Setup, Production Architecture, Scaling Guide, Monitoring Guide, Backup Guide, Troubleshooting, Release Checklist.
+
+### Step 20 — Final Production Checklist
+Verify:
+* ✅ Frontend builds successfully
+* ✅ Backend builds successfully
+* ✅ Vercel deployment succeeds
+* ✅ Render deployment succeeds
+* ✅ All Features work
+* ✅ Admin Dashboard works
+* ✅ Monitoring works
+* ✅ Security passes review
+* ✅ Performance is optimized
+* ✅ No console errors
+* ✅ No TypeScript errors
+* ✅ No ESLint errors
+* ✅ No build warnings
+* ✅ No broken routes
+* ✅ Mobile responsive
+* ✅ Production-ready UI
+
+### Deliverables
+At completion, provide:
+1. Production audit report
+2. List of issues found
+3. List of issues fixed
+4. Deployment configuration summary
+5. Environment variable documentation
+6. Render deployment instructions
+7. Vercel deployment instructions
+8. Final production readiness report
+9. Remaining recommendations (if any)
+10. Confirmation that the application is ready for live deployment.
+
+### Important Requirements
+* Do **not** remove existing features.
+* Maintain backward compatibility.
+* Do not introduce breaking API changes.
+* Keep the architecture modular and scalable.
+* Follow production best practices.
+* Ensure the application can be deployed with minimal manual configuration.
+
+The final outcome should be a stable, secure, scalable, and production-ready AI Job Finder platform that deploys successfully to **Vercel** (frontend) and **Render** (backend) and is ready for real users.
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
