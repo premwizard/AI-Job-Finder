@@ -7,7 +7,7 @@ secure_headers = secure.Secure(
     hsts=secure.StrictTransportSecurity().include_subdomains().preload().max_age(31536000),
     xfo=secure.XFrameOptions().sameorigin(),
     xxp=secure.XXSSProtection().set("1; mode=block"),
-    content=secure.XContentTypeOptions().nosniff(),
+    content=secure.XContentTypeOptions().set("nosniff"),
     referrer=secure.ReferrerPolicy().strict_origin_when_cross_origin(),
     # In a full production setup, CSP should be strictly defined.
     # We use a permissive policy for local development to not block Next.js.
