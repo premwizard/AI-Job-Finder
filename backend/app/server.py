@@ -35,6 +35,7 @@ from app.routes import (
     embedding_routes,
     mcp_routes,
     github_mcp_routes,
+    gmail_mcp_routes,
 )
 
 
@@ -81,6 +82,7 @@ app.include_router(version_routes.router)
 app.include_router(embedding_routes.router)
 app.include_router(mcp_routes.router)
 app.include_router(github_mcp_routes.router)
+app.include_router(gmail_mcp_routes.router)
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
 
