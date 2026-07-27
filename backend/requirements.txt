@@ -16,6 +16,7 @@ mcp
 PyGithub
 google-api-python-client
 google-auth-oauthlib
+google-generativeai
 celery
 redis
 flower
