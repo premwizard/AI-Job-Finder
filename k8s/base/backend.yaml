@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ai-job-finder-backend:latest
+          image: Crown Atlas-backend:latest
           ports:
             - containerPort: 8000
           envFrom:
             - configMapRef:
-                name: ai-job-finder-config
+                name: Crown Atlas-config
             - secretRef:
-                name: ai-job-finder-secret
+                name: Crown Atlas-secret
           volumeMounts:
             - name: chroma-data
               mountPath: /app/chroma_db

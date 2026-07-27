@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-frontend
+  name: {{ include "Crown Atlas.fullname" . }}-frontend
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-frontend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-frontend
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-frontend
+      app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-frontend
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-frontend
+        app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-frontend
     spec:
       containers:
         - name: frontend

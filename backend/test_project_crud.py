@@ -48,7 +48,7 @@ def test_project_crud():
         
         # 2. CREATE Project
         create_req = profile_schemas.ProjectCreate(
-            name="AI Job Finder Portfolio Platform",
+            name="Crown Atlas Portfolio Platform",
             short_description="An intelligent AI-powered job matching & portfolio platform",
             description="Full-stack AI job search suite featuring automated resume parsing, portfolio management, and smart job recommendations.",
             project_type="Full-Stack Web App",
@@ -57,7 +57,7 @@ def test_project_crud():
             duration="4 Months (Jan - Apr 2026)",
             tech_stack="Next.js 15, FastAPI, Tailwind CSS, PostgreSQL, Zod",
             ai_technologies="OpenAI GPT-4o, PyTorch, LangChain",
-            github_url="https://github.com/example/ai-job-finder",
+            github_url="https://github.com/example/Crown Atlas",
             live_demo_url="https://aijobfinder.example.com",
             video_demo_url="https://youtube.com/watch?v=demo123",
             images=json.dumps(["/uploads/projects/screenshot1.png", "/uploads/projects/screenshot2.png"]),
@@ -70,7 +70,7 @@ def test_project_crud():
         created_proj = service._create_item(Project, user_id, create_req)
         proj_id = created_proj.id
         assert proj_id is not None
-        assert created_proj.name == "AI Job Finder Portfolio Platform"
+        assert created_proj.name == "Crown Atlas Portfolio Platform"
         assert created_proj.is_featured is True
         print(f"[SUCCESS] CREATE Project item ID: {proj_id}")
         
@@ -83,12 +83,12 @@ def test_project_crud():
         
         # 4. UPDATE Project (PUT)
         update_req = profile_schemas.ProjectUpdate(
-            name="AI Job Finder & Career Copilot v2",
+            name="Crown Atlas & Career Copilot v2",
             status="In Progress",
             is_featured=False
         )
         updated_proj = service._update_item(Project, proj_id, user_id, update_req)
-        assert updated_proj.name == "AI Job Finder & Career Copilot v2"
+        assert updated_proj.name == "Crown Atlas & Career Copilot v2"
         assert updated_proj.status == "In Progress"
         assert updated_proj.is_featured is False
         print(f"[SUCCESS] UPDATE Project item ID {proj_id} updated name & status to '{updated_proj.status}'")

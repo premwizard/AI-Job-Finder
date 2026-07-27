@@ -20,7 +20,7 @@ class Executor:
             return {"status": "success", "result": "Resume successfully parsed and indexed into RAG."}
             
         elif task.task_type == "FIND_MATCHING_JOBS":
-            return {"status": "success", "result": "Found 12 highly relevant semantic job matches."}
+            return {"status": "success", "result": "Found 12 highly relevant semantCrown Atlas matches."}
             
         elif task.task_type == "ANALYZE_SKILL_GAP":
             return {"status": "success", "result": "Identified 3 missing skills for target roles: GraphQL, Kafka, CI/CD."}

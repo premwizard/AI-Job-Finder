@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-backend
+  name: {{ include "Crown Atlas.fullname" . }}-backend
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend
 spec:
   type: {{ .Values.backend.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend

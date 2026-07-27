@@ -52,7 +52,7 @@ class {class_name}(BaseAgent):
         pass
 """
 
-base_dir = r"c:\merged_partition_content\D drive\AI Job Finder\backend\app\agents\workers"
+base_dir = r"c:\merged_partition_content\D drive\Crown Atlas\backend\app\agents\workers"
 os.makedirs(base_dir, exist_ok=True)
 
 for file_name, class_name, caps in agents:

@@ -32,7 +32,7 @@ class ChatEngine:
         
         # 3. Build Prompt
         system_prompt = f"""
-        You are a Premium AI Career Assistant for 'AI Job Finder'.
+        You are a Premium AI Career Assistant for 'Crown Atlas'.
         Answer the user's question accurately. 
         You MUST ground your response in the retrieved CONTEXT below.
         If the CONTEXT does not contain the answer, rely on your general knowledge but mention that it's general advice.

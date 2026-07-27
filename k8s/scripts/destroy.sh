@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Destroying AI Job Finder deployment..."
+echo "Destroying Crown Atlas deployment..."
 
 helm uninstall ai-job-finder || echo "Release not found."
 

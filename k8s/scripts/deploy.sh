@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Deploying AI Job Finder via Helm..."
+echo "Deploying Crown Atlas via Helm..."
 
 # Ensure we are in the scripts directory context
 cd "$(dirname "$0")/.."

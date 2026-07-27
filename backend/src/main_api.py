@@ -12,8 +12,8 @@ from app.routes import auth_routes, profile_routes, settings_routes, social_auth
 from src.api.routers import analytics, applications, jobs, resume, saved_jobs, users
 
 app = FastAPI(
-    title="AI Job Finder API",
-    description="Backend API for the AI Job Finder application.",
+    title="Crown Atlas API",
+    description="Backend API for the Crown Atlas application.",
     version="1.0.0",
 )
 
@@ -52,7 +52,7 @@ app.include_router(settings_routes.router)  # /api/settings/*
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the AI Job Finder API"}
+    return {"message": "Welcome to the Crown Atlas API"}
 
 
 @app.get("/favicon.ico", include_in_schema=False)

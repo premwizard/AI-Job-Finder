@@ -92,7 +92,7 @@ export default function RegisterPage() {
         <div className="flex flex-col space-y-2 text-center mb-8">
           <h1 className="text-3xl font-semibold tracking-tight">Create an account</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your details to get started with AI Job Finder
+            Enter your details to get started with Crown Atlas
           </p>
         </div>
 

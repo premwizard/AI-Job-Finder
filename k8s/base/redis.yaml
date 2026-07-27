@@ -24,7 +24,7 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ai-job-finder-secret
+                  name: Crown Atlas-secret
                   key: REDIS_PASSWORD
           ports:
             - containerPort: 6379

@@ -2,7 +2,7 @@ import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class AppSettings(BaseSettings):
-    app_name: str = "AI Job Finder API"
+    app_name: str = "Crown Atlas API"
     version: str = "1.0.0"
     environment: str = "development"
     secret_key: str = os.environ.get("SECRET_KEY", "your-super-secret-key")

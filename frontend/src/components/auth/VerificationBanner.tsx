@@ -25,7 +25,7 @@ export default function VerificationBanner() {
         </AlertTitle>
         <AlertDescription className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-4">
           <span>
-            Verify your email address to unlock all AI Job Finder features, including AI Match and Applications.
+            Verify your email address to unlock all Crown Atlas features, including AI Match and Applications.
           </span>
           <div className="flex items-center gap-3">
             <Button 

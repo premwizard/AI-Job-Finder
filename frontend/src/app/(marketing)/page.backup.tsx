@@ -178,7 +178,7 @@ const features = [
   { icon: <FileSearch />, title: "Resume Analysis", description: "Identify weaknesses in your resume, calculate ATS score, and receive actionable improvement tips." },
   { icon: <BrainCircuit />, title: "Skill Gap Detection", description: "Automatically detect what skills you are missing for your target roles and generate a learning roadmap." },
   { icon: <MessageSquare />, title: "AI Interview Prep", description: "Practice with our AI agent that generates company and role-specific technical and HR questions." },
-  { icon: <FileText />, title: "Cover Letter Generator", description: "Generate highly personalized cover letters tailored to specific job descriptions in seconds." },
+  { icon: <FileText />, title: "Cover Letter Generator", description: "Generate highly personalized cover letters tailored to specifCrown Atlas descriptions in seconds." },
   { icon: <Mail />, title: "Smart Email Alerts", description: "Never miss an opportunity with intelligent alerts that notify you only for highly matched roles." },
   { icon: <Users />, title: "RAG Knowledge Assistant", description: "Chat with an AI that knows everything about your profile, career goals, and the job market." },
   { icon: <Bot />, title: "AI Agents", description: "Deploy autonomous agents to scrape, filter, and summarize job listings from various portals." },

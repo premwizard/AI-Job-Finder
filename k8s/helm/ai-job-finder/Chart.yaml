@@ -1,6 +1,6 @@
 apiVersion: v2
-name: ai-job-finder
-description: A Helm chart for AI Job Finder Platform
+name: Crown Atlas
+description: A Helm chart for Crown Atlas Platform
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

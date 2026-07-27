@@ -26,7 +26,7 @@ def send_job_email(jobs: List[Dict]):
         return
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"AI Job Finder: {len(jobs)} New Fresher Jobs Today!"
+    msg["Subject"] = f"Crown Atlas: {len(jobs)} New Fresher Jobs Today!"
     msg["From"] = EMAIL
     msg["To"] = RECEIVER_EMAIL
 
@@ -78,7 +78,7 @@ def send_job_email(jobs: List[Dict]):
     html_content += """
         </div>
         <div class="footer">
-          <p>Automated by AI Job Finder V2.</p>
+          <p>Automated by Crown Atlas V2.</p>
         </div>
       </body>
     </html>
@@ -105,7 +105,7 @@ def send_weekly_email(weekly_stats: List[Dict]):
         return
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = "AI Job Finder: Weekly Analytics Report"
+    msg["Subject"] = "Crown Atlas: Weekly Analytics Report"
     msg["From"] = EMAIL
     msg["To"] = RECEIVER_EMAIL
 
@@ -147,7 +147,7 @@ def send_weekly_email(weekly_stats: List[Dict]):
           </div>
         </div>
         <div class="footer">
-          <p>Automated by AI Job Finder V3.1.</p>
+          <p>Automated by Crown Atlas V3.1.</p>
         </div>
       </body>
     </html>

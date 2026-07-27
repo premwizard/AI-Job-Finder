@@ -1,4 +1,4 @@
-# AI Job Finder
+# Crown Atlas
 
 An automated job finder and career management platform that searches for AI/ML/Software Engineering roles across various job boards (Wellfound, Greenhouse, Lever) and provides intelligent AI-powered resume and profile tools.
 
@@ -282,7 +282,7 @@ The foundational vector intelligence layer of the platform.
 * Embedding versioning
 * Enables Semantic Search, Recommendation Engine, Skill Gap Analysis, and RAG Retrieval.
 
-### 2. Semantic Job Matching Engine
+### 2. SemantCrown Atlas Matching Engine
 Intelligently matches users with jobs beyond simple keyword overlap.
 * Resume vs Job semantic similarity
 * Skills, Experience, Education, and Certification matching
@@ -455,7 +455,7 @@ AI agents never call services directly; they execute all capabilities through th
 Transforms the platform from a scheduled scraper into an intelligent career opportunity monitor.
 * Intelligent job discovery & continuous opportunity monitoring
 * Multi-provider job search & duplicate detection
-* Semantic job evaluation
+* SemantCrown Atlas evaluation
 * Company intelligence & skill-gap analysis integration
 * Opportunity ranking & career impact analysis
 * Personalized recommendations & intelligent notifications
@@ -467,7 +467,7 @@ Transforms the platform from a scheduled scraper into an intelligent career oppo
 ## 🚀 Phase 7 – MCP Integration & Autonomous Career Intelligence
 
 ### Overview
-Phase 7 transforms AI Job Finder from an intelligent job search platform into a complete **AI Career Operating System**.
+Phase 7 transforms Crown Atlas from an intelligent job search platform into a complete **AI Career Operating System**.
 
 This phase introduces the **Model Context Protocol (MCP)** architecture, intelligent external integrations, autonomous workflow orchestration, career relationship management, salary intelligence, and the **Autonomous Career Copilot** capable of coordinating every AI subsystem across the platform.
 
@@ -615,7 +615,7 @@ AI-powered compensation analysis and career decision support.
 * Negotiation Email Generator
 
 ### 🤖 Autonomous Career Copilot
-The central intelligence layer of AI Job Finder.
+The central intelligence layer of Crown Atlas.
 
 * Long-Term Goal Management
 * Autonomous Career Planning
@@ -653,14 +653,14 @@ The platform now supports a modular provider architecture where new integrations
 * Custom Enterprise Providers
 
 ### 🎯 Why Phase 7 Matters
-Phase 7 transforms AI Job Finder from a traditional AI assistant into a proactive AI Career Operating System capable of planning, coordinating, reasoning, and continuously improving a user's career journey through autonomous intelligence and standardized MCP integrations.
+Phase 7 transforms Crown Atlas from a traditional AI assistant into a proactive AI Career Operating System capable of planning, coordinating, reasoning, and continuously improving a user's career journey through autonomous intelligence and standardized MCP integrations.
 
 ---
 
 ## 🚀 Phase 8 — Module 1: Enterprise Architecture & Microservices
 
 ### Goal
-Refactor AI Job Finder from a modular monolithic application into a scalable, enterprise-grade service-oriented architecture while preserving all existing functionality.
+Refactor Crown Atlas from a modular monolithic application into a scalable, enterprise-grade service-oriented architecture while preserving all existing functionality.
 
 This is **not** a full microservices migration yet.
 
@@ -929,7 +929,7 @@ The result should be a production-ready, enterprise-grade architecture that prov
 ## 🚀 Phase 8 — Module 2: Docker & Containerization
 
 ### Goal
-Containerize the entire AI Job Finder platform using Docker and Docker Compose, creating a reproducible development and production environment.
+Containerize the entire Crown Atlas platform using Docker and Docker Compose, creating a reproducible development and production environment.
 
 The objective is to ensure the application can be started with a single command while keeping services isolated, configurable, and production-ready.
 
@@ -1118,14 +1118,14 @@ Do not introduce new application features.
 Do not modify business logic.
 Maintain full compatibility with existing APIs and frontend functionality.
 Optimize for reproducibility, scalability, and future Kubernetes deployment.
-The final result should allow any developer to clone the repository, configure the environment, run a single Docker Compose command, and have the complete AI Job Finder platform running consistently with minimal setup.
+The final result should allow any developer to clone the repository, configure the environment, run a single Docker Compose command, and have the complete Crown Atlas platform running consistently with minimal setup.
 
 ---
 
 ## 🚀 Phase 8 — Module 3: Kubernetes, Helm & Cloud-Native Deployment
 
 ### Goal
-Prepare AI Job Finder for enterprise-grade cloud deployment using Kubernetes.
+Prepare Crown Atlas for enterprise-grade cloud deployment using Kubernetes.
 
 Build a complete Kubernetes deployment architecture that supports high availability, horizontal scaling, rolling updates, self-healing, and secure configuration management.
 
@@ -1278,14 +1278,14 @@ Do not modify application functionality.
 Do not introduce business logic changes.
 Maintain compatibility with Docker Compose development.
 Focus entirely on cloud-native infrastructure and deployment readiness.
-The final result should allow AI Job Finder to be deployed to any Kubernetes cluster using Helm with a repeatable, scalable, secure, and production-ready deployment process that forms the foundation for future observability, background processing, and enterprise operations.
+The final result should allow Crown Atlas to be deployed to any Kubernetes cluster using Helm with a repeatable, scalable, secure, and production-ready deployment process that forms the foundation for future observability, background processing, and enterprise operations.
 
 ---
 
 ## 🚀 Phase 8 — Module 4: Background Jobs, Task Queue & Workflow Processing
 
 ### Goal
-Build a production-grade asynchronous processing platform for AI Job Finder.
+Build a production-grade asynchronous processing platform for Crown Atlas.
 
 Transform all long-running operations into distributed background jobs executed by scalable workers, ensuring fast API responses, high throughput, fault tolerance, and reliable workflow execution.
 
@@ -1450,14 +1450,14 @@ Do not introduce new user-facing features.
 Preserve all existing AI capabilities.
 Refactor long-running operations to execute asynchronously.
 Ensure every background process is modular, observable, fault-tolerant, and independently scalable.
-The final result should provide a robust asynchronous execution platform capable of supporting AI Job Finder's autonomous agents, MCP integrations, document intelligence, and future enterprise-scale workloads.
+The final result should provide a robust asynchronous execution platform capable of supporting Crown Atlas's autonomous agents, MCP integrations, document intelligence, and future enterprise-scale workloads.
 
 ---
 
 ## 🚀 Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
 
 ### Goal
-Build a production-grade distributed caching platform for AI Job Finder that significantly improves response times, reduces database load, minimizes external API calls, lowers AI inference costs, and supports high-concurrency workloads.
+Build a production-grade distributed caching platform for Crown Atlas that significantly improves response times, reduces database load, minimizes external API calls, lowers AI inference costs, and supports high-concurrency workloads.
 
 The caching layer should be transparent to business logic and reusable across all modules.
 Do not modify existing features.
@@ -1620,14 +1620,14 @@ Do not introduce new user-facing functionality.
 Maintain complete backward compatibility.
 Ensure the caching layer remains transparent to existing services.
 Optimize for scalability, low latency, and reduced infrastructure costs.
-The final result should provide a high-performance distributed caching platform that enables AI Job Finder to deliver fast, reliable, and cost-efficient AI-powered experiences while supporting future enterprise-scale deployments.
+The final result should provide a high-performance distributed caching platform that enables Crown Atlas to deliver fast, reliable, and cost-efficient AI-powered experiences while supporting future enterprise-scale deployments.
 
 ---
 
 ## 🚀 Phase 8 — Module 6: Enterprise Observability, Monitoring & Diagnostics Platform
 
 ### Goal
-Build a production-grade observability platform that provides complete visibility into AI Job Finder's infrastructure, services, AI agents, MCP providers, workflows, queues, APIs, databases, and user interactions.
+Build a production-grade observability platform that provides complete visibility into Crown Atlas's infrastructure, services, AI agents, MCP providers, workflows, queues, APIs, databases, and user interactions.
 
 The observability platform should enable developers and administrators to detect, diagnose, troubleshoot, and optimize the system in real time.
 This module focuses on visibility and diagnostics only.
@@ -1785,14 +1785,14 @@ Do not introduce new end-user features.
 Do not modify business logic.
 Instrumentation should remain transparent to application functionality.
 Ensure observability components are modular, extensible, and production-ready.
-The final result should provide complete operational visibility into AI Job Finder, enabling rapid debugging, proactive monitoring, performance optimization, and enterprise-grade incident management while preparing the platform for large-scale cloud deployments.
+The final result should provide complete operational visibility into Crown Atlas, enabling rapid debugging, proactive monitoring, performance optimization, and enterprise-grade incident management while preparing the platform for large-scale cloud deployments.
 
 ---
 
 ## 🚀 Phase 8 — Module 7: Enterprise Security, Compliance & Governance
 
 ### Goal
-Build a comprehensive enterprise-grade security and compliance framework for AI Job Finder.
+Build a comprehensive enterprise-grade security and compliance framework for Crown Atlas.
 
 Harden every layer of the platform including authentication, authorization, APIs, AI services, MCP providers, infrastructure, storage, and background workers.
 This module focuses on security, governance, auditing, and compliance.
@@ -1945,14 +1945,14 @@ Do not change application behavior for legitimate users.
 Maintain backward compatibility wherever possible.
 Apply the principle of least privilege throughout the platform.
 Keep security concerns isolated within dedicated modules and middleware.
-The final result should provide an enterprise-grade security foundation that protects AI Job Finder, its users, and its AI infrastructure while preparing the platform for production deployments, enterprise customers, and future compliance certifications.
+The final result should provide an enterprise-grade security foundation that protects Crown Atlas, its users, and its AI infrastructure while preparing the platform for production deployments, enterprise customers, and future compliance certifications.
 
 ---
 
 ## 🚀 Phase 8 — Module 8: Enterprise Admin Dashboard & Platform Management
 
 ### Goal
-Build a comprehensive enterprise-grade administration platform for AI Job Finder.
+Build a comprehensive enterprise-grade administration platform for Crown Atlas.
 
 The Admin Dashboard should provide complete operational control over the entire platform, including users, AI agents, MCP providers, infrastructure, analytics, billing, security, queues, monitoring, feature flags, and platform configuration.
 This module is intended exclusively for administrators and support personnel.
@@ -1960,7 +1960,7 @@ Do not expose any administrative functionality to regular users.
 
 ### Objectives
 Create a centralized administration console capable of managing every aspect of the platform.
-The Admin Dashboard should become the operational control center for AI Job Finder.
+The Admin Dashboard should become the operational control center for Crown Atlas.
 
 ### Architecture
 Administrator -> Admin Dashboard -> Admin API -> Platform Services -> Users, AI Agents, MCP Providers, Infrastructure, Analytics, Security, Billing, Observability
@@ -2094,14 +2094,14 @@ Resolve all issues before considering this module complete.
 Do not expose administrator functionality to normal users.
 Keep the admin platform modular and extensible.
 Use existing services wherever possible instead of duplicating business logic.
-The Admin Dashboard should become the single operational control center for AI Job Finder, enabling administrators to monitor, manage, secure, configure, and maintain the platform efficiently in production while supporting future enterprise growth.
+The Admin Dashboard should become the single operational control center for Crown Atlas, enabling administrators to monitor, manage, secure, configure, and maintain the platform efficiently in production while supporting future enterprise growth.
 
 ---
 
 ## 🚀 Phase 8 — Module 9: SaaS Billing, Subscription & Monetization Platform
 
 ### Goal
-Transform AI Job Finder into a commercial SaaS platform with enterprise-grade billing, subscription management, usage tracking, credit accounting, invoicing, and organization support.
+Transform Crown Atlas into a commercial SaaS platform with enterprise-grade billing, subscription management, usage tracking, credit accounting, invoicing, and organization support.
 
 The billing system must be modular, provider-agnostic, secure, auditable, and capable of supporting future payment providers.
 Do not modify existing AI functionality.
@@ -2238,7 +2238,7 @@ The final result should provide a production-ready SaaS monetization platform ca
 ## 🚀 Phase 8 — Module 10: Production Deployment, CI/CD, Performance Optimization & Disaster Recovery
 
 ### Goal
-Prepare AI Job Finder for enterprise-scale production deployment.
+Prepare Crown Atlas for enterprise-scale production deployment.
 
 Build a fully automated DevOps pipeline supporting continuous integration, continuous deployment, automated testing, security scanning, rollback strategies, performance optimization, CDN integration, backup systems, disaster recovery, and operational excellence.
 This module represents the final production readiness stage of the platform.
@@ -2356,7 +2356,7 @@ At the end of this module the platform should provide:
 Do not mark this module complete until every deployment workflow, recovery procedure, and production validation passes successfully.
 
 ### Final Acceptance Criteria
-AI Job Finder should be capable of:
+Crown Atlas should be capable of:
 * Running locally with Docker
 * Deploying automatically through CI/CD
 * Scaling on Kubernetes
@@ -2371,14 +2371,14 @@ AI Job Finder should be capable of:
 Do not add new end-user features.
 Focus exclusively on deployment automation, operational excellence, platform reliability, and production readiness.
 Maintain backward compatibility with all previous phases.
-The final result should transform AI Job Finder into a fully production-ready, cloud-native, enterprise SaaS platform capable of serving real users at scale with automated deployments, resilient infrastructure, comprehensive testing, and professional DevOps practices.
+The final result should transform Crown Atlas into a fully production-ready, cloud-native, enterprise SaaS platform capable of serving real users at scale with automated deployments, resilient infrastructure, comprehensive testing, and professional DevOps practices.
 
 ---
 
-## 🚀 AI Job Finder — Production Readiness & Deployment (Vercel + Render)
+## 🚀 Crown Atlas — Production Readiness & Deployment (Vercel + Render)
 
 ### Goal
-Prepare the entire AI Job Finder platform for a production deployment using:
+Prepare the entire Crown Atlas platform for a production deployment using:
 * **Frontend:** Vercel
 * **Backend API:** Render
 * **Database:** Existing Production Database (PostgreSQL/Supabase/Neon)
@@ -2499,7 +2499,7 @@ At completion, provide:
 * Follow production best practices.
 * Ensure the application can be deployed with minimal manual configuration.
 
-The final outcome should be a stable, secure, scalable, and production-ready AI Job Finder platform that deploys successfully to **Vercel** (frontend) and **Render** (backend) and is ready for real users.
+The final outcome should be a stable, secure, scalable, and production-ready Crown Atlas platform that deploys successfully to **Vercel** (frontend) and **Render** (backend) and is ready for real users.
 
 ---
 

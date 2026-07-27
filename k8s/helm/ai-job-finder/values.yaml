@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
 
 backend:
-  image: "ai-job-finder-backend:latest"
+  image: "Crown Atlas-backend:latest"
   service:
     type: ClusterIP
     port: 8000
@@ -22,7 +22,7 @@ backend:
     targetCPUUtilizationPercentage: 80
 
 frontend:
-  image: "ai-job-finder-frontend:latest"
+  image: "Crown Atlas-frontend:latest"
   service:
     type: ClusterIP
     port: 3000
@@ -59,7 +59,7 @@ ingress:
   className: "nginx"
   annotations: {}
   hosts:
-    - host: ai-job-finder.local
+    - host: Crown Atlas.local
       paths:
         - path: /
           pathType: Prefix

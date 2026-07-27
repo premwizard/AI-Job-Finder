@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Checking health of AI Job Finder cluster..."
+echo "Checking health of Crown Atlas cluster..."
 
 kubectl get pods -l app.kubernetes.io/instance=ai-job-finder
 

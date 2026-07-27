@@ -10,7 +10,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2.5">
             <BrainCircuit className="h-6 w-6 text-[#62466b]" />
             <span className="font-bold text-lg text-[#14110f] tracking-tight">
-              AI Job Finder
+              Crown Atlas
             </span>
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">

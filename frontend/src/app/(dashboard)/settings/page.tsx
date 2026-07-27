@@ -153,7 +153,7 @@ export default function SettingsPage() {
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardHeader>
               <CardTitle>Email Preferences</CardTitle>
-              <CardDescription>Control what emails you receive from AI Job Finder.</CardDescription>
+              <CardDescription>Control what emails you receive from Crown Atlas.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center p-4 border rounded-lg bg-muted/30">

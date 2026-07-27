@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}
+  name: {{ include "Crown Atlas.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -31,7 +31,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "ai-job-finder.fullname" $ }}-{{ .service }}
+                name: {{ include "Crown Atlas.fullname" $ }}-{{ .service }}
                 port:
                   name: http
           {{- end }}

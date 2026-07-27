@@ -1,183 +1,86 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Search, FileText, UserCheck, Building2, Map, BarChart3 } from 'lucide-react';
+
+const features = [
+  {
+    title: "AI Job Discovery",
+    description: "Find relevant opportunities using intelligent search, personalized recommendations, and skill matching.",
+    icon: <Search className="w-6 h-6 text-[#62466b]" />
+  },
+  {
+    title: "Resume Intelligence",
+    description: "Receive AI-powered resume analysis, ATS optimization, and tailored improvement suggestions.",
+    icon: <FileText className="w-6 h-6 text-[#62466b]" />
+  },
+  {
+    title: "Interview Copilot",
+    description: "Practice technical, HR, and behavioral interviews with personalized AI feedback.",
+    icon: <UserCheck className="w-6 h-6 text-[#62466b]" />
+  },
+  {
+    title: "Company Insights",
+    description: "Research companies, salary trends, technologies, hiring patterns, and employee insights.",
+    icon: <Building2 className="w-6 h-6 text-[#62466b]" />
+  },
+  {
+    title: "Career Roadmaps",
+    description: "Generate personalized learning paths based on your target role and skill gaps.",
+    icon: <Map className="w-6 h-6 text-[#62466b]" />
+  },
+  {
+    title: "Career Analytics",
+    description: "Track applications, interviews, offers, progress, and career growth using powerful dashboards.",
+    icon: <BarChart3 className="w-6 h-6 text-[#62466b]" />
+  }
+];
 
 export function HowItWorks() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stepsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    gsap.registerPlugin(ScrollTrigger);
-
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    const stepsEl = stepsRef.current;
-    if (!canvas || !container || !stepsEl) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Canvas setup
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-      ctx.scale(dpr, dpr);
-    };
-
-    window.addEventListener('resize', resize);
-    resize();
-
-    // Data for constellation
-    const nodes: {x: number, y: number, r: number, targetGroup: number}[] = [];
-    for (let i = 0; i < 50; i++) {
-      nodes.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        r: Math.random() * 2 + 1,
-        targetGroup: Math.floor(Math.random() * 3), // 3 groups
-      });
-    }
-
-    const state = { progress: 0 };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      
-      const p = state.progress; // 0 to 1
-
-      nodes.forEach((node, i) => {
-        // Calculate clustered position based on group
-        const groupX = (window.innerWidth / 4) * (node.targetGroup + 1);
-        const groupY = window.innerHeight / 2;
-        
-        // Interpolate between random and clustered based on scroll progress
-        const currentX = node.x + (groupX - node.x) * p;
-        const currentY = node.y + (groupY - node.y) * p;
-
-        ctx.beginPath();
-        ctx.arc(currentX, currentY, node.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(98, 70, 107, ${0.4 + p * 0.6})`; // Vintage grape node on pale oak
-        ctx.fill();
-
-        // Draw connections if highly progressed
-        if (p > 0.5) {
-          nodes.forEach((otherNode, j) => {
-            if (i < j && node.targetGroup === otherNode.targetGroup) {
-              const otherGroupX = (window.innerWidth / 4) * (otherNode.targetGroup + 1);
-              const otherGroupY = window.innerHeight / 2;
-              const otherCurrentX = otherNode.x + (otherGroupX - otherNode.x) * p;
-              const otherCurrentY = otherNode.y + (otherGroupY - otherNode.y) * p;
-
-              const dist = Math.hypot(currentX - otherCurrentX, currentY - otherCurrentY);
-              if (dist < 100 * p) { // Connect nodes that are close
-                ctx.beginPath();
-                ctx.moveTo(currentX, currentY);
-                ctx.lineTo(otherCurrentX, otherCurrentY);
-                ctx.strokeStyle = `rgba(52, 49, 45, ${((100 * p - dist) / 100) * 0.6 * (p - 0.5) * 2})`;
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-              }
-            }
-          });
-        }
-      });
-    };
-
-    // Initial draw
-    draw();
-
-    // GSAP ScrollTrigger
-    const st = ScrollTrigger.create({
-      trigger: container,
-      start: 'top top',
-      end: '+=300%', // Pin for 3 viewport heights
-      pin: true,
-      scrub: 0.5,
-      animation: gsap.to(state, {
-        progress: 1,
-        ease: 'none',
-        onUpdate: draw
-      })
-    });
-
-    // Step fading logic
-    const stepElements = Array.from(stepsEl.children);
-    stepElements.forEach((step, index) => {
-      gsap.fromTo(step, 
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          scrollTrigger: {
-            trigger: container,
-            start: `${index * 33}% top`,
-            end: `${(index + 1) * 33}% top`,
-            scrub: true,
-          }
-        }
-      );
-      
-      // Fade out logic
-      if (index < stepElements.length - 1) {
-        gsap.to(step, {
-          opacity: 0,
-          y: -50,
-          scrollTrigger: {
-            trigger: container,
-            start: `${(index + 0.8) * 33}% top`,
-            end: `${(index + 1) * 33}% top`,
-            scrub: true,
-          }
-        });
-      }
-    });
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      st.kill();
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
-  }, []);
-
   return (
-    <section ref={containerRef} className="relative w-full h-screen bg-[#d9c5b2]/30 overflow-hidden">
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 z-0 pointer-events-none"
-      />
-      
-      <div className="absolute inset-0 z-10 flex flex-col justify-center items-center pointer-events-none">
-        <div ref={stepsRef} className="relative w-full max-w-4xl text-center">
-          
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
-              Understands you
-            </h2>
-            <p className="text-[#34312d] text-lg font-medium">We map your unique trajectory—not just keywords.</p>
-          </div>
-          
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
-              Scans everything
-            </h2>
-            <p className="text-[#34312d] text-lg font-medium">Thousands of active roles processed in milliseconds.</p>
-          </div>
+    <section id="features" className="py-24 bg-white relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="text-center mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4"
+            style={{ fontFamily: 'var(--font-space-grotesk)' }}
+          >
+            Why Crown Atlas?
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-lg text-[#7e7f83] max-w-2xl mx-auto font-medium"
+          >
+            Everything you need to navigate your career journey, powered by advanced artificial intelligence.
+          </motion.p>
+        </div>
 
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-6 opacity-0">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-[#14110f] mb-4" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
-              Draws the match
-            </h2>
-            <p className="text-[#34312d] text-lg font-medium">You only see the roles where you're a definitive fit.</p>
-          </div>
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-[#f3f3f4] rounded-2xl p-8 border border-[#7e7f83]/10 hover:shadow-lg transition-all hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-6">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-bold text-[#14110f] mb-3">{feature.title}</h3>
+              <p className="text-[#7e7f83] leading-relaxed">
+                {feature.description}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

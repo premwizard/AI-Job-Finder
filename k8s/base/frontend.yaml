@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ai-job-finder-frontend:latest
+          image: Crown Atlas-frontend:latest
           ports:
             - containerPort: 3000
 ---

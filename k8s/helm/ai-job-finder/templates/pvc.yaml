@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-chroma-pvc
+  name: {{ include "Crown Atlas.fullname" . }}-chroma-pvc
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-chroma
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-chroma
 spec:
   accessModes:
     - ReadWriteOnce
@@ -14,9 +14,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-uploads-pvc
+  name: {{ include "Crown Atlas.fullname" . }}-uploads-pvc
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-uploads
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-uploads
 spec:
   accessModes:
     - ReadWriteOnce

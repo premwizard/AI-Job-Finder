@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-backend
+  name: {{ include "Crown Atlas.fullname" . }}-backend
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+      app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+        app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend
     spec:
       containers:
         - name: backend
@@ -36,9 +36,9 @@ spec:
             periodSeconds: 10
           envFrom:
             - configMapRef:
-                name: {{ include "ai-job-finder.fullname" . }}-config
+                name: {{ include "Crown Atlas.fullname" . }}-config
             - secretRef:
-                name: {{ include "ai-job-finder.fullname" . }}-secret
+                name: {{ include "Crown Atlas.fullname" . }}-secret
           resources:
             {{- toYaml .Values.backend.resources | nindent 12 }}
           volumeMounts:
@@ -49,7 +49,7 @@ spec:
       volumes:
         - name: chroma-data
           persistentVolumeClaim:
-            claimName: {{ include "ai-job-finder.fullname" . }}-chroma-pvc
+            claimName: {{ include "Crown Atlas.fullname" . }}-chroma-pvc
         - name: uploads-data
           persistentVolumeClaim:
-            claimName: {{ include "ai-job-finder.fullname" . }}-uploads-pvc
+            claimName: {{ include "Crown Atlas.fullname" . }}-uploads-pvc

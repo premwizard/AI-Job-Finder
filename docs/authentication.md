@@ -1,6 +1,6 @@
 # 🔐 Authentication & Account Security
 
-AI Job Finder includes a production-ready authentication and account security system designed with scalability, security, and modern user experience in mind.
+Crown Atlas includes a production-ready authentication and account security system designed with scalability, security, and modern user experience in mind.
 
 ---
 

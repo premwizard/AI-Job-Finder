@@ -92,7 +92,7 @@ class AnalyticsTracker:
 
 
 def run_diagnostics():
-    print("=== AI JOB Finder V3.1 Diagnostics ===\n")
+    print("=== Crown Atlas V3.1 Diagnostics ===\n")
     print(f"EMAIL configured: {'YES' if EMAIL else 'NO'}")
     print(f"EMAIL_PASSWORD configured: {'YES' if EMAIL_PASSWORD else 'NO'}")
     print(f"Receiver email configured: {'YES' if RECEIVER_EMAIL else 'NO'}\n")
@@ -110,7 +110,7 @@ def generate_job_hash(job: dict) -> str:
 
 def main():
     run_diagnostics()
-    print("Starting AI Job Finder V3.1 Pipeline...")
+    print("Starting Crown Atlas V3.1 Pipeline...")
 
     db = SessionLocal()
     new_jobs = []

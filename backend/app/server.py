@@ -65,8 +65,8 @@ from app.shared.logger.logger import app_logger
 import time
 
 app = FastAPI(
-    title="AI Job Finder API",
-    description="Backend API for the AI Job Finder application.",
+    title="Crown Atlas API",
+    description="Backend API for the Crown Atlas application.",
     version="1.0.0",
 )
 
@@ -239,13 +239,13 @@ async def shutdown_event():
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the AI Job Finder API"}
+    return {"message": "Welcome to the Crown Atlas API"}
 
 @app.get("/api/v1/health")
 def health_check():
     return {
         "status": "ok",
-        "service": "AI Job Finder API",
+        "service": "Crown Atlas API",
         "version": "1.0.0",
         "components": {
             "database": "connected",

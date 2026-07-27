@@ -14,12 +14,12 @@ def send_password_reset_email(to_email: str, reset_link: str, otp: str):
         print("Email configuration is missing. Cannot send email.")
         return
 
-    subject = "AI Job Finder - Password Reset Request"
+    subject = "Crown Atlas - Password Reset Request"
 
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">AI Job Finder</h2>
+        <h2 style="color: #2563eb;">Crown Atlas</h2>
         <h3>Reset Your Password</h3>
         <p>We received a request to reset your password. Click the button below to proceed.</p>
         
@@ -44,7 +44,7 @@ def send_password_reset_email(to_email: str, reset_link: str, otp: str):
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"AI Job Finder <{EMAIL}>"
+    msg["From"] = f"Crown Atlas <{EMAIL}>"
     msg["To"] = to_email
 
     msg.attach(MIMEText(html_content, "html"))
@@ -67,12 +67,12 @@ def send_verification_email(to_email: str, verification_link: str):
         print("Email configuration is missing. Cannot send verification email.")
         return
 
-    subject = "AI Job Finder - Verify Your Email Address"
+    subject = "Crown Atlas - Verify Your Email Address"
 
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">AI Job Finder</h2>
+        <h2 style="color: #2563eb;">Crown Atlas</h2>
         <h3>Welcome!</h3>
         <p>Please verify your email address by clicking the button below to unlock all platform features.</p>
         
@@ -92,7 +92,7 @@ def send_verification_email(to_email: str, verification_link: str):
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"AI Job Finder <{EMAIL}>"
+    msg["From"] = f"Crown Atlas <{EMAIL}>"
     msg["To"] = to_email
 
     msg.attach(MIMEText(html_content, "html"))
@@ -114,12 +114,12 @@ def send_password_change_otp_email(to_email: str, otp: str):
         print("Email configuration is missing. Cannot send email.")
         return
 
-    subject = "AI Job Finder - Confirm Password Change"
+    subject = "Crown Atlas - Confirm Password Change"
 
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2563eb;">AI Job Finder</h2>
+        <h2 style="color: #2563eb;">Crown Atlas</h2>
         <h3>Confirm Password Change</h3>
         <p>Hello,</p>
         <p>We received a request to change your password.</p>
@@ -141,7 +141,7 @@ def send_password_change_otp_email(to_email: str, otp: str):
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"AI Job Finder <{EMAIL}>"
+    msg["From"] = f"Crown Atlas <{EMAIL}>"
     msg["To"] = to_email
 
     msg.attach(MIMEText(html_content, "html"))
@@ -163,15 +163,15 @@ def send_account_deletion_otp_email(to_email: str, otp: str):
         print("Email configuration is missing. Cannot send email.")
         return
 
-    subject = "AI Job Finder - Confirm Account Deletion"
+    subject = "Crown Atlas - Confirm Account Deletion"
 
     html_content = f"""
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #dc2626;">AI Job Finder</h2>
+        <h2 style="color: #dc2626;">Crown Atlas</h2>
         <h3>Confirm Account Deletion</h3>
         <p>Hello,</p>
-        <p>We received a request to <strong>permanently delete</strong> your AI Job Finder account.</p>
+        <p>We received a request to <strong>permanently delete</strong> your Crown Atlas account.</p>
         <p>This will remove your profile, saved jobs, applications, resume, and AI history.</p>
 
         <p>Verification Code:</p>
@@ -191,7 +191,7 @@ def send_account_deletion_otp_email(to_email: str, otp: str):
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"AI Job Finder <{EMAIL}>"
+    msg["From"] = f"Crown Atlas <{EMAIL}>"
     msg["To"] = to_email
 
     msg.attach(MIMEText(html_content, "html"))

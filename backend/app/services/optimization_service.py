@@ -21,7 +21,7 @@ class OptimizationService:
             raise HTTPException(status_code=404, detail="Job not found")
             
         # 2. Retrieve Job Context from RAG
-        # We query the jobs collection for this specific job's chunks (simulated by querying its title/description)
+        # We query the jobs collection for this specifCrown Atlas's chunks (simulated by querying its title/description)
         job_results = self.retriever.retrieve("jobs", job.title)
         job_context = "\n".join([r.get("content", "") for r in job_results[:3]])
         # Fallback to direct description if RAG misses

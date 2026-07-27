@@ -21,10 +21,10 @@ class Planner:
         Break this goal down into a logical, sequential Execution Plan.
         You must map the required steps to the following internal System Task Types:
         - ANALYZE_RESUME (Extract and analyze user resume)
-        - FIND_MATCHING_JOBS (Search for semantic job matches)
+        - FIND_MATCHING_JOBS (Search for semantCrown Atlas matches)
         - ANALYZE_SKILL_GAP (Compare user to a target job)
         - GENERATE_LEARNING_PLAN (Build a roadmap to close gaps)
-        - OPTIMIZE_RESUME (Rewrite resume for a specific job)
+        - OPTIMIZE_RESUME (Rewrite resume for a specifCrown Atlas)
         - MANUAL_ACTION (Anything that requires the user to do something outside the system, like apply)
         
         Return a JSON array of Task objects in the order they must be executed:

@@ -16,8 +16,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "IC Job - Find your match",
-  description: "Your next role is already out there. We just draw the line to it.",
+  title: "Crown Atlas | AI Career Intelligence Platform",
+  description: "Crown Atlas is an AI-powered career intelligence platform by Infinity Crown. Discover jobs, optimize resumes, prepare for interviews, analyze companies, and accelerate your career.",
 };
 
 export default function RootLayout({

@@ -21,35 +21,6 @@ export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const [isAnimatingLines, setIsAnimatingLines] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-
-  // Magnetic button setup
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
-  const buttonX = useSpring(useTransform(mouseX, [-40, 40], [-15, 15]), springConfig);
-  const buttonY = useSpring(useTransform(mouseY, [-40, 40], [-15, 15]), springConfig);
-
-  const handleMouseMoveButton = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    // Only magnetize if within ~40px range
-    if (Math.abs(x) < 40 && Math.abs(y) < 40) {
-      mouseX.set(x);
-      mouseY.set(y);
-    } else {
-      mouseX.set(0);
-      mouseY.set(0);
-    }
-  };
-
-  const handleMouseLeaveButton = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -221,12 +192,6 @@ export function Hero() {
     };
   }, []);
 
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
-    if (!inputValue) return;
-    setIsAnimatingLines(true);
-    (window as any).__startConstellation = true;
-  };
 
   return (
     <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#f3f3f4] flex items-center justify-center">
@@ -235,7 +200,16 @@ export function Hero() {
         className="absolute inset-0 pointer-events-none z-0"
       />
       
-      <div className="z-10 flex flex-col items-center text-center max-w-3xl px-6">
+      <div className="z-10 flex flex-col items-center text-center max-w-4xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-6 inline-flex items-center rounded-full border border-[#7e7f83]/30 bg-white/50 px-4 py-1.5 text-sm font-medium text-[#62466b] backdrop-blur-sm"
+        >
+          ✨ Powered by Infinity Crown
+        </motion.div>
+        
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -243,46 +217,37 @@ export function Hero() {
           className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[#14110f] tracking-tight mb-6"
           style={{ fontFamily: 'var(--font-space-grotesk)' }}
         >
-          Your next role is already out there. <br/>
-          <span className="text-[#62466b]">We just draw the line to it.</span>
+          Navigate Your Career with AI
         </motion.h1>
         
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg md:text-xl text-[#7e7f83] mb-10 max-w-2xl font-normal leading-relaxed"
+          className="text-lg md:text-xl text-[#7e7f83] mb-10 max-w-3xl font-normal leading-relaxed"
         >
-          IC Job maps your unique skills directly to open positions. No filler, just the matches that matter.
+          Crown Atlas is an AI-powered career intelligence platform that helps you discover jobs, optimize resumes, prepare for interviews, analyze companies, and make smarter career decisions—all from one intelligent workspace.
         </motion.p>
         
-        <motion.form 
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          onSubmit={handleSearch}
-          className="w-full max-w-md flex flex-col sm:flex-row gap-3"
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
         >
-          <input 
-            type="text" 
-            placeholder="Paste your role or skills..." 
-            className="flex-1 bg-white border border-[#7e7f83]/30 rounded-md px-4 py-3 text-[#34312d] placeholder-[#7e7f83] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:border-[#62466b] transition-all shadow-sm"
-            value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
-          />
-          <motion.button
-            ref={buttonRef}
-            style={{ x: buttonX, y: buttonY }}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.98 }}
-            onMouseMove={handleMouseMoveButton}
-            onMouseLeave={handleMouseLeaveButton}
-            type="submit"
-            className="bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-6 py-3 rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4]"
+          <a
+            href="/register"
+            className="inline-flex items-center justify-center bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-8 py-4 rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4] text-lg"
           >
-            Find my matches
-          </motion.button>
-        </motion.form>
+            Get Started
+          </a>
+          <a
+            href="#features"
+            className="inline-flex items-center justify-center bg-white border border-[#7e7f83]/30 text-[#34312d] hover:bg-[#f3f3f4] font-semibold px-8 py-4 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-[#7e7f83] focus:ring-offset-2 focus:ring-offset-[#f3f3f4] text-lg"
+          >
+            Explore Features
+          </a>
+        </motion.div>
       </div>
     </section>
   );

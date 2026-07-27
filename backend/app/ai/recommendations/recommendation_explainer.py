@@ -39,7 +39,7 @@ class RecommendationExplainer:
             parsed = json.loads(text.strip())
             return {
                 "strengths": parsed.get("strengths", ["Strong semantic match"]),
-                "weaknesses": parsed.get("weaknesses", ["Review specific job requirements"]),
+                "weaknesses": parsed.get("weaknesses", ["Review specifCrown Atlas requirements"]),
                 "summary": parsed.get("summary", "This job is highly recommended based on your profile.")
             }
         except Exception:

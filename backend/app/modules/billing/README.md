@@ -1,6 +1,6 @@
 # Billing Module
 
-This directory manages all commercial SaaS aspects of AI Job Finder.
+This directory manages all commercial SaaS aspects of Crown Atlas.
 
 ## Golden Rules
 1. **Provider Abstraction**: NEVER import `stripe` anywhere outside of this module. The rest of the application should only know about "Plans", "Credits", and "Subscriptions".

@@ -8,7 +8,7 @@ resources:
   - redis.yaml
 
 configMapGenerator:
-  - name: ai-job-finder-config
+  - name: Crown Atlas-config
     literals:
       - NODE_ENV=production
       - ENVIRONMENT=production
@@ -16,7 +16,7 @@ configMapGenerator:
       - REDIS_URL=redis://:redis@redis:6379/0
 
 secretGenerator:
-  - name: ai-job-finder-secret
+  - name: Crown Atlas-secret
     literals:
       - POSTGRES_PASSWORD=postgres
       - REDIS_PASSWORD=redis

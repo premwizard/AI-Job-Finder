@@ -1,7 +1,7 @@
 import sqlite3
 
 conn = sqlite3.connect(
-    "C:\\merged_partition_content\\D drive\\AI Job Finder\\backend\\sql_app.db"
+    "C:\\merged_partition_content\\D drive\\Crown Atlas\\backend\\sql_app.db"
 )
 cursor = conn.cursor()
 try:

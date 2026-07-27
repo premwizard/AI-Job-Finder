@@ -37,7 +37,7 @@ def test_profile_analytics():
         s3 = Skill(user_id=user_id, skill_name="FastAPI", category="Backend")
         db.add_all([s1, s2, s3])
 
-        p1 = Project(user_id=user_id, name="AI Job Finder", short_description="Job search platform")
+        p1 = Project(user_id=user_id, name="Crown Atlas", short_description="Job search platform")
         db.add(p1)
 
         c1 = Certification(user_id=user_id, name="AWS Cloud Practitioner", issuer="AWS")

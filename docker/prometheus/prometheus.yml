@@ -3,7 +3,7 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'ai-job-finder-backend'
+  - job_name: 'Crown Atlas-backend'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['backend:8000']

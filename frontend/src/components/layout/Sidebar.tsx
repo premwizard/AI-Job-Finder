@@ -72,7 +72,7 @@ export function Sidebar() {
       <div className="flex h-14 items-center border-b px-4">
         <Link href="/dashboard" className="flex items-center gap-2 font-bold text-primary">
           <BrainCircuit className="h-6 w-6" />
-          <span>AI Job Finder</span>
+          <span>Crown Atlas</span>
         </Link>
       </div>
       

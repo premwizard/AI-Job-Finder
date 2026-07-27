@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-backend
+  name: {{ include "Crown Atlas.fullname" . }}-backend
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-backend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "ai-job-finder.fullname" . }}-backend
+    name: {{ include "Crown Atlas.fullname" . }}-backend
   minReplicas: {{ .Values.backend.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.backend.autoscaling.maxReplicas }}
   metrics:
@@ -25,14 +25,14 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "ai-job-finder.fullname" . }}-frontend
+  name: {{ include "Crown Atlas.fullname" . }}-frontend
   labels:
-    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-frontend
+    app.kubernetes.io/name: {{ include "Crown Atlas.name" . }}-frontend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "ai-job-finder.fullname" . }}-frontend
+    name: {{ include "Crown Atlas.fullname" . }}-frontend
   minReplicas: {{ .Values.frontend.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.frontend.autoscaling.maxReplicas }}
   metrics:

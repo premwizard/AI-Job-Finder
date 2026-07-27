@@ -138,17 +138,27 @@ export function FinalCTA() {
         className="absolute inset-0 z-0 pointer-events-none"
       />
       
-      <div className="z-10 flex flex-col items-center text-center px-6">
+      <div className="z-10 flex flex-col items-center text-center px-6 max-w-3xl">
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-4xl md:text-6xl font-extrabold text-[#14110f] mb-8"
+          className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#14110f] mb-6"
           style={{ fontFamily: 'var(--font-space-grotesk)' }}
         >
-          Your constellation awaits.
+          Start Building Your Future Today
         </motion.h2>
+
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="text-lg md:text-xl text-[#7e7f83] mb-10 font-medium leading-relaxed"
+        >
+          Join Crown Atlas and experience a smarter way to discover opportunities, improve your skills, and accelerate your career with AI.
+        </motion.p>
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -156,17 +166,18 @@ export function FinalCTA() {
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <motion.button
-            ref={buttonRef}
+          <motion.a
+            href="/register"
+            ref={buttonRef as any}
             style={{ x: buttonX, y: buttonY }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
-            onMouseMove={handleMouseMoveButton}
+            onMouseMove={handleMouseMoveButton as any}
             onMouseLeave={handleMouseLeaveButton}
-            className="bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-8 py-4 text-lg rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4]"
+            className="inline-flex items-center justify-center bg-[#62466b] hover:bg-[#7a5a85] text-[#f3f3f4] font-semibold px-8 py-4 text-lg rounded-md transition-colors shadow-[0_4px_20px_rgba(98,70,107,0.3)] focus:outline-none focus:ring-2 focus:ring-[#62466b] focus:ring-offset-2 focus:ring-offset-[#f3f3f4]"
           >
-            Find my matches
-          </motion.button>
+            Launch Crown Atlas
+          </motion.a>
         </motion.div>
       </div>
     </section>

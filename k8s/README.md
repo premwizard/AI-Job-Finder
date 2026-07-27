@@ -1,12 +1,12 @@
 # Kubernetes Deployment
 
-This directory contains the production-ready Kubernetes infrastructure for AI Job Finder.
+This directory contains the production-ready Kubernetes infrastructure for Crown Atlas.
 
 ## Architecture
 
 We provide a dual-deployment strategy:
 1. **Raw Manifests (`base/`)**: A Kustomize-compatible directory for simple deployments.
-2. **Helm Chart (`helm/ai-job-finder/`)**: The recommended standard for parameterized, scalable environments.
+2. **Helm Chart (`helm/Crown Atlas/`)**: The recommended standard for parameterized, scalable environments.
 
 ## Deployment with Helm
 
@@ -34,7 +34,7 @@ The current configuration embeds default secrets in `values.yaml` for structural
 1. Do NOT commit production secrets to Git.
 2. Inject secrets during deployment:
    ```bash
-   helm upgrade --install ai-job-finder ./helm/ai-job-finder \
+   helm upgrade --install Crown Atlas ./helm/Crown Atlas \
        --set postgres.password="SUPER_SECRET" \
        --set redis.password="SUPER_SECRET"
    ```

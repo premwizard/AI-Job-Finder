@@ -23,7 +23,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600 shadow-lg shadow-blue-600/20">
               <BrainCircuit className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold tracking-tight">AI Job Finder</span>
+            <span className="text-2xl font-bold tracking-tight">Crown Atlas</span>
           </div>
 
           {/* Main Marketing Copy */}
@@ -75,7 +75,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600">
             <BrainCircuit className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight">AI Job Finder</span>
+          <span className="text-xl font-bold tracking-tight">Crown Atlas</span>
         </div>
 
         {/* Form Container with Entrance Animation */}
