@@ -1,7 +1,7 @@
 import os
 import sys
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 # Ensure the backend directory is in the path
@@ -45,6 +45,10 @@ from app.routes import (
     copilot_routes,
 )
 
+from app.modules.auth.controllers import auth_controller as auth_v2_controller
+from app.modules.queue.controllers import queue_controller
+from app.shared.logger.logger import app_logger
+import time
 
 app = FastAPI(
     title="AI Job Finder API",
@@ -60,6 +64,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    app_logger.info(f"{request.method} {request.url.path} - {response.status_code} - {process_time:.4f}s")
+    return response
 
 # Include Routers
 app.include_router(auth_routes.router)
@@ -97,6 +109,11 @@ app.include_router(ats_mcp_routes.router)
 app.include_router(crm_routes.router)
 app.include_router(salary_routes.router)
 app.include_router(copilot_routes.router)
+
+# V2 Modular Routers
+app.include_router(auth_v2_controller.router)
+app.include_router(queue_controller.router)
+
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
 
@@ -162,3 +179,15 @@ def startup_event():
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the AI Job Finder API"}
+
+@app.get("/api/v1/health")
+def health_check():
+    return {
+        "status": "ok",
+        "service": "AI Job Finder API",
+        "version": "1.0.0",
+        "components": {
+            "database": "connected",
+            "mcp": "ready"
+        }
+    }

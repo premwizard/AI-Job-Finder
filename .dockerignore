@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.venv
+venv/
+ENV/
+
+# Node / Next.js
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnp
+.pnp.js
+.next/
+out/
+build/
+dist/
+.DS_Store
+*.pem
+
+# Local Data / Vector DB
+*.db
+*.sqlite3
+chroma_db/
+uploads/
+seen_jobs.json
+weekly_stats.json
+
+# Docker
+docker-compose.override.yml

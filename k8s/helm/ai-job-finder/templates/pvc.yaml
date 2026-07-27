@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ai-job-finder.fullname" . }}-chroma-pvc
+  labels:
+    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-chroma
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ai-job-finder.fullname" . }}-uploads-pvc
+  labels:
+    app.kubernetes.io/name: {{ include "ai-job-finder.name" . }}-uploads
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

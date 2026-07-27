@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    # Mount local backend code for hot reloading
+    volumes:
+      - ./backend:/app:ro
+      - chroma_data:/app/chroma_db
+      - uploads_data:/app/uploads
+    # Command to run uvicorn with hot reload instead of standard entrypoint
+    command: ["uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  worker:
+    # Mount local backend code for hot reloading
+    volumes:
+      - ./backend:/app:ro
+      - chroma_data:/app/chroma_db
+      - uploads_data:/app/uploads
+    # Enable Celery auto-reload via watchdog in dev (assuming watchdog installed or fallback)
+    command: ["watchmedo", "auto-restart", "--directory=./app", "--pattern=*.py", "--recursive", "--", "celery", "-A", "app.modules.queue.core.celery_app.celery_app", "worker", "--loglevel=info"]
+
+  dashboard:
+    volumes:
+      - ./backend:/app:ro
+
+  frontend:
+    # Mount local frontend code for hot reloading
+    volumes:
+      - ./frontend:/app:ro
+      - /app/node_modules
+      - /app/.next
+    # Use dev server
+    command: ["npm", "run", "dev"]
