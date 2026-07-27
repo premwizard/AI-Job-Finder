@@ -1949,6 +1949,292 @@ The final result should provide an enterprise-grade security foundation that pro
 
 ---
 
+## 🚀 Phase 8 — Module 8: Enterprise Admin Dashboard & Platform Management
+
+### Goal
+Build a comprehensive enterprise-grade administration platform for AI Job Finder.
+
+The Admin Dashboard should provide complete operational control over the entire platform, including users, AI agents, MCP providers, infrastructure, analytics, billing, security, queues, monitoring, feature flags, and platform configuration.
+This module is intended exclusively for administrators and support personnel.
+Do not expose any administrative functionality to regular users.
+
+### Objectives
+Create a centralized administration console capable of managing every aspect of the platform.
+The Admin Dashboard should become the operational control center for AI Job Finder.
+
+### Architecture
+Administrator -> Admin Dashboard -> Admin API -> Platform Services -> Users, AI Agents, MCP Providers, Infrastructure, Analytics, Security, Billing, Observability
+
+### Backend Structure
+`server/`, `modules/`, `admin/`, `controllers/`, `services/`, `repositories/`, `routes/`, `dto/`, `validators/`, `middlewares/`, `permissions/`, `analytics/`, `configuration/`, `feature-flags/`, `support/`, `system/`, `tests/`, `README.md`
+
+### Frontend Structure
+`src/`, `modules/`, `admin/`, `pages/`, `dashboard/`, `users/`, `roles/`, `agents/`, `mcp/`, `analytics/`, `security/`, `billing/`, `queues/`, `monitoring/`, `logs/`, `settings/`, `support/`, `feature-flags/`, `components/`, `hooks/`, `services/`, `types/`
+
+### Admin Authentication
+Restrict access using RBAC.
+Support: Administrator, Super Administrator, Support Engineer, Platform Operator, Read-only Auditor.
+Enforce permission-based navigation and API authorization.
+
+### Admin Dashboard Home
+Display: Platform Health Score, Active Users, New Registrations, Daily Active Users, Monthly Active Users, AI Requests Today, MCP Provider Status, Worker Status, Queue Statistics, System Health, Storage Usage, API Performance, Recent Incidents, Recent Audit Events, Revenue Overview (future).
+Dark mode. Responsive layout.
+
+### User Management
+Manage users. Support: Search, Filtering, Sorting, Pagination, Profile inspection, Role assignment, Account activation, Account suspension, Email verification status, OAuth providers, Connected devices, Login history, Delete account, Export user data, View activity timeline.
+
+### Role & Permission Management
+Create and manage: Roles, Permissions, Permission groups, Inherited permissions, Custom administrator roles, Permission auditing.
+
+### AI Agent Management
+Monitor every AI agent.
+Display: Agent health, Execution count, Latency, Failure rate, Average execution time, Memory usage, Tool usage, Current version, Configuration, Restart controls (future-ready).
+
+### MCP Provider Management
+Manage: GitHub, Gmail, Google Calendar, Google Drive, ATS Providers, Future providers.
+Display: Connection health, Authentication status, Rate limits, Latency, Failure rate, Usage statistics, Credential status.
+
+### Queue Management
+Display: Running jobs, Queued jobs, Failed jobs, Retry queue, Dead Letter Queue, Worker utilization, Job throughput, Processing latency.
+Allow: Retry failed jobs, Cancel pending jobs, Pause queues, Resume queues.
+
+### Platform Monitoring
+Integrate with observability.
+Display: CPU, Memory, Disk, Redis, Database, API latency, Queue latency, Worker health, Cache health, Overall platform status.
+
+### Security Center
+Display: Failed logins, Suspicious activity, Audit logs, Session statistics, OAuth activity, Rate limiting events, Incident reports, Security Health Score.
+
+### Feature Flags
+Implement a feature flag system.
+Support: Enable/disable features, Percentage rollouts, Environment targeting, Role targeting, User targeting, Feature scheduling, Audit changes.
+
+### System Configuration
+Manage: Application settings, AI provider settings, MCP configuration, Email configuration, Storage configuration, Rate limits, Upload limits, Queue settings, Cache configuration, Environment metadata (read-only).
+
+### Analytics
+Display: User growth, Application activity, Resume uploads, Interview generation, AI usage, Token usage, MCP usage, Provider statistics, Geographic usage, Feature adoption, Retention, Engagement.
+
+### Billing Management
+Prepare for future billing.
+Display: Plans, Subscriptions, Usage, Credits, Invoices, Revenue, Enterprise accounts.
+No payment processing in this module.
+
+### Logs Center
+View: Application logs, Security logs, Queue logs, AI logs, MCP logs, API logs.
+Search, filter, and export logs.
+
+### Support Center
+Support administrators with: User lookup, Support tickets (future-ready), Account diagnostics, Data export, Session revocation, Password reset assistance, OAuth troubleshooting, System diagnostics.
+
+### Notifications
+Allow administrators to receive alerts for: System outages, Queue failures, Provider outages, Security incidents, Storage thresholds, High latency, Critical application errors.
+
+### APIs
+Create versioned admin endpoints.
+Examples:
+* `GET /api/v1/admin/dashboard`
+* `GET /api/v1/admin/users`
+* `GET /api/v1/admin/analytics`
+* `GET /api/v1/admin/system`
+* `GET /api/v1/admin/security`
+* `GET /api/v1/admin/queues`
+* `GET /api/v1/admin/agents`
+* `GET /api/v1/admin/providers`
+* `GET /api/v1/admin/logs`
+* `POST /api/v1/admin/feature-flags`
+* `PATCH /api/v1/admin/users/{id}`
+* `DELETE /api/v1/admin/users/{id}`
+
+Protect every endpoint using administrator authorization.
+
+### UI/UX
+The dashboard should include: Modern enterprise layout, Collapsible sidebar, Global search, Breadcrumb navigation, Advanced filters, Data tables, Charts, Real-time status indicators, Dark mode, Responsive design, Loading skeletons, Empty states, Error boundaries, Keyboard shortcuts (future-ready).
+
+### Documentation
+Document: Admin architecture, Permission model, Dashboard modules, Configuration system, Feature flag workflow, Operational procedures, Troubleshooting guide, Administrator handbook.
+
+### Deliverables
+At the end of this module the platform should provide:
+* ✓ Enterprise Admin Dashboard
+* ✓ User Management
+* ✓ Role & Permission Management
+* ✓ AI Agent Management
+* ✓ MCP Provider Management
+* ✓ Queue Management
+* ✓ Platform Monitoring
+* ✓ Security Center
+* ✓ Feature Flag System
+* ✓ Configuration Management
+* ✓ Analytics Dashboard
+* ✓ Logs Center
+* ✓ Support Tools
+* ✓ Real-time Operational Insights
+* ✓ Comprehensive Documentation
+
+### Testing
+**Verify:**
+* ✓ Administrator authentication
+* ✓ Permission enforcement
+* ✓ User management
+* ✓ Feature flags
+* ✓ AI monitoring
+* ✓ Queue management
+* ✓ Provider management
+* ✓ Dashboard rendering
+* ✓ Analytics accuracy
+* ✓ Log visibility
+* ✓ Configuration updates
+* ✓ Responsive UI
+* ✓ Security restrictions
+
+Resolve all issues before considering this module complete.
+
+### Important
+Do not expose administrator functionality to normal users.
+Keep the admin platform modular and extensible.
+Use existing services wherever possible instead of duplicating business logic.
+The Admin Dashboard should become the single operational control center for AI Job Finder, enabling administrators to monitor, manage, secure, configure, and maintain the platform efficiently in production while supporting future enterprise growth.
+
+---
+
+## 🚀 Phase 8 — Module 9: SaaS Billing, Subscription & Monetization Platform
+
+### Goal
+Transform AI Job Finder into a commercial SaaS platform with enterprise-grade billing, subscription management, usage tracking, credit accounting, invoicing, and organization support.
+
+The billing system must be modular, provider-agnostic, secure, auditable, and capable of supporting future payment providers.
+Do not modify existing AI functionality.
+Instead, build the commercial infrastructure around the platform.
+
+### Objectives
+Implement: Subscription Plans, Billing Engine, Usage Metering, Credit System, Invoice Management, Organization Billing, Team Billing, Enterprise Contracts, Payment Provider Abstraction, Revenue Analytics.
+
+### Architecture
+User -> Subscription -> Usage Metering -> Billing Engine -> Payment Provider -> Invoices -> Analytics -> Admin Dashboard
+
+### Backend Structure
+`server/`, `modules/`, `billing/`, `subscriptions/`, `payments/`, `credits/`, `plans/`, `invoices/`, `organizations/`, `usage/`, `metering/`, `providers/`, `webhooks/`, `discounts/`, `analytics/`, `controllers/`, `services/`, `repositories/`, `dto/`, `validators/`, `tests/`, `README.md`
+
+### Subscription Plans
+Support configurable plans. Examples: Free, Starter, Professional, Business, Enterprise.
+Each plan should define: Monthly price, Yearly price, Credits, Storage limits, Resume uploads, AI requests, MCP integrations, API access, Priority queues, Team members, Support level, Custom branding (future).
+Plans should be configurable without code changes.
+
+### Billing Provider Abstraction
+Implement a provider interface.
+Support: Stripe, Future providers, PayPal, Razorpay, Paddle, Lemon Squeezy, Custom Enterprise Billing.
+The business logic must never depend directly on Stripe.
+
+### Stripe Integration
+Implement: Checkout Sessions, Customer Portal, Subscriptions, Invoices, Webhooks, Payment Methods, Taxes, Trials, Coupon Support, Subscription Upgrades, Subscription Downgrades, Subscription Cancellation, Payment Recovery.
+
+### Usage Metering
+Track: AI Requests, LLM Tokens, Resume Analysis, Interview Generation, Career Copilot Executions, GitHub Analysis, Email Sync, Calendar Sync, Drive Sync, ATS Sync, Workflow Executions, API Calls, Storage Usage, Bandwidth, Background Jobs.
+Every billable action should be measurable.
+
+### Credit System
+Create a credit engine.
+Support: Monthly credits, Purchased credits, Bonus credits, Referral credits, Enterprise credits, Credit expiration, Credit refunds, Manual adjustments, Transaction history.
+Every AI operation should consume configurable credits.
+
+### Organization Billing
+Support: Organizations, Teams, Shared subscriptions, Seat-based pricing, Usage aggregation, Centralized billing, Role-based billing administration, Department allocation (future).
+
+### Invoice Management
+Automatically generate invoices.
+Include: Invoice Number, Customer, Subscription, Usage Summary, Credits Used, Taxes, Payment Status, Billing Period, Download PDF, Invoice History.
+
+### Payment Methods
+Support: Credit/Debit Cards, Future Digital Wallets, Enterprise invoicing, Bank transfer hooks.
+Multiple payment methods per customer.
+
+### Discounts
+Support: Coupons, Promotional codes, Referral rewards, Educational discounts, Enterprise discounts, Time-limited promotions, Percentage discounts, Fixed discounts, Usage-based discounts.
+
+### Trial Management
+Support: Free trials, Trial expiration, Upgrade reminders, Grace periods, Automatic conversion, Manual conversion, Trial analytics.
+
+### Billing Dashboard
+Create a user-facing billing page.
+Display: Current Plan, Credits Remaining, Usage Statistics, Invoices, Payment Methods, Subscription Status, Upgrade Options, Renewal Date, Billing History, Usage Charts.
+Dark mode. Responsive design.
+
+### Revenue Analytics
+Integrate with the Admin Dashboard.
+Track: Monthly Recurring Revenue, Annual Recurring Revenue, Active Subscriptions, Trial Conversions, Churn Rate, Average Revenue Per User, Revenue Growth, Plan Distribution, Credit Usage, Payment Failures.
+
+### Webhooks
+Implement secure webhook processing.
+Handle: Successful payments, Failed payments, Subscription updates, Invoice creation, Refunds, Charge disputes, Trial expiration, Plan changes.
+Validate webhook signatures.
+
+### Notifications
+Notify users for: Successful payment, Payment failure, Upcoming renewal, Trial ending, Subscription expiration, Low credits, Invoice generated, Plan upgraded, Plan downgraded.
+
+### APIs
+Create versioned billing APIs.
+Examples:
+* `GET /api/v1/billing/plans`
+* `GET /api/v1/billing/subscription`
+* `GET /api/v1/billing/usage`
+* `GET /api/v1/billing/invoices`
+* `POST /api/v1/billing/checkout`
+* `POST /api/v1/billing/portal`
+* `POST /api/v1/billing/cancel`
+* `POST /api/v1/billing/upgrade`
+* `POST /api/v1/billing/webhooks`
+
+Protect all endpoints with authentication and authorization.
+
+### Security
+Ensure: PCI-friendly architecture, No payment data stored directly, Webhook signature verification, Idempotent payment processing, Audit logging, Role-based billing administration, Encrypted billing metadata.
+
+### Documentation
+Document: Billing architecture, Plan configuration, Provider abstraction, Usage metering, Credit system, Invoice lifecycle, Webhook processing, Upgrade/downgrade flow, Developer integration guide.
+
+### Deliverables
+At the end of this module the platform should provide:
+* ✓ Modular billing engine
+* ✓ Subscription management
+* ✓ Configurable pricing plans
+* ✓ Provider abstraction
+* ✓ Stripe integration
+* ✓ Usage metering
+* ✓ Credit system
+* ✓ Invoice management
+* ✓ Team & organization billing
+* ✓ Billing dashboard
+* ✓ Revenue analytics
+* ✓ Secure webhook processing
+* ✓ Comprehensive documentation
+
+### Testing
+**Verify:**
+* ✓ Subscription creation
+* ✓ Plan upgrades
+* ✓ Plan downgrades
+* ✓ Trial lifecycle
+* ✓ Usage metering accuracy
+* ✓ Credit deduction
+* ✓ Credit refunds
+* ✓ Invoice generation
+* ✓ Webhook validation
+* ✓ Payment recovery
+* ✓ Team billing
+* ✓ Revenue analytics
+* ✓ Authorization rules
+
+Resolve all billing issues before considering this module complete.
+
+### Important
+Keep the billing system independent from AI business logic.
+Every billable action should pass through the usage metering layer.
+Design all billing services to support future payment providers without requiring changes to the rest of the application.
+The final result should provide a production-ready SaaS monetization platform capable of supporting individual users, teams, enterprise customers, and future marketplace offerings.
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
@@ -2075,6 +2361,8 @@ The final result should provide an enterprise-grade security foundation that pro
 * Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
 * Phase 8 — Module 6: Enterprise Observability, Monitoring & Diagnostics Platform
 * Phase 8 — Module 7: Enterprise Security, Compliance & Governance
+* Phase 8 — Module 8: Enterprise Admin Dashboard & Platform Management
+* Phase 8 — Module 9: SaaS Billing, Subscription & Monetization Platform
 * Phase 9 — Advanced Agentic Integrations
 
 ---

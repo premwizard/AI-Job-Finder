@@ -50,6 +50,7 @@ from app.modules.queue.controllers import queue_controller
 from app.modules.cache.controllers import cache_controller
 from app.modules.observability.controllers import observability_controller
 from app.modules.security.controllers import security_controller
+from app.modules.admin.controllers import admin_controller
 from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
 from app.modules.observability.logging.structured_logger import structured_logger
 from app.modules.observability.tracing.tracer import init_tracer
@@ -146,6 +147,7 @@ app.include_router(queue_controller.router)
 app.include_router(cache_controller.router)
 app.include_router(observability_controller.router)
 app.include_router(security_controller.router)
+app.include_router(admin_controller.router)
 
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
