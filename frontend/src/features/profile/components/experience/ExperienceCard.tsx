@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { format, differenceInMonths, differenceInYears } from 'date-fns';
 import { Building2, Calendar, MapPin, Pencil, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { WorkExperience } from '../../types/experience';
@@ -81,10 +81,8 @@ export function ExperienceCard({ experience, onEdit }: ExperienceCardProps) {
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-destructive">
+                  <AlertDialogTrigger className={buttonVariants({ variant: "ghost", size: "icon", className: "text-destructive" })}>
                       <Trash2 className="h-4 w-4" />
-                    </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>

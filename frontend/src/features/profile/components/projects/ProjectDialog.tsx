@@ -45,7 +45,7 @@ const projectSchema = z.object({
   video_demo_url: z.string().optional(),
   challenges: z.string().optional(),
   achievements: z.string().optional(),
-  status: z.string().default("Completed"),
+  status: z.string(),
   is_featured: z.boolean(),
 });
 

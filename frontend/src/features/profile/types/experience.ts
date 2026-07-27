@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Skill } from "./skills";
+import { SkillResponse } from "./skills";
 
 export const experienceSchema = z.object({
   company_name: z.string().min(1, "Company name is required").max(100),
@@ -11,7 +11,7 @@ export const experienceSchema = z.object({
   work_model: z.string().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
-  is_current: z.boolean().default(false),
+  is_current: z.boolean(),
   description: z.string().max(2000).optional(),
   achievements: z.string().max(2000).optional(),
   manager_name: z.string().max(100).optional(),
@@ -59,7 +59,7 @@ export interface WorkExperience {
   order: number;
   created_at: string;
   updated_at?: string;
-  skills?: Skill[];
+  skills?: SkillResponse[];
   projects?: Project[];
 }
 

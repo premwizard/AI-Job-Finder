@@ -1,2 +1,1 @@
-export * from './components/LoginForm';
-export * from './components/RegisterForm';
+// No auth components yet
