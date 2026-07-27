@@ -1789,6 +1789,166 @@ The final result should provide complete operational visibility into AI Job Find
 
 ---
 
+## 🚀 Phase 8 — Module 7: Enterprise Security, Compliance & Governance
+
+### Goal
+Build a comprehensive enterprise-grade security and compliance framework for AI Job Finder.
+
+Harden every layer of the platform including authentication, authorization, APIs, AI services, MCP providers, infrastructure, storage, and background workers.
+This module focuses on security, governance, auditing, and compliance.
+Do not introduce new business features.
+The implementation should preserve backward compatibility while significantly improving platform security.
+
+### Objectives
+Secure: Frontend, Backend, APIs, Authentication, Authorization, AI Agents, MCP Providers, Databases, Redis, Background Workers, Docker, Kubernetes, External Integrations.
+
+### Architecture
+User -> Authentication -> Authorization -> API Gateway -> Business Services -> Security Layer -> Database -> Infrastructure -> Audit Logs -> Monitoring
+
+### Folder Structure
+`server/`, `security/`, `authentication/`, `authorization/`, `permissions/`, `audit/`, `encryption/`, `headers/`, `policies/`, `middleware/`, `secrets/`, `rate-limit/`, `validation/`, `compliance/`, `incident/`, `services/`
+
+### Authentication Hardening
+Enhance authentication with: JWT validation, Refresh token rotation, Session revocation, Device tracking, Session timeout, Login history, Brute-force protection, Password policy enforcement, Email verification validation, OAuth account validation, Account lockout after repeated failures.
+
+### Authorization
+Implement Role-Based Access Control (RBAC).
+Support roles such as: Guest, User, Premium User, Moderator, Administrator, Super Administrator.
+Support custom roles in the future.
+
+### Fine-Grained Permissions
+Support permissions such as: View Profile, Edit Profile, Delete Account, Manage Users, Manage Jobs, Manage AI Agents, Manage MCP Providers, View Analytics, Manage Billing, Manage System Settings, View Audit Logs.
+Permission checks should occur at the API and service layers.
+
+### API Security
+Secure every endpoint.
+Implement: Input validation, Output sanitization, Request size limits, Request timeout, Payload validation, API version validation, Content-Type validation, Secure error responses, Rate limiting hooks, Replay protection (where applicable).
+
+### Security Headers
+Configure: Content Security Policy (CSP), Strict-Transport-Security (HSTS), X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, Cross-Origin policies.
+Configure secure defaults.
+
+### CSRF Protection
+Protect all state-changing requests.
+Support: CSRF tokens, SameSite cookies, Origin validation, Secure cookie attributes.
+
+### CORS
+Create environment-aware CORS configuration.
+Support: Development, Staging, Production.
+Allow only trusted origins.
+
+### Secrets Management
+Centralize management of: JWT secrets, OAuth credentials, Database credentials, Redis credentials, API keys, Encryption keys, MCP credentials.
+Never expose secrets in source code or logs.
+Prepare for integration with cloud secret managers.
+
+### Encryption
+Encrypt sensitive information.
+**At Rest:** Sensitive database fields, Tokens, Stored credentials, OAuth refresh tokens.
+**In Transit:** HTTPS-ready configuration, TLS support, Secure internal communication.
+
+### Audit Logging
+Record security events.
+Examples: Login, Logout, Password Change, Email Change, Role Change, Permission Change, OAuth Connection, Account Deletion, MCP Connection, Failed Login, Unauthorized Access, Administrator Actions.
+Audit logs must be immutable.
+
+### Rate Limiting
+Implement configurable limits.
+Examples: Authentication, Password Reset, Email Verification, Resume Upload, AI Requests, MCP Requests, Public APIs.
+Support per-user and per-IP policies.
+
+### AI Security
+Protect AI services.
+Implement: Prompt validation, Prompt size limits, Output filtering hooks, Safe request handling, Agent authorization, Workflow authorization, Tool execution authorization.
+Prevent unauthorized agent actions.
+
+### MCP Security
+Secure every provider.
+Validate: OAuth tokens, Provider permissions, Scopes, Session expiration, Provider ownership, Connection health.
+Support secure disconnect and credential revocation.
+
+### File Security
+Validate: File type, File size, Content type, Malware scan integration hooks, Secure storage paths, Randomized filenames, Access authorization.
+Prepare for future antivirus integration.
+
+### Compliance
+Prepare architecture for: GDPR, CCPA, SOC 2, ISO 27001, Data retention policies, Consent management, Right to delete, Data export, Privacy controls.
+Do not implement legal workflows beyond architectural readiness.
+
+### Incident Response
+Create a security incident framework.
+Track: Unauthorized access, Privilege escalation, Repeated failures, Suspicious API usage, Compromised tokens, Credential abuse.
+Generate incident records for administrators.
+
+### Security Dashboard
+Create an Admin Security Center.
+Display: Login Activity, Active Sessions, Recent Incidents, Failed Logins, OAuth Connections, Connected Devices, Audit Logs, Permission Changes, Security Health Score.
+Dark mode. Responsive layout.
+
+### APIs
+* `GET /api/security/health`
+* `GET /api/security/sessions`
+* `GET /api/security/audit`
+* `GET /api/security/incidents`
+* `POST /api/security/revoke-session`
+* `POST /api/security/revoke-all`
+* `POST /api/security/rotate-keys`
+
+Restrict administrative endpoints appropriately.
+
+### Performance
+Security measures should: Minimize latency, Avoid unnecessary encryption overhead, Support horizontal scaling, Remain compatible with caching and background workers.
+
+### Documentation
+Document: Security architecture, Authentication flow, Authorization model, Permission system, Encryption strategy, Secrets management, Audit logging, Incident handling, Compliance readiness, Developer security guidelines.
+
+### Deliverables
+At the end of this module the platform should provide:
+* ✓ Enterprise RBAC
+* ✓ Fine-grained permissions
+* ✓ Hardened authentication
+* ✓ Secure API layer
+* ✓ Security headers
+* ✓ CSRF protection
+* ✓ Environment-aware CORS
+* ✓ Centralized secrets management
+* ✓ Encryption at rest and in transit
+* ✓ Immutable audit logs
+* ✓ Rate limiting
+* ✓ AI security controls
+* ✓ MCP security
+* ✓ Security dashboard
+* ✓ Compliance-ready architecture
+* ✓ Comprehensive documentation
+
+### Testing
+**Verify:**
+* ✓ Authentication security
+* ✓ Authorization rules
+* ✓ Permission enforcement
+* ✓ CSRF protection
+* ✓ Security headers
+* ✓ Rate limiting
+* ✓ Audit logging
+* ✓ Encryption
+* ✓ OAuth security
+* ✓ MCP authorization
+* ✓ Session revocation
+* ✓ Incident recording
+* ✓ Security dashboard
+* ✓ Penetration-style testing for common vulnerabilities
+
+Resolve all identified security issues before considering this module complete.
+
+### Important
+Do not change application behavior for legitimate users.
+Maintain backward compatibility wherever possible.
+Apply the principle of least privilege throughout the platform.
+Keep security concerns isolated within dedicated modules and middleware.
+The final result should provide an enterprise-grade security foundation that protects AI Job Finder, its users, and its AI infrastructure while preparing the platform for production deployments, enterprise customers, and future compliance certifications.
+
+---
+
 ## 🔌 API Documentation
 
 ### Job Embeddings
@@ -1914,6 +2074,7 @@ The final result should provide complete operational visibility into AI Job Find
 * Phase 8 — Module 4: Background Jobs, Task Queue & Workflow Processing
 * Phase 8 — Module 5: Enterprise Caching Layer & Performance Optimization
 * Phase 8 — Module 6: Enterprise Observability, Monitoring & Diagnostics Platform
+* Phase 8 — Module 7: Enterprise Security, Compliance & Governance
 * Phase 9 — Advanced Agentic Integrations
 
 ---

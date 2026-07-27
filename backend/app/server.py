@@ -49,10 +49,13 @@ from app.modules.auth.controllers import auth_controller as auth_v2_controller
 from app.modules.queue.controllers import queue_controller
 from app.modules.cache.controllers import cache_controller
 from app.modules.observability.controllers import observability_controller
+from app.modules.security.controllers import security_controller
 from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
 from app.modules.observability.logging.structured_logger import structured_logger
 from app.modules.observability.tracing.tracer import init_tracer
 from app.modules.observability.middleware.metrics_middleware import init_metrics
+from app.modules.security.middleware.security_headers import security_headers_middleware
+from app.modules.security.rate_limit.limiter import init_rate_limiter
 from app.shared.logger.logger import app_logger
 import time
 
@@ -68,6 +71,9 @@ init_tracer(app)
 # Initialize Prometheus Metrics (Exposes /metrics)
 init_metrics(app)
 
+# Initialize Rate Limiting
+init_rate_limiter(app)
+
 # Configure CORS for Next.js frontend
 app.add_middleware(
     CORSMiddleware,
@@ -76,6 +82,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add Security Headers Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=security_headers_middleware)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -135,6 +145,7 @@ app.include_router(auth_v2_controller.router)
 app.include_router(queue_controller.router)
 app.include_router(cache_controller.router)
 app.include_router(observability_controller.router)
+app.include_router(security_controller.router)
 
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
