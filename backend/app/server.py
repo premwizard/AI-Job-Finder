@@ -42,6 +42,7 @@ from app.routes import (
     ats_mcp_routes,
     crm_routes,
     salary_routes,
+    copilot_routes,
 )
 
 
@@ -95,6 +96,7 @@ app.include_router(orchestrator_routes.router)
 app.include_router(ats_mcp_routes.router)
 app.include_router(crm_routes.router)
 app.include_router(salary_routes.router)
+app.include_router(copilot_routes.router)
 # Legacy routers removed because they use outdated schemas and cause 500 errors.
 # Frontend should use the new features/ API paths (e.g. /api/auth/me, /api/profile/analytics)
 
