@@ -27,3 +27,4 @@ opentelemetry-instrumentation-fastapi
 python-json-logger
 slowapi
 secure
+stripe
