@@ -17,6 +17,7 @@ def test_project_crud():
     # Create tables if not exist
     Base.metadata.create_all(bind=engine)
     
+    
     # Safe migration for existing SQLite DBs
     with engine.connect() as conn:
         for col_def in [
