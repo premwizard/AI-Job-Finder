@@ -1,4 +1,16 @@
 {
     "terminal.integrated.suggest.enabled": true,
-    "terminal.integrated.suggest.cdPath": "relative"
+    "terminal.integrated.suggest.cdPath": "relative",
+    "python.testing.pytestArgs": [
+        "backend"
+    ],
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./backend",
+        "-p",
+        "*_test.py"
+    ]
 }
