@@ -1,0 +1,36 @@
+# Files and directories ignored by Antigravity AI to optimize memory and context usage
+
+# Dependencies & Build Outputs
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/.venv/
+**/venv/
+**/env/
+
+# Python Cache & Linting Tools
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage
+
+# Database Files & SQLite Dumps
+**/*.db
+**/*.db-journal
+**/*.db.bak
+**/*.sqlite
+**/*.sqlite3
+
+# Uploads & Large Media / Data Artifacts
+**/uploads/
+**/logs/
+**/*.log
+
+# Temporary Scratch Files & Dumps
+backend/all_routers.txt
+backend/scratch_*.py
