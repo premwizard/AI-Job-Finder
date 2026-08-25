@@ -5,6 +5,10 @@
 import { cn } from '../lib/utils';
 import { api } from '../services/api';
 
+declare const describe: (name: string, fn: () => void) => void;
+declare const test: (name: string, fn: () => void) => void;
+declare const expect: (value: any) => any;
+
 describe('Frontend Utility & API Tests', () => {
   test('cn utility correctly merges Tailwind classes and conditions', () => {
     const result = cn('px-2 py-1', 'bg-blue-500', false && 'hidden', true && 'text-white');

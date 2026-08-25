@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { JobPostingSchema } from "@/components/common/JobPostingSchema";
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -65,6 +66,19 @@ export default function JobDetailsPage() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
+      <JobPostingSchema
+        job={{
+          title: job.job_title || "Job Details",
+          description: job.description_clean || "Job posting on AI Job Finder",
+          datePosted: job.posted_date || new Date().toISOString(),
+          hiringOrganization: {
+            name: job.company_name || "Company",
+          },
+          jobLocation: {
+            addressLocality: job.locations?.[0]?.city || job.locations?.[0]?.country || "Remote",
+          },
+        }}
+      />
       {/* Header */}
       <div className="bg-card/50 border border-border/50 rounded-xl p-6 shadow-sm backdrop-blur-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4">
