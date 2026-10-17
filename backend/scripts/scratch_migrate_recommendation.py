@@ -5,6 +5,12 @@ Ensures the job_recommendations table exists in SQLite database.
 """
 
 import logging
+import os
+import sys
+
+# Ensure backend directory is in sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app.database.database import engine
 from app.models.models import JobRecommendation
 

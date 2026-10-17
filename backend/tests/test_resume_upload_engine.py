@@ -18,7 +18,7 @@ import os
 import uuid
 import io
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import HTTPException, UploadFile
 from sqlalchemy import text

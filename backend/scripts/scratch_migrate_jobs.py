@@ -5,6 +5,12 @@ Safely drops and recreates job-related tables including SavedJob,
 Application, JobLocation, JobSkill, JobRequirement, JobBenefit, and Job.
 """
 
+import os
+import sys
+
+# Ensure backend directory is in sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app.database.database import engine, Base
 from app.models.models import (
     Job,

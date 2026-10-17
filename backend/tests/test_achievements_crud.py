@@ -7,7 +7,7 @@ import sys
 import os
 import uuid
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi import HTTPException
 

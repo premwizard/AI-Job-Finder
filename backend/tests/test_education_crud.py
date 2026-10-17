@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 # Add backend directory to sys.path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Education

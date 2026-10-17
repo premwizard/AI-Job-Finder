@@ -8,7 +8,7 @@ import sys
 from fastapi.testclient import TestClient
 
 # Ensure backend directory is in python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.main_api import app
 
