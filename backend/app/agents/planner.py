@@ -3,6 +3,7 @@ import os
 import google.generativeai as genai
 from typing import Dict, Any, List
 
+
 class Planner:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -11,12 +12,14 @@ class Planner:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel("gemini-1.5-pro")
 
-    def create_plan(self, goal_title: str, goal_description: str) -> List[Dict[str, Any]]:
+    def create_plan(
+        self, goal_title: str, goal_description: str
+    ) -> List[Dict[str, Any]]:
         prompt = f"""
         You are the Master AI Career Agent Planner.
         A user has submitted the following career goal:
         TITLE: {goal_title}
-        DESCRIPTION: {goal_description or 'None provided.'}
+        DESCRIPTION: {goal_description or "None provided."}
         
         Break this goal down into a logical, sequential Execution Plan.
         You must map the required steps to the following internal System Task Types:
@@ -37,7 +40,7 @@ class Planner:
             ...
         ]
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
@@ -45,7 +48,7 @@ class Planner:
                 text = text[7:]
             if text.endswith("```"):
                 text = text[:-3]
-                
+
             parsed = json.loads(text.strip())
             return parsed
         except Exception as e:
@@ -54,6 +57,6 @@ class Planner:
                 {
                     "task_type": "MANUAL_ACTION",
                     "description": f"Manually pursue goal: {goal_title}",
-                    "priority": 1
+                    "priority": 1,
                 }
             ]

@@ -1,15 +1,17 @@
 from typing import Dict, Any
 
+
 class FlagService:
     """
     In-memory registry for Feature Flags.
     In a production database, this should sync with a `feature_flags` SQL table or LaunchDarkly.
     """
+
     _flags: Dict[str, bool] = {
         "beta_ai_copilot": False,
         "new_dashboard_ui": True,
         "mcp_google_drive_sync": False,
-        "advanced_analytics": True
+        "advanced_analytics": True,
     }
 
     @classmethod
@@ -25,10 +27,11 @@ class FlagService:
         cls._flags[flag_name] = enabled
         # In a real app, emit an audit log event here
         from app.modules.security.audit.audit_logger import AuditLogger
+
         AuditLogger.log_event(
             event_type="FEATURE_FLAG_CHANGE",
             user_id="ADMIN",
             action=f"Changed feature flag {flag_name} to {enabled}",
-            ip_address="internal"
+            ip_address="internal",
         )
         return {"flag": flag_name, "enabled": enabled}

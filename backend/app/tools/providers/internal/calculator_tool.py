@@ -2,20 +2,22 @@ from typing import Dict, Any
 from pydantic import BaseModel, Field
 from app.tools.base_tool import BaseTool
 
+
 class CalculatorInput(BaseModel):
     operation: str = Field(..., description="add, subtract, multiply, divide")
     a: float = Field(..., description="First number")
     b: float = Field(..., description="Second number")
 
+
 class CalculatorTool(BaseTool):
     @property
     def name(self) -> str:
         return "CalculatorTool"
-        
+
     @property
     def description(self) -> str:
         return "Performs basic mathematical operations."
-        
+
     @property
     def category(self) -> str:
         return "internal"
@@ -28,7 +30,7 @@ class CalculatorTool(BaseTool):
         op = params.get("operation")
         a = params.get("a")
         b = params.get("b")
-        
+
         if op == "add":
             return {"result": a + b}
         elif op == "subtract":

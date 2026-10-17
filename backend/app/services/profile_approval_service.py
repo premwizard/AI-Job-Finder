@@ -23,7 +23,7 @@ from app.models.models import (
 
 class MergeApprovedItem(BaseModel):
     category: str  # "personal_info", "summary", "skills", "experience", "education", "projects", "certifications", "languages"
-    action: str    # "accept", "edit"
+    action: str  # "accept", "edit"
     value: Dict[str, Any]
 
 
@@ -38,7 +38,9 @@ class ProfileApprovalService:
     def __init__(self, db: Session):
         self.db = db
 
-    def apply_approved_merge(self, user_id: str, request: ApproveMergeRequest) -> Dict[str, Any]:
+    def apply_approved_merge(
+        self, user_id: str, request: ApproveMergeRequest
+    ) -> Dict[str, Any]:
         """Apply approved merge items into user profile inside an atomic transaction block."""
         resume = (
             self.db.query(Resume)
@@ -52,7 +54,11 @@ class ProfileApprovalService:
 
         # Atomic Transaction Block
         try:
-            profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+            profile = (
+                self.db.query(UserProfile)
+                .filter(UserProfile.user_id == user_id)
+                .first()
+            )
             if not profile:
                 profile = UserProfile(user_id=user_id)
                 self.db.add(profile)
@@ -62,7 +68,14 @@ class ProfileApprovalService:
                 cat = item.category.lower()
                 val = item.value or {}
 
-                if cat in ("personal_info", "personal", "summary", "name", "headline", "location"):
+                if cat in (
+                    "personal_info",
+                    "personal",
+                    "summary",
+                    "name",
+                    "headline",
+                    "location",
+                ):
                     if "summary" in val and val["summary"]:
                         profile.professional_summary = val["summary"]
                     if "phone" in val and val["phone"]:
@@ -76,7 +89,9 @@ class ProfileApprovalService:
                     if "bio" in val and val["bio"]:
                         profile.bio = val["bio"]
                     if "full_name" in val and val["full_name"]:
-                        user_obj = self.db.query(User).filter(User.id == user_id).first()
+                        user_obj = (
+                            self.db.query(User).filter(User.id == user_id).first()
+                        )
                         if user_obj:
                             parts = str(val["full_name"]).strip().split(" ", 1)
                             user_obj.first_name = parts[0]
@@ -91,12 +106,17 @@ class ProfileApprovalService:
                     merged_count += 1
 
                 elif cat == "skills":
-                    skill_name = (val.get("name") or val.get("skill_name") or "").strip()
+                    skill_name = (
+                        val.get("name") or val.get("skill_name") or ""
+                    ).strip()
                     if skill_name:
                         # Check duplicate
                         existing = (
                             self.db.query(Skill)
-                            .filter(Skill.user_id == user_id, Skill.skill_name.ilike(skill_name))
+                            .filter(
+                                Skill.user_id == user_id,
+                                Skill.skill_name.ilike(skill_name),
+                            )
                             .first()
                         )
                         if not existing:
@@ -104,15 +124,27 @@ class ProfileApprovalService:
                                 user_id=user_id,
                                 skill_name=skill_name,
                                 category=val.get("category"),
-                                level=val.get("proficiency_level") or val.get("level") or "Intermediate",
+                                level=val.get("proficiency_level")
+                                or val.get("level")
+                                or "Intermediate",
                             )
                             self.db.add(new_sk)
                             merged_count += 1
 
                 elif cat in ("experience", "work_experience", "experiences"):
-                    job_title = (val.get("job_title") or val.get("role") or val.get("title") or "").strip()
-                    company = (val.get("company") or val.get("company_name") or val.get("organization") or "").strip()
-                    
+                    job_title = (
+                        val.get("job_title")
+                        or val.get("role")
+                        or val.get("title")
+                        or ""
+                    ).strip()
+                    company = (
+                        val.get("company")
+                        or val.get("company_name")
+                        or val.get("organization")
+                        or ""
+                    ).strip()
+
                     if not job_title and not company and val.get("name"):
                         parts = str(val.get("name")).split(" at ")
                         job_title = parts[0].strip()
@@ -150,20 +182,26 @@ class ProfileApprovalService:
 
                 elif cat == "education":
                     degree = (val.get("degree") or "").strip()
-                    institution = (val.get("institution") or val.get("institution_name") or "").strip()
+                    institution = (
+                        val.get("institution") or val.get("institution_name") or ""
+                    ).strip()
                     if degree or institution:
                         existing = (
                             self.db.query(Education)
                             .filter(
                                 Education.user_id == user_id,
                                 Education.degree.ilike(degree or "Degree"),
-                                Education.institution_name.ilike(institution or "Institution"),
+                                Education.institution_name.ilike(
+                                    institution or "Institution"
+                                ),
                             )
                             .first()
                         )
                         if existing:
                             if val.get("field_of_study") or val.get("major"):
-                                existing.major = val.get("field_of_study") or val.get("major")
+                                existing.major = val.get("field_of_study") or val.get(
+                                    "major"
+                                )
                             if val.get("gpa") or val.get("cgpa"):
                                 existing.cgpa = val.get("gpa") or val.get("cgpa")
                         else:
@@ -178,56 +216,82 @@ class ProfileApprovalService:
                             merged_count += 1
 
                 elif cat in ("projects", "project"):
-                    title = (val.get("title") or val.get("name") or val.get("project_name") or "").strip()
+                    title = (
+                        val.get("title")
+                        or val.get("name")
+                        or val.get("project_name")
+                        or ""
+                    ).strip()
                     if not title and val.get("title"):
                         title = str(val.get("title"))
                     if title:
                         existing = (
                             self.db.query(Project)
-                            .filter(Project.user_id == user_id, Project.name.ilike(title))
+                            .filter(
+                                Project.user_id == user_id, Project.name.ilike(title)
+                            )
                             .first()
                         )
                         tech = val.get("technologies") or val.get("tech_stack")
-                        tech_str = ", ".join(tech) if isinstance(tech, list) else (tech or "")
+                        tech_str = (
+                            ", ".join(tech) if isinstance(tech, list) else (tech or "")
+                        )
                         if existing:
                             if val.get("description") or val.get("short_description"):
-                                existing.description = val.get("description") or val.get("short_description")
+                                existing.description = val.get(
+                                    "description"
+                                ) or val.get("short_description")
                             if tech_str:
                                 existing.tech_stack = tech_str
                         else:
                             new_proj = Project(
                                 user_id=user_id,
                                 name=title,
-                                description=val.get("description") or val.get("short_description"),
+                                description=val.get("description")
+                                or val.get("short_description"),
                                 tech_stack=tech_str,
                                 github_url=val.get("repo_url") or val.get("github_url"),
-                                live_demo_url=val.get("project_url") or val.get("live_demo_url"),
+                                live_demo_url=val.get("project_url")
+                                or val.get("live_demo_url"),
                             )
                             self.db.add(new_proj)
                             merged_count += 1
 
                 elif cat in ("certifications", "certification", "certs", "cert"):
-                    name = (val.get("name") or val.get("title") or val.get("certificate_name") or "").strip()
+                    name = (
+                        val.get("name")
+                        or val.get("title")
+                        or val.get("certificate_name")
+                        or ""
+                    ).strip()
                     if not name and val.get("title"):
                         name = str(val.get("title"))
                     if name:
                         existing = (
                             self.db.query(Certification)
-                            .filter(Certification.user_id == user_id, Certification.name.ilike(name))
+                            .filter(
+                                Certification.user_id == user_id,
+                                Certification.name.ilike(name),
+                            )
                             .first()
                         )
                         if existing:
                             if val.get("issuing_organization") or val.get("issuer"):
-                                existing.issuer = val.get("issuing_organization") or val.get("issuer")
+                                existing.issuer = val.get(
+                                    "issuing_organization"
+                                ) or val.get("issuer")
                             if val.get("credential_id"):
                                 existing.credential_id = val.get("credential_id")
                         else:
                             new_cert = Certification(
                                 user_id=user_id,
                                 name=name,
-                                issuer=val.get("issuing_organization") or val.get("issuer") or "Organization",
+                                issuer=val.get("issuing_organization")
+                                or val.get("issuer")
+                                or "Organization",
                                 credential_id=val.get("credential_id"),
-                                verification_url=val.get("credential_url") or val.get("verification_url"),
+                                verification_url=val.get("credential_url")
+                                or val.get("verification_url"),
                                 category=val.get("category"),
                             )
                             self.db.add(new_cert)
@@ -238,7 +302,10 @@ class ProfileApprovalService:
                     if lang_name and profile and profile.id:
                         existing = (
                             self.db.query(Language)
-                            .filter(Language.user_id == user_id, Language.name.ilike(lang_name))
+                            .filter(
+                                Language.user_id == user_id,
+                                Language.name.ilike(lang_name),
+                            )
                             .first()
                         )
                         if not existing:
@@ -275,7 +342,7 @@ class ProfileApprovalService:
             if not val:
                 return ""
             # Strip all non-alphanumeric characters for a robust duplicate check
-            return re.sub(r'[^a-zA-Z0-9]', '', str(val)).lower()
+            return re.sub(r"[^a-zA-Z0-9]", "", str(val)).lower()
 
         # 1. Deduplicate Skills
         skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
@@ -318,7 +385,9 @@ class ProfileApprovalService:
                 seen_projs.add(norm)
 
         # 5. Deduplicate Certifications
-        certs = self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        certs = (
+            self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        )
         seen_certs = set()
         for c in certs:
             norm = _norm(c.name)

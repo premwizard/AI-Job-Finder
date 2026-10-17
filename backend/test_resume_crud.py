@@ -2,6 +2,7 @@
 Automated CRUD Test — Phase 2 Module 10: Resume Center
 Tests: Upload, List, Replace, Delete, Version Tracking, is_active promotion.
 """
+
 import sys
 import os
 import uuid
@@ -17,7 +18,16 @@ from app.services.profile_service import ProfileService
 
 
 def make_fake_upload(filename: str, content: bytes = b"%PDF-1.4 fake resume content"):
-    """Create a mock UploadFile-like object for testing."""
+    """Create a mock UploadFile-like object for testing file ingestion.
+
+    Args:
+        filename: Name of the mock resume file.
+        content: Binary content of the resume file.
+
+    Returns:
+        FakeUploadFile instance mimicking FastAPI upload stream.
+    """
+
     class FakeUploadFile:
         def __init__(self, filename, content):
             self.filename = filename
@@ -29,7 +39,12 @@ def make_fake_upload(filename: str, content: bytes = b"%PDF-1.4 fake resume cont
     return FakeUploadFile(filename, content)
 
 
-def test_resume_center_crud():
+def test_resume_center_crud() -> None:
+    """Validate CRUD lifecycle and version management for user resumes.
+
+    Tests upload, list, replace, delete, version tracking, and active resume
+    flag promotion in the database.
+    """
     print("--- Starting Resume Center CRUD Test ---")
 
     # Ensure tables exist
@@ -53,7 +68,12 @@ def test_resume_center_crud():
 
         # Create dummy test user
         dummy_email = f"test_resume_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Resume", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Resume",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -69,8 +89,10 @@ def test_resume_center_crud():
         assert uploaded_v1.file_type == "PDF"
         assert uploaded_v1.file_size > 0
         assert uploaded_v1.parsing_status == "Ready"
-        print(f"[SUCCESS] UPLOAD v1 — ID: {uploaded_v1.id}, version: {uploaded_v1.version}, "
-              f"size: {uploaded_v1.file_size}B, type: {uploaded_v1.file_type}")
+        print(
+            f"[SUCCESS] UPLOAD v1 — ID: {uploaded_v1.id}, version: {uploaded_v1.version}, "
+            f"size: {uploaded_v1.file_size}B, type: {uploaded_v1.file_type}"
+        )
 
         # ── 2. READ — list resumes ──────────────────────────────────────────
         resumes = service.get_resumes(user_id)
@@ -89,15 +111,21 @@ def test_resume_center_crud():
         assert len(resumes) == 2
         v1_record = next(r for r in resumes if r.id == uploaded_v1.id)
         assert v1_record.is_active is False
-        print(f"[SUCCESS] UPLOAD v2 — version: {uploaded_v2.version}, v1 is_active: {v1_record.is_active}")
+        print(
+            f"[SUCCESS] UPLOAD v2 — version: {uploaded_v2.version}, v1 is_active: {v1_record.is_active}"
+        )
 
         # ── 4. REPLACE — replace v2 with a new file (same version, new file) ──
-        fake_replace = make_fake_upload("my_resume_v2_updated.docx", b"PK\x03\x04" + b"z" * 512)
+        fake_replace = make_fake_upload(
+            "my_resume_v2_updated.docx", b"PK\x03\x04" + b"z" * 512
+        )
         replaced = service.replace_resume(user_id, uploaded_v2.id, fake_replace)
         assert replaced.version == 2
         assert replaced.file_type == "DOCX"
         assert replaced.file_name == "my_resume_v2_updated.docx"
-        print(f"[SUCCESS] REPLACE — same version {replaced.version}, new file type: {replaced.file_type}")
+        print(
+            f"[SUCCESS] REPLACE — same version {replaced.version}, new file type: {replaced.file_type}"
+        )
 
         # ── 5. DELETE v2 — v1 should be promoted to active ────────────────
         deleted = service.delete_resume(user_id, uploaded_v2.id)

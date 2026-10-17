@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 18: Notification Settings
 Tests: GET (empty/default), PUT (create/update toggles, channels, frequency, quiet hours), GET (verify persistence).
 """
+
 import sys
 import os
 import uuid
@@ -14,7 +15,12 @@ from app.schemas.profile_schemas import NotificationSettingUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_notification_settings_crud():
+def test_notification_settings_crud() -> None:
+    """Validate CRUD operations and preference toggles for notification settings.
+
+    Verifies retrieval of default notification flags, update of channel configurations
+    (email, push, in-app), quiet hours scheduling, and setting persistence.
+    """
     print("--- Starting Notification Settings CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -25,7 +31,12 @@ def test_notification_settings_crud():
 
         # Create test user
         dummy_email = f"test_notif_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Notif", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Notif",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -36,7 +47,9 @@ def test_notification_settings_crud():
         empty_settings = service.get_notification_settings(user_id)
         assert empty_settings is not None
         assert empty_settings.job_matches is None or empty_settings.job_matches is True
-        print("[SUCCESS] GET empty/default notification settings — returned expected response")
+        print(
+            "[SUCCESS] GET empty/default notification settings — returned expected response"
+        )
 
         # ── 2. PUT — create initial notification settings ─────────────────
         create_data = NotificationSettingUpdate(
@@ -64,13 +77,17 @@ def test_notification_settings_crud():
         assert created.quiet_hours_enabled is True
         assert created.quiet_hours_start == "23:00"
         assert created.quiet_hours_end == "07:00"
-        print(f"[SUCCESS] PUT create — freq: {created.notification_frequency}, quiet: {created.quiet_hours_start}-{created.quiet_hours_end}")
+        print(
+            f"[SUCCESS] PUT create — freq: {created.notification_frequency}, quiet: {created.quiet_hours_start}-{created.quiet_hours_end}"
+        )
 
         # ── 3. GET — verify persisted settings ────────────────────────────
         fetched = service.get_notification_settings(user_id)
         assert fetched.job_matches is True
         assert fetched.quiet_hours_start == "23:00"
-        print(f"[SUCCESS] GET after create — quiet_hours_end: {fetched.quiet_hours_end}")
+        print(
+            f"[SUCCESS] GET after create — quiet_hours_end: {fetched.quiet_hours_end}"
+        )
 
         # ── 4. PUT — partial update (toggle all types off) ─────────────────
         update_data = NotificationSettingUpdate(
@@ -93,7 +110,11 @@ def test_notification_settings_crud():
         print("[SUCCESS] PUT update — select all off verified, channels preserved")
 
         # Cleanup
-        setting_record = db.query(NotificationSetting).filter(NotificationSetting.user_id == user_id).first()
+        setting_record = (
+            db.query(NotificationSetting)
+            .filter(NotificationSetting.user_id == user_id)
+            .first()
+        )
         if setting_record:
             db.delete(setting_record)
         db.delete(user)

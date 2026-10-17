@@ -1,6 +1,7 @@
 from typing import Callable, Any, Dict, List
 import asyncio
 
+
 class EventBus:
     def __init__(self):
         self._subscribers: Dict[str, List[Callable]] = {}
@@ -17,6 +18,7 @@ class EventBus:
                     asyncio.create_task(callback(data))
                 else:
                     callback(data)
+
 
 # Global internal event bus
 event_bus = EventBus()

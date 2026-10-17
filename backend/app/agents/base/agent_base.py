@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
+
 class BaseAgent(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
         pass
-        
+
     @property
     @abstractmethod
     def capabilities(self) -> list:
@@ -25,7 +26,7 @@ class BaseAgent(ABC):
         pass
 
     @abstractmethod
-    def execute(self, shared_context: 'SharedContext', message: 'Message') -> 'Message':
+    def execute(self, shared_context: "SharedContext", message: "Message") -> "Message":
         pass
 
     @abstractmethod

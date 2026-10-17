@@ -6,7 +6,15 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.middleware.auth_middleware import get_current_user
-from app.models.models import Certification, Education, Experience, Project, Resume, Skill, User
+from app.models.models import (
+    Certification,
+    Education,
+    Experience,
+    Project,
+    Resume,
+    Skill,
+    User,
+)
 from app.schemas import profile_schemas
 from app.services.profile_service import ProfileService
 from app.services.profile_approval_service import ApproveMergeRequest
@@ -67,12 +75,14 @@ def get_personal_info(
 ):
     return service.get_personal_info(current_user.id)
 
+
 @router.delete("/avatar", status_code=status.HTTP_204_NO_CONTENT)
 def delete_avatar(
     service: ProfileService = Depends(get_profile_service),
     current_user: User = Depends(get_current_user),
 ):
     service.delete_avatar(current_user.id)
+
 
 @router.put("/personal", response_model=profile_schemas.PersonalInfoResponse)
 def update_personal_info(
@@ -82,6 +92,7 @@ def update_personal_info(
 ):
     return service.update_personal_info(current_user.id, req)
 
+
 # --- Professional Information (New Module) ---
 @router.get("/professional", response_model=profile_schemas.ProfessionalInfoResponse)
 def get_professional_info(
@@ -89,6 +100,7 @@ def get_professional_info(
     current_user: User = Depends(get_current_user),
 ):
     return service.get_professional_info(current_user.id)
+
 
 @router.put("/professional", response_model=profile_schemas.ProfessionalInfoResponse)
 def update_professional_info(
@@ -171,6 +183,7 @@ def get_skills(
 ):
     return service.get_skills(current_user.id)
 
+
 @router.post(
     "/skills",
     response_model=profile_schemas.SkillResponse,
@@ -202,6 +215,7 @@ def delete_skill(
 ):
     service._delete_item(Skill, item_id, current_user.id)
 
+
 # --- Experience ---
 @router.get("/experience", response_model=list[profile_schemas.ExperienceResponse])
 def get_experiences(
@@ -209,6 +223,7 @@ def get_experiences(
     current_user: User = Depends(get_current_user),
 ):
     return service.get_experiences(current_user.id)
+
 
 @router.post(
     "/experience",
@@ -298,7 +313,6 @@ def delete_education(
     service._delete_item(Education, item_id, current_user.id)
 
 
-
 # --- Certifications ---
 @router.get(
     "/certifications",
@@ -355,7 +369,6 @@ def delete_certification(
     current_user: User = Depends(get_current_user),
 ):
     service._delete_item(Certification, item_id, current_user.id)
-
 
 
 # --- Projects ---
@@ -527,6 +540,7 @@ def get_resume_parsed_data(
     if target.parsed_data_json:
         try:
             import json
+
             parsed_json = json.loads(target.parsed_data_json)
         except Exception:
             pass
@@ -561,7 +575,7 @@ def download_resume_file(
     return FileResponse(
         path=target.file_path,
         filename=target.file_name or os.path.basename(target.file_path),
-        media_type="application/octet-stream"
+        media_type="application/octet-stream",
     )
 
 
@@ -785,38 +799,46 @@ from app.services.ats_analysis_service import ATSAnalysisService
 from app.models.models import ATSAnalysisHistory
 import json
 
+
 @router.post("/resume/{resume_id}/ats-analyze")
 def analyze_resume_ats(
     resume_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
+
     target_text = resume.clean_text or resume.raw_text or ""
     if not target_text:
         raise HTTPException(status_code=400, detail="Resume has no parseable text")
-        
+
     # Run analysis
     result = ATSAnalysisService.analyze_resume(target_text)
-    
+
     # Save JSON to resume
     resume.ats_analysis_json = result.model_dump_json()
-    
+
     # Save History
     history_entry = ATSAnalysisHistory(
         user_id=current_user.id,
         resume_id=resume.id,
         overall_score=result.overall_score,
-        category_scores_json=json.dumps({k: v.model_dump() for k, v in result.category_scores.items()}),
-        full_analysis_json=result.model_dump_json()
+        category_scores_json=json.dumps(
+            {k: v.model_dump() for k, v in result.category_scores.items()}
+        ),
+        full_analysis_json=result.model_dump_json(),
     )
     db.add(history_entry)
     db.commit()
-    
+
     return result
+
 
 @router.get("/resume/{resume_id}/ats-history")
 def get_ats_history(
@@ -824,11 +846,20 @@ def get_ats_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
-    history = db.query(ATSAnalysisHistory).filter(ATSAnalysisHistory.resume_id == resume_id).order_by(ATSAnalysisHistory.analyzed_at.desc()).all()
+
+    history = (
+        db.query(ATSAnalysisHistory)
+        .filter(ATSAnalysisHistory.resume_id == resume_id)
+        .order_by(ATSAnalysisHistory.analyzed_at.desc())
+        .all()
+    )
     return history
 
 
@@ -836,37 +867,44 @@ def get_ats_history(
 from app.services.quality_analysis_service import QualityAnalysisService
 from app.models.models import QualityAnalysisHistory
 
+
 @router.post("/resume/{resume_id}/quality-analyze")
 def analyze_resume_quality(
     resume_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
+
     target_text = resume.clean_text or resume.raw_text or ""
     if not target_text:
         raise HTTPException(status_code=400, detail="Resume has no parseable text")
-        
+
     # Run analysis
     result = QualityAnalysisService.analyze_resume_quality(target_text)
-    
+
     # Save JSON to resume
     resume.quality_analysis_json = result.model_dump_json()
-    
+
     # Save History
     history_entry = QualityAnalysisHistory(
         user_id=current_user.id,
         resume_id=resume.id,
         overall_score=result.overall_score,
-        category_scores_json=json.dumps({k: v.model_dump() for k, v in result.category_scores.items()}),
-        full_analysis_json=result.model_dump_json()
+        category_scores_json=json.dumps(
+            {k: v.model_dump() for k, v in result.category_scores.items()}
+        ),
+        full_analysis_json=result.model_dump_json(),
     )
     db.add(history_entry)
     db.commit()
-    
+
     return result
 
 
@@ -876,11 +914,20 @@ def get_quality_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
-    history = db.query(QualityAnalysisHistory).filter(QualityAnalysisHistory.resume_id == resume_id).order_by(QualityAnalysisHistory.analyzed_at.desc()).all()
+
+    history = (
+        db.query(QualityAnalysisHistory)
+        .filter(QualityAnalysisHistory.resume_id == resume_id)
+        .order_by(QualityAnalysisHistory.analyzed_at.desc())
+        .all()
+    )
     return history
 
 
@@ -889,9 +936,11 @@ from app.services.improvement_engine_service import ImprovementEngineService
 from app.models.models import ResumeImprovementSuggestion
 from pydantic import BaseModel
 
+
 class ResolveImprovementRequest(BaseModel):
-    action: str # "ACCEPT", "REJECT", "EDIT"
+    action: str  # "ACCEPT", "REJECT", "EDIT"
     edited_text: str = None
+
 
 @router.post("/resume/{resume_id}/improvements/generate")
 def generate_resume_improvements(
@@ -899,24 +948,32 @@ def generate_resume_improvements(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
+
     parsed_json = resume.parsed_data_json
     if not parsed_json:
         raise HTTPException(status_code=400, detail="Resume must be parsed first")
-        
+
     suggestions = ImprovementEngineService.generate_improvements(parsed_json)
-    
+
     # Save suggestions to DB
     for s in suggestions:
         # Check if already exists exactly
-        existing = db.query(ResumeImprovementSuggestion).filter(
-            ResumeImprovementSuggestion.resume_id == resume.id,
-            ResumeImprovementSuggestion.original_text == s.original_text,
-            ResumeImprovementSuggestion.status == "PENDING"
-        ).first()
+        existing = (
+            db.query(ResumeImprovementSuggestion)
+            .filter(
+                ResumeImprovementSuggestion.resume_id == resume.id,
+                ResumeImprovementSuggestion.original_text == s.original_text,
+                ResumeImprovementSuggestion.status == "PENDING",
+            )
+            .first()
+        )
         if not existing:
             new_sugg = ResumeImprovementSuggestion(
                 user_id=current_user.id,
@@ -925,10 +982,10 @@ def generate_resume_improvements(
                 original_text=s.original_text,
                 suggested_text=s.suggested_text,
                 improvement_type=s.improvement_type,
-                reason=s.reason
+                reason=s.reason,
             )
             db.add(new_sugg)
-            
+
     db.commit()
     return {"message": "Improvements generated successfully"}
 
@@ -939,11 +996,20 @@ def get_resume_improvements(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
-    suggestions = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.resume_id == resume_id).order_by(ResumeImprovementSuggestion.created_at.desc()).all()
+
+    suggestions = (
+        db.query(ResumeImprovementSuggestion)
+        .filter(ResumeImprovementSuggestion.resume_id == resume_id)
+        .order_by(ResumeImprovementSuggestion.created_at.desc())
+        .all()
+    )
     return suggestions
 
 
@@ -955,36 +1021,57 @@ def resolve_resume_improvement(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
-    suggestion = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.id == suggestion_id, ResumeImprovementSuggestion.resume_id == resume_id).first()
-    
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
+    suggestion = (
+        db.query(ResumeImprovementSuggestion)
+        .filter(
+            ResumeImprovementSuggestion.id == suggestion_id,
+            ResumeImprovementSuggestion.resume_id == resume_id,
+        )
+        .first()
+    )
+
     if not resume or not suggestion:
         raise HTTPException(status_code=404, detail="Not found")
-        
+
     if req.action in ["ACCEPT", "EDIT"]:
-        final_text = req.edited_text if req.action == "EDIT" else suggestion.suggested_text
-        
+        final_text = (
+            req.edited_text if req.action == "EDIT" else suggestion.suggested_text
+        )
+
         # Apply to resume JSON via string replacement
-        if resume.parsed_data_json and suggestion.original_text in resume.parsed_data_json:
-            resume.parsed_data_json = resume.parsed_data_json.replace(suggestion.original_text, final_text)
-            
+        if (
+            resume.parsed_data_json
+            and suggestion.original_text in resume.parsed_data_json
+        ):
+            resume.parsed_data_json = resume.parsed_data_json.replace(
+                suggestion.original_text, final_text
+            )
+
             # Note: Also attempt to replace in raw/clean text to keep them somewhat in sync
             if resume.clean_text:
-                resume.clean_text = resume.clean_text.replace(suggestion.original_text, final_text)
-            
+                resume.clean_text = resume.clean_text.replace(
+                    suggestion.original_text, final_text
+                )
+
     suggestion.status = req.action
     suggestion.resolved_at = datetime.utcnow()
-    
+
     if req.action in ["ACCEPT", "EDIT"]:
         from app.services.version_service import VersionService
+
         VersionService.create_snapshot(
             resume=resume,
             change_summary=f"Applied AI Improvement (Section: {suggestion.section})",
-            db=db
+            db=db,
         )
-        
+
     db.commit()
-    
+
     return {"message": f"Suggestion {req.action.lower()}ed successfully"}
 
 
@@ -994,31 +1081,50 @@ def apply_all_resume_improvements(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    resume = db.query(Resume).filter(Resume.id == resume_id, Resume.user_id == current_user.id).first()
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id, Resume.user_id == current_user.id)
+        .first()
+    )
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
-        
-    pending = db.query(ResumeImprovementSuggestion).filter(ResumeImprovementSuggestion.resume_id == resume_id, ResumeImprovementSuggestion.status == "PENDING").all()
-    
+
+    pending = (
+        db.query(ResumeImprovementSuggestion)
+        .filter(
+            ResumeImprovementSuggestion.resume_id == resume_id,
+            ResumeImprovementSuggestion.status == "PENDING",
+        )
+        .all()
+    )
+
     applied = 0
     for suggestion in pending:
-        if resume.parsed_data_json and suggestion.original_text in resume.parsed_data_json:
-            resume.parsed_data_json = resume.parsed_data_json.replace(suggestion.original_text, suggestion.suggested_text)
+        if (
+            resume.parsed_data_json
+            and suggestion.original_text in resume.parsed_data_json
+        ):
+            resume.parsed_data_json = resume.parsed_data_json.replace(
+                suggestion.original_text, suggestion.suggested_text
+            )
             if resume.clean_text:
-                resume.clean_text = resume.clean_text.replace(suggestion.original_text, suggestion.suggested_text)
-            
+                resume.clean_text = resume.clean_text.replace(
+                    suggestion.original_text, suggestion.suggested_text
+                )
+
             suggestion.status = "ACCEPTED"
             suggestion.resolved_at = datetime.utcnow()
             applied += 1
-            
+
     if applied > 0:
         from app.services.version_service import VersionService
+
         VersionService.create_snapshot(
             resume=resume,
             change_summary=f"Applied {applied} AI Improvements in bulk",
-            db=db
+            db=db,
         )
-            
+
     db.commit()
     return {"message": f"Applied {applied} suggestions successfully"}
 
@@ -1029,6 +1135,6 @@ def get_resume_analytics(
     current_user: User = Depends(get_current_user),
 ):
     from app.services.resume_analytics_service import ResumeAnalyticsService
+
     service = ResumeAnalyticsService(db)
     return service.get_resume_analytics(current_user.id)
-

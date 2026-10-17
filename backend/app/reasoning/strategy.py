@@ -12,10 +12,10 @@ class ExecutionStrategy:
                 if t.status == "pending":
                     return [t]
             return []
-        
+
         elif strategy == "parallel":
             # In a full implementation, check task.dependencies vs completed tasks.
             # Here we just return all pending for simplicity.
             return [t for t in tasks if t.status == "pending"]
-            
+
         return []

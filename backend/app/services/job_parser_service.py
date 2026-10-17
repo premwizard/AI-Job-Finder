@@ -9,6 +9,7 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+
 class JobParserService:
     def __init__(self, db: Session):
         self.db = db
@@ -31,7 +32,7 @@ class JobParserService:
 
         try:
             raw_response = self.ai_provider.parse_text(JOB_PARSER_PROMPT, text_to_parse)
-            
+
             # Clean possible markdown formatting
             if raw_response.startswith("```json"):
                 raw_response = raw_response.replace("```json\n", "")
@@ -43,10 +44,10 @@ class JobParserService:
                     raw_response = raw_response[:-3]
 
             parsed_json = json.loads(raw_response)
-            
+
             # Validate with Pydantic
             validated_data = JobParsingResponse(**parsed_json)
-            
+
             job.parsed_data_json = validated_data.model_dump_json()
             job.ai_summary = validated_data.ai_summary
             job.confidence_scores_json = validated_data.confidence.model_dump_json()
@@ -55,12 +56,12 @@ class JobParserService:
             job.prompt_version = "v1"
             job.ai_processed = True
             job.parsing_status = "success"
-            
+
             self.db.commit()
             self.db.refresh(job)
-            
+
             return validated_data.model_dump()
-            
+
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse AI JSON response for job {job_id}: {e}")
             job.parsing_status = "failed_json"
@@ -73,27 +74,33 @@ class JobParserService:
             raise e
 
     def parse_all_unprocessed(self):
-        unprocessed_jobs = self.db.query(Job).filter(Job.ai_processed == False).limit(50).all()
+        unprocessed_jobs = (
+            self.db.query(Job).filter(Job.ai_processed == False).limit(50).all()
+        )
         results = {"success": 0, "failed": 0}
-        
+
         for job in unprocessed_jobs:
             try:
                 self.parse_job(job.id)
                 results["success"] += 1
             except Exception:
                 results["failed"] += 1
-                
+
         return results
 
     def get_parsing_statistics(self) -> Dict[str, Any]:
         total = self.db.query(Job).count()
-        processed = self.db.query(Job).filter(Job.ai_processed == True, Job.parsing_status == "success").count()
+        processed = (
+            self.db.query(Job)
+            .filter(Job.ai_processed == True, Job.parsing_status == "success")
+            .count()
+        )
         pending = self.db.query(Job).filter(Job.ai_processed == False).count()
         failed = self.db.query(Job).filter(Job.parsing_status.like("failed%")).count()
-        
+
         return {
             "total_jobs": total,
             "processed_jobs": processed,
             "pending_jobs": pending,
-            "failed_jobs": failed
+            "failed_jobs": failed,
         }

@@ -3,6 +3,7 @@ import os
 import google.generativeai as genai
 from typing import Dict, Any
 
+
 class OptimizerEngine:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -11,7 +12,9 @@ class OptimizerEngine:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel("gemini-1.5-pro")
 
-    def generate_suggestions(self, job_context: str, resume_context: str) -> Dict[str, Any]:
+    def generate_suggestions(
+        self, job_context: str, resume_context: str
+    ) -> Dict[str, Any]:
         prompt = f"""
         You are a highly skilled Resume Optimizer. Your task is to analyze the user's current resume against the requirements of a specific target job, and generate actionable, evidence-based suggestions to improve their ATS and semantic match score.
         
@@ -40,7 +43,7 @@ class OptimizerEngine:
             ]
         }}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
@@ -48,7 +51,7 @@ class OptimizerEngine:
                 text = text[7:]
             if text.endswith("```"):
                 text = text[:-3]
-                
+
             parsed = json.loads(text.strip())
             return parsed
         except Exception as e:
@@ -56,5 +59,5 @@ class OptimizerEngine:
             return {
                 "projected_ats_score": 0,
                 "projected_match_score": 0,
-                "suggestions": []
+                "suggestions": [],
             }

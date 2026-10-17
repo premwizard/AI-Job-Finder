@@ -29,11 +29,26 @@ from app.services.ai_resume_parser_service import (
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:
+    """Create an in-memory FastAPI UploadFile instance for testing.
+
+    Args:
+        filename: Name of the mock file to create.
+        content: Binary content payload of the file.
+
+    Returns:
+        UploadFile wrapping the byte stream.
+    """
     file_obj = io.BytesIO(content)
     return UploadFile(filename=filename, file=file_obj)
 
 
-def test_ai_resume_parser():
+def test_ai_resume_parser() -> None:
+    """Validate AI resume parsing engine and structured extraction.
+
+    Tests experienced candidate resumes, fresher/student resumes, minimal inputs,
+    hallucination protection, schema compliance, and isolated DB storage without
+    unauthorized profile mutation.
+    """
     print("--- Starting AI Resume Parser Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -85,7 +100,9 @@ def test_ai_resume_parser():
         assert len(parsed_exp.work_experience) >= 1
         assert len(parsed_exp.education) >= 1
         assert len(parsed_exp.social_links) >= 1
-        print("[SUCCESS] Experienced Candidate Resume parsed into strongly typed schema")
+        print(
+            "[SUCCESS] Experienced Candidate Resume parsed into strongly typed schema"
+        )
 
         # ── 2. Fresher / Student Resume Parsing Test ─────────────────────
         fresher_text = (
@@ -114,7 +131,9 @@ def test_ai_resume_parser():
         assert parsed_inc.education == []
         assert parsed_inc.certifications == []
         assert parsed_inc.patents == []
-        print("[SUCCESS] Incomplete Resume & Hallucination Protection verified (missing sections return empty lists)")
+        print(
+            "[SUCCESS] Incomplete Resume & Hallucination Protection verified (missing sections return empty lists)"
+        )
 
         # ── 4. Large Multi-Page Resume Test ──────────────────────────────
         large_text = (
@@ -137,7 +156,12 @@ def test_ai_resume_parser():
 
         # ── 5. Database Persistence & Isolation Test ─────────────────────
         dummy_email = f"test_parser_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Parser", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Parser",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -149,7 +173,9 @@ def test_ai_resume_parser():
         db.commit()
 
         resume_content = "EMILY DAVIS\nemily@davis.com | (555) 444-3333\nSKILLS: Python, React\nEDUCATION: BS CS | Stanford 2022"
-        upload_file = create_dummy_upload_file("emily_resume.txt", resume_content.encode("utf-8"))
+        upload_file = create_dummy_upload_file(
+            "emily_resume.txt", resume_content.encode("utf-8")
+        )
 
         service = ProfileService(db)
         uploaded_resume = service.upload_resume(user_id, upload_file)
@@ -164,7 +190,9 @@ def test_ai_resume_parser():
         # Verify ISOLATION: user profile headline must NOT be mutated!
         db.refresh(profile)
         assert profile.headline == "Original Headline"
-        print("[SUCCESS] Isolated DB Storage — Output saved in Resume.parsed_data_json without mutating user_profiles table!")
+        print(
+            "[SUCCESS] Isolated DB Storage — Output saved in Resume.parsed_data_json without mutating user_profiles table!"
+        )
 
         # Cleanup
         db.query(Resume).filter(Resume.user_id == user_id).delete()

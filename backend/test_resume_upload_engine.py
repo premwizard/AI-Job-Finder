@@ -12,6 +12,7 @@ Tests:
 - Download resume file
 - Delete resume file
 """
+
 import sys
 import os
 import uuid
@@ -27,11 +28,25 @@ from app.services.profile_service import ProfileService
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:
+    """Create an in-memory FastAPI UploadFile instance for testing.
+
+    Args:
+        filename: Name of the mock file to create.
+        content: Binary content payload of the file.
+
+    Returns:
+        UploadFile wrapping the byte stream.
+    """
     file_obj = io.BytesIO(content)
     return UploadFile(filename=filename, file=file_obj)
 
 
-def test_resume_upload_engine():
+def test_resume_upload_engine() -> None:
+    """Validate resume upload, validation, and storage engine.
+
+    Tests uploading valid files (PDF, PNG, DOCX), auto-versioning, duplicate detection
+    via SHA-256 hash match, size constraints, corrupted headers, and activation toggling.
+    """
     print("--- Starting Resume Upload Engine Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -54,7 +69,12 @@ def test_resume_upload_engine():
 
         # 1. Create test user
         dummy_email = f"test_resume_eng_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Resume", last_name="EngineTester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Resume",
+            last_name="EngineTester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -78,7 +98,9 @@ def test_resume_upload_engine():
         assert res_v1.mime_type == "application/pdf"
         assert res_v1.file_name == "my_resume.pdf"
         assert res_v1.file_hash is not None
-        print(f"[SUCCESS] Uploaded v1 resume: ID={res_v1.id}, version={res_v1.version}, active={res_v1.is_active}")
+        print(
+            f"[SUCCESS] Uploaded v1 resume: ID={res_v1.id}, version={res_v1.version}, active={res_v1.is_active}"
+        )
 
         # 4. Duplicate Detection Test
         dup_file = create_dummy_upload_file("my_resume_copy.pdf", valid_pdf_bytes)
@@ -88,7 +110,9 @@ def test_resume_upload_engine():
         except HTTPException as e:
             assert e.status_code == 400
             assert "Duplicate" in e.detail
-        print("[SUCCESS] Duplicate detection caught identical file hash (400 Duplicate error)")
+        print(
+            "[SUCCESS] Duplicate detection caught identical file hash (400 Duplicate error)"
+        )
 
         # 5. Unsupported Format Test (.exe / .zip)
         exe_file = create_dummy_upload_file("malicious.exe", b"MZexecutable")
@@ -101,7 +125,9 @@ def test_resume_upload_engine():
         print("[SUCCESS] Unsupported format rejected (.exe file)")
 
         # 6. Corrupted File Header Test (File named .pdf but doesn't start with %PDF)
-        corrupted_pdf = create_dummy_upload_file("corrupted.pdf", b"INVALID_HEADER_DATA_12345")
+        corrupted_pdf = create_dummy_upload_file(
+            "corrupted.pdf", b"INVALID_HEADER_DATA_12345"
+        )
         try:
             service.upload_resume(user_id, corrupted_pdf)
             assert False, "Expected 400 Corrupted File Error"
@@ -135,7 +161,9 @@ def test_resume_upload_engine():
         assert len(resumes_after_v2) == 2
         v1_check = next(r for r in resumes_after_v2 if r.id == res_v1.id)
         assert v1_check.is_active is False
-        print(f"[SUCCESS] Uploaded v2 resume: ID={res_v2.id}. Auto-deactivated v1 (v1.is_active={v1_check.is_active})")
+        print(
+            f"[SUCCESS] Uploaded v2 resume: ID={res_v2.id}. Auto-deactivated v1 (v1.is_active={v1_check.is_active})"
+        )
 
         # 9. Replace resume v2 with DOCX file
         valid_docx_bytes = b"PK\x03\x04\x14\x00\x08\x00 valid docx zip content header"
@@ -146,7 +174,9 @@ def test_resume_upload_engine():
         assert replaced_v2.version == 2
         assert replaced_v2.file_type == "DOCX"
         assert replaced_v2.file_name == "updated_resume.docx"
-        print(f"[SUCCESS] Replaced v2 resume with new DOCX file. Kept version={replaced_v2.version}")
+        print(
+            f"[SUCCESS] Replaced v2 resume with new DOCX file. Kept version={replaced_v2.version}"
+        )
 
         # 10. Activate v1 version
         activated_v1 = service.set_active_resume(user_id, res_v1.id)

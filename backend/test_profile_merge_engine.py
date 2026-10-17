@@ -17,10 +17,18 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app.database.database import SessionLocal, engine, Base
 from app.models.models import User, Resume, UserProfile, Skill, Experience
-from app.services.profile_merge_service import ProfileMergeService, MergeSuggestionsResponse
+from app.services.profile_merge_service import (
+    ProfileMergeService,
+    MergeSuggestionsResponse,
+)
 
 
-def test_profile_merge_engine():
+def test_profile_merge_engine() -> None:
+    """Validate profile merge suggestion engine and conflict detection.
+
+    Verifies identification of new skills, duplicates, conflict/update items across
+    experiences and summaries, while ensuring zero unintentional profile database mutations.
+    """
     print("--- Starting Profile Merge Engine Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -29,14 +37,22 @@ def test_profile_merge_engine():
     try:
         # Create test user
         dummy_email = f"test_merge_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Merge", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Merge",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
         user_id = user.id
 
         # Populate initial profile data: Python, FastAPI
-        profile = UserProfile(user_id=user_id, professional_summary="Senior Engineer with Python experience.")
+        profile = UserProfile(
+            user_id=user_id,
+            professional_summary="Senior Engineer with Python experience.",
+        )
         sk1 = Skill(user_id=user_id, skill_name="Python")
         sk2 = Skill(user_id=user_id, skill_name="FastAPI")
         exp1 = Experience(user_id=user_id, role="Backend Lead", company_name="TechCorp")
@@ -54,12 +70,22 @@ def test_profile_merge_engine():
                 {"name": "AWS"},
             ],
             "work_experience": [
-                {"job_title": "Backend Lead", "company": "TechCorp", "start_date": "2020", "end_date": "Present"}, # CONFLICT date
-                {"job_title": "Cloud Architect", "company": "SkyNet", "start_date": "2023", "end_date": "Present"}, # NEW
+                {
+                    "job_title": "Backend Lead",
+                    "company": "TechCorp",
+                    "start_date": "2020",
+                    "end_date": "Present",
+                },  # CONFLICT date
+                {
+                    "job_title": "Cloud Architect",
+                    "company": "SkyNet",
+                    "start_date": "2023",
+                    "end_date": "Present",
+                },  # NEW
             ],
             "education": [
-                {"degree": "B.S. CS", "institution": "Stanford University"}, # NEW
-            ]
+                {"degree": "B.S. CS", "institution": "Stanford University"},  # NEW
+            ],
         }
 
         resume = Resume(
@@ -83,8 +109,16 @@ def test_profile_merge_engine():
         assert suggestions_res.total_suggestions >= 5
 
         # ── 2. Verify Skills Categories ───────────────────────────────────
-        new_skills = [s for s in suggestions_res.suggestions if s.category == "skills" and s.status == "NEW"]
-        dup_skills = [s for s in suggestions_res.suggestions if s.category == "skills" and s.status == "DUPLICATE"]
+        new_skills = [
+            s
+            for s in suggestions_res.suggestions
+            if s.category == "skills" and s.status == "NEW"
+        ]
+        dup_skills = [
+            s
+            for s in suggestions_res.suggestions
+            if s.category == "skills" and s.status == "DUPLICATE"
+        ]
 
         new_skill_names = [s.title for s in new_skills]
         dup_skill_names = [s.title for s in dup_skills]
@@ -93,22 +127,32 @@ def test_profile_merge_engine():
         assert any("AWS" in name for name in new_skill_names)
         assert any("Python" in name for name in dup_skill_names)
         assert any("FastAPI" in name for name in dup_skill_names)
-        print("[SUCCESS] Skill Suggestions: Detected Docker & AWS as NEW, Python & FastAPI as DUPLICATE")
+        print(
+            "[SUCCESS] Skill Suggestions: Detected Docker & AWS as NEW, Python & FastAPI as DUPLICATE"
+        )
 
         # ── 3. Verify Experience Conflict & New Detection ─────────────────
-        exp_suggestions = [s for s in suggestions_res.suggestions if s.category == "experience"]
+        exp_suggestions = [
+            s for s in suggestions_res.suggestions if s.category == "experience"
+        ]
         conflict_exp = [s for s in exp_suggestions if s.status == "CONFLICT"]
         new_exp = [s for s in exp_suggestions if s.status == "NEW"]
 
         assert len(conflict_exp) >= 1  # TechCorp date mismatch (2021 vs 2020)
-        assert len(new_exp) >= 1       # SkyNet
-        print("[SUCCESS] Experience Suggestions: Detected TechCorp date mismatch as CONFLICT and SkyNet as NEW")
+        assert len(new_exp) >= 1  # SkyNet
+        print(
+            "[SUCCESS] Experience Suggestions: Detected TechCorp date mismatch as CONFLICT and SkyNet as NEW"
+        )
 
         # ── 4. Verify Summary Conflict Detection ──────────────────────────
-        sum_suggestions = [s for s in suggestions_res.suggestions if s.category == "summary"]
+        sum_suggestions = [
+            s for s in suggestions_res.suggestions if s.category == "summary"
+        ]
         assert len(sum_suggestions) == 1
         assert sum_suggestions[0].status == "CONFLICT"
-        print("[SUCCESS] Summary Suggestions: Detected summary text mismatch as CONFLICT")
+        print(
+            "[SUCCESS] Summary Suggestions: Detected summary text mismatch as CONFLICT"
+        )
 
         # ── 5. ZERO DB MUTATION ASSERTION ─────────────────────────────────
         # Ensure profile skills count is STILL 2 and experiences count is STILL 1
@@ -116,7 +160,9 @@ def test_profile_merge_engine():
         current_exp = db.query(Experience).filter(Experience.user_id == user_id).all()
         assert len(current_skills) == 2
         assert len(current_exp) == 1
-        print("[SUCCESS] Zero DB Mutation Assertion Verified — Profile tables were NOT updated automatically!")
+        print(
+            "[SUCCESS] Zero DB Mutation Assertion Verified — Profile tables were NOT updated automatically!"
+        )
 
         # Cleanup
         db.query(Resume).filter(Resume.user_id == user_id).delete()

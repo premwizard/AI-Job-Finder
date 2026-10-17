@@ -1,6 +1,7 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class AppSettings(BaseSettings):
     app_name: str = "Crown Atlas API"
     version: str = "1.0.0"
@@ -12,5 +13,6 @@ class AppSettings(BaseSettings):
     database_url: str = os.environ.get("DATABASE_URL", "sqlite:///./sql_app.db")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
 
 settings = AppSettings()

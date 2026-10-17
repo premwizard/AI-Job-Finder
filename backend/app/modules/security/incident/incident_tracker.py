@@ -1,9 +1,11 @@
 from app.modules.security.audit.audit_logger import AuditLogger, AuditEvent
 
+
 class IncidentTracker:
     """
     Tracks and escalates suspicious security activity.
     """
+
     @staticmethod
     def record_failed_login(username: str, ip_address: str):
         """
@@ -13,9 +15,9 @@ class IncidentTracker:
             event_type=AuditEvent.LOGIN_FAILED,
             user_id=username,
             action="Failed login attempt",
-            ip_address=ip_address
+            ip_address=ip_address,
         )
-        
+
     @staticmethod
     def escalate_incident(severity: str, description: str, ip_address: str):
         """
@@ -26,5 +28,5 @@ class IncidentTracker:
             user_id="SYSTEM",
             action=description,
             ip_address=ip_address,
-            metadata={"severity": severity}
+            metadata={"severity": severity},
         )

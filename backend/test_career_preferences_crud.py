@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 11: Career Preferences
 Tests: GET (empty), PUT (create), PUT (update fields), verify new columns.
 """
+
 import sys
 import os
 import uuid
@@ -15,7 +16,13 @@ from app.schemas.profile_schemas import CareerPreferenceUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_career_preferences_crud():
+def test_career_preferences_crud() -> None:
+    """Validate CRUD operations and persistence for career preferences.
+
+    Verifies retrieval of empty/default preferences, initial preference creation,
+    column mutations (roles, industries, countries, cities, salary negotiation),
+    and verified persistence.
+    """
     print("--- Starting Career Preferences CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -40,7 +47,12 @@ def test_career_preferences_crud():
 
         # Create test user
         dummy_email = f"test_career_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Career", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Career",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -80,7 +92,9 @@ def test_career_preferences_crud():
         assert created.startup_or_enterprise == "Startup"
         assert created.negotiable_salary is True
         assert created.willing_to_relocate is True
-        print(f"[SUCCESS] PUT create — roles: {created.preferred_roles}, countries: {created.preferred_countries}")
+        print(
+            f"[SUCCESS] PUT create — roles: {created.preferred_roles}, countries: {created.preferred_countries}"
+        )
 
         # ── 3. GET — verify persisted ──────────────────────────────────────
         fetched = service.get_career_preferences(user_id)
@@ -101,17 +115,27 @@ def test_career_preferences_crud():
         # Unchanged fields should be preserved (upsert semantics)
         assert updated.preferred_countries == "India,USA,Germany"
         assert updated.work_setup == "Remote,Hybrid"
-        print(f"[SUCCESS] PUT update — roles: {updated.preferred_roles}, startup_or_enterprise: {updated.startup_or_enterprise}")
+        print(
+            f"[SUCCESS] PUT update — roles: {updated.preferred_roles}, startup_or_enterprise: {updated.startup_or_enterprise}"
+        )
 
         # ── 5. Verify toggle booleans ──────────────────────────────────────
-        toggle_data = CareerPreferenceUpdate(visa_sponsorship=True, willing_to_relocate=False)
+        toggle_data = CareerPreferenceUpdate(
+            visa_sponsorship=True, willing_to_relocate=False
+        )
         toggled = service.update_career_preferences(user_id, toggle_data)
         assert toggled.visa_sponsorship is True
         assert toggled.willing_to_relocate is False
-        print(f"[SUCCESS] Toggle booleans — visa_sponsorship: {toggled.visa_sponsorship}, relocate: {toggled.willing_to_relocate}")
+        print(
+            f"[SUCCESS] Toggle booleans — visa_sponsorship: {toggled.visa_sponsorship}, relocate: {toggled.willing_to_relocate}"
+        )
 
         # Cleanup
-        pref_record = db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+        pref_record = (
+            db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
         if pref_record:
             db.delete(pref_record)
         db.delete(user)

@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def init_metrics(app: FastAPI):
     """
     Initializes Prometheus metrics for FastAPI.
@@ -20,10 +21,12 @@ def init_metrics(app: FastAPI):
             in_progress_name="http_requests_inprogress",
             in_progress_labels=True,
         )
-        
+
         # Setup and expose
-        instrumentator.instrument(app).expose(app, include_in_schema=False, route_name="metrics")
-        
+        instrumentator.instrument(app).expose(
+            app, include_in_schema=False, route_name="metrics"
+        )
+
         logger.info("Prometheus metrics initialized successfully.")
     except Exception as e:
         logger.error(f"Failed to initialize Prometheus metrics: {e}")

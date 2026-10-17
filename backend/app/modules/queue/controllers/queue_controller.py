@@ -8,16 +8,21 @@ from app.modules.queue.jobs.sample_ai_job import sample_heavy_ai_analysis
 
 router = APIRouter(prefix="/api/jobs", tags=["Jobs & Queue"])
 
+
 class JobRequest(BaseModel):
     document_text: str
+
 
 @router.post("/test-dispatch", status_code=status.HTTP_202_ACCEPTED)
 async def dispatch_test_job(request: JobRequest):
     """
     Test endpoint to dispatch a background job.
     """
-    task = JobDispatcher.dispatch_immediate(sample_heavy_ai_analysis, request.document_text)
+    task = JobDispatcher.dispatch_immediate(
+        sample_heavy_ai_analysis, request.document_text
+    )
     return {"message": "Job dispatched successfully", "task_id": task.id}
+
 
 @router.get("/{task_id}")
 async def get_job_status(task_id: str):
@@ -26,6 +31,7 @@ async def get_job_status(task_id: str):
     """
     status_info = JobDispatcher.get_job_status(task_id, celery_app)
     return status_info
+
 
 @router.get("/statistics/workers")
 async def get_worker_statistics():
@@ -37,5 +43,5 @@ async def get_worker_statistics():
         "active": i.active(),
         "scheduled": i.scheduled(),
         "reserved": i.reserved(),
-        "stats": i.stats()
+        "stats": i.stats(),
     }

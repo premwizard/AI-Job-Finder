@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.models import Job
 from typing import List
 
+
 class SearchStrategy:
     def __init__(self, db: Session):
         self.db = db

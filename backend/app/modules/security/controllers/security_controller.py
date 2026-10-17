@@ -5,11 +5,11 @@ from app.modules.security.incident.incident_tracker import IncidentTracker
 
 router = APIRouter(prefix="/api/security", tags=["Security & Compliance"])
 
+
 @router.get("/health", status_code=status.HTTP_200_OK)
 @limiter.limit("5/minute")
 async def security_health(
-    request: Request,
-    role: Role = Depends(require_role(Role.ADMIN))
+    request: Request, role: Role = Depends(require_role(Role.ADMIN))
 ):
     """
     Diagnostic health check for security components.
@@ -19,8 +19,9 @@ async def security_health(
         "status": "secure",
         "rbac_active": True,
         "rate_limiting_active": True,
-        "role_detected": role.value
+        "role_detected": role.value,
     }
+
 
 @router.post("/trigger-incident", status_code=status.HTTP_201_CREATED)
 async def trigger_test_incident(request: Request):
@@ -28,6 +29,8 @@ async def trigger_test_incident(request: Request):
     Test endpoint to trigger a security incident and verify the audit logs.
     """
     client_ip = request.client.host if request.client else "unknown"
-    IncidentTracker.escalate_incident("HIGH", "Manual test incident triggered", client_ip)
-    
+    IncidentTracker.escalate_incident(
+        "HIGH", "Manual test incident triggered", client_ip
+    )
+
     return {"message": "Incident logged successfully."}

@@ -4,6 +4,7 @@ import google.generativeai as genai
 from typing import Dict, Any
 from app.memory.context_builder import MemoryContextBuilder
 
+
 class DecisionEngine:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -15,7 +16,7 @@ class DecisionEngine:
 
     def make_decision(self, user_id: str, question: str) -> Dict[str, Any]:
         memory_context = self.context_builder.build_context(user_id, question, limit=5)
-        
+
         prompt = f"""
         You are the Cognitive Decision Engine.
         Question: {question}
@@ -33,17 +34,19 @@ class DecisionEngine:
             "alternatives_considered": "What other options were rejected and why"
         }}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
-            if text.startswith("```json"): text = text[7:]
-            if text.endswith("```"): text = text[:-3]
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.endswith("```"):
+                text = text[:-3]
             return json.loads(text.strip())
         except Exception as e:
             print(f"Decision Error: {e}")
             return {
                 "decision": "Unable to compute decision.",
                 "reasoning": str(e),
-                "confidence": 0.0
+                "confidence": 0.0,
             }

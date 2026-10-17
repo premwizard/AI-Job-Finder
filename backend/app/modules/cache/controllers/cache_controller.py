@@ -8,6 +8,7 @@ import time
 
 router = APIRouter(prefix="/api/cache", tags=["Cache Management"])
 
+
 @router.get("/statistics")
 async def get_cache_statistics():
     """
@@ -15,6 +16,7 @@ async def get_cache_statistics():
     """
     stats = await CacheMetrics.get_statistics()
     return stats
+
 
 @router.delete("/flush/{namespace}", status_code=status.HTTP_204_NO_CONTENT)
 async def flush_namespace(namespace: str):
@@ -24,9 +26,11 @@ async def flush_namespace(namespace: str):
     await invalidate_namespace(namespace)
     return None
 
+
 # ==========================================
 # Proof of Concept: Caching demonstration
 # ==========================================
+
 
 @router.get("/test-cached-endpoint")
 @cache(expire=TTLPolicy.SHORT, key_builder=custom_key_builder)
@@ -37,9 +41,9 @@ async def test_cached_endpoint(request: Request):
     Subsequent requests within 5 minutes will return instantly from Redis.
     """
     # Simulate a heavy DB query or external API call
-    time.sleep(2) 
+    time.sleep(2)
     return {
         "message": "This is a heavy computation result",
         "timestamp": time.time(),
-        "cached": "If timestamp doesn't change on reload, caching is working!"
+        "cached": "If timestamp doesn't change on reload, caching is working!",
     }

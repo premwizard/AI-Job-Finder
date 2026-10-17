@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 16: Profile Analytics
 Tests: GET /api/profile/analytics, verifies profile_completion, metrics, breakdown, and readiness score.
 """
+
 import sys
 import os
 import uuid
@@ -13,7 +14,12 @@ from app.models.models import User, Skill, Project, Certification
 from app.services.profile_service import ProfileService
 
 
-def test_profile_analytics():
+def test_profile_analytics() -> None:
+    """Validate profile analytics computation and metrics generation.
+
+    Populates skills, projects, and certifications for a test user and verifies
+    computation of profile completion rate, career readiness score, and section breakdown.
+    """
     print("--- Starting Profile Analytics Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -24,7 +30,12 @@ def test_profile_analytics():
 
         # Create test user
         dummy_email = f"test_analytics_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Analytics", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Analytics",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -37,7 +48,9 @@ def test_profile_analytics():
         s3 = Skill(user_id=user_id, skill_name="FastAPI", category="Backend")
         db.add_all([s1, s2, s3])
 
-        p1 = Project(user_id=user_id, name="Crown Atlas", short_description="Job search platform")
+        p1 = Project(
+            user_id=user_id, name="Crown Atlas", short_description="Job search platform"
+        )
         db.add(p1)
 
         c1 = Certification(user_id=user_id, name="AWS Cloud Practitioner", issuer="AWS")

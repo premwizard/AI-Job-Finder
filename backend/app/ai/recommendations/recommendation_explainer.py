@@ -3,6 +3,7 @@ import os
 import google.generativeai as genai
 from typing import Dict, Any, List
 
+
 class RecommendationExplainer:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -11,13 +12,20 @@ class RecommendationExplainer:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel("gemini-1.5-pro")
 
-    def generate_explanation(self, job_title: str, recommendation_score: float, matched_skills: List[str], missing_skills: List[str], growth_score: float) -> Dict[str, Any]:
+    def generate_explanation(
+        self,
+        job_title: str,
+        recommendation_score: float,
+        matched_skills: List[str],
+        missing_skills: List[str],
+        growth_score: float,
+    ) -> Dict[str, Any]:
         prompt = f"""
         You are an expert AI Career Agent. You are recommending a "{job_title}" role to a candidate.
         
         Recommendation Score: {recommendation_score}/100
-        Matched Skills: {', '.join(matched_skills) if matched_skills else 'None'}
-        Missing Skills: {', '.join(missing_skills) if missing_skills else 'None'}
+        Matched Skills: {", ".join(matched_skills) if matched_skills else "None"}
+        Missing Skills: {", ".join(missing_skills) if missing_skills else "None"}
         Career Growth Potential Score: {growth_score}/100
         
         Provide a concise, human-readable summary of this recommendation in JSON format with exactly three keys:
@@ -27,7 +35,7 @@ class RecommendationExplainer:
         
         Keep it professional, encouraging, and structured. Return ONLY valid JSON, no markdown blocks.
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
@@ -35,16 +43,22 @@ class RecommendationExplainer:
                 text = text[7:]
             if text.endswith("```"):
                 text = text[:-3]
-                
+
             parsed = json.loads(text.strip())
             return {
                 "strengths": parsed.get("strengths", ["Strong semantic match"]),
-                "weaknesses": parsed.get("weaknesses", ["Review specifCrown Atlas requirements"]),
-                "summary": parsed.get("summary", "This job is highly recommended based on your profile.")
+                "weaknesses": parsed.get(
+                    "weaknesses", ["Review specifCrown Atlas requirements"]
+                ),
+                "summary": parsed.get(
+                    "summary", "This job is highly recommended based on your profile."
+                ),
             }
         except Exception:
             return {
                 "strengths": ["✓ Good alignment with your professional background."],
-                "weaknesses": ["Review the job description to identify specific missing skills."],
-                "summary": "We recommend exploring this opportunity."
+                "weaknesses": [
+                    "Review the job description to identify specific missing skills."
+                ],
+                "summary": "We recommend exploring this opportunity.",
             }

@@ -2,10 +2,12 @@ import os
 import hashlib
 import hmac
 
+
 class CryptoUtils:
     """
     Standardized cryptographic utilities.
     """
+
     @staticmethod
     def generate_secure_hash(data: str, salt: str = None) -> str:
         """
@@ -14,11 +16,9 @@ class CryptoUtils:
         """
         if not salt:
             salt = os.environ.get("SECURITY_SALT", "default_insecure_salt")
-        
+
         return hmac.new(
-            salt.encode('utf-8'),
-            data.encode('utf-8'),
-            hashlib.sha256
+            salt.encode("utf-8"), data.encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
     @staticmethod

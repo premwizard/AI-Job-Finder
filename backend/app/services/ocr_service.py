@@ -21,12 +21,14 @@ import cv2
 
 try:
     import pytesseract
+
     PYTESSERACT_AVAILABLE = True
 except ImportError:
     PYTESSERACT_AVAILABLE = False
 
 try:
     from paddleocr import PaddleOCR
+
     PADDLE_AVAILABLE = True
 except ImportError:
     PADDLE_AVAILABLE = False
@@ -47,9 +49,15 @@ class OcrImagePreprocessor:
     def deskew_cv2(cv_img: np.ndarray) -> np.ndarray:
         """Detect text angle and deskew image if rotated."""
         try:
-            gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY) if len(cv_img.shape) == 3 else cv_img
+            gray = (
+                cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+                if len(cv_img.shape) == 3
+                else cv_img
+            )
             # Invert image for minAreaRect text contour analysis
-            thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+            thresh = cv2.threshold(
+                gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+            )[1]
             coords = np.column_stack(np.where(thresh > 0))
             if len(coords) > 0:
                 angle = cv2.minAreaRect(coords)[-1]
@@ -61,7 +69,13 @@ class OcrImagePreprocessor:
                     (h, w) = cv_img.shape[:2]
                     center = (w // 2, h // 2)
                     M = cv2.getRotationMatrix2D(center, angle, 1.0)
-                    cv_img = cv2.warpAffine(cv_img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+                    cv_img = cv2.warpAffine(
+                        cv_img,
+                        M,
+                        (w, h),
+                        flags=cv2.INTER_CUBIC,
+                        borderMode=cv2.BORDER_REPLICATE,
+                    )
         except Exception:
             pass
         return cv_img
@@ -75,7 +89,9 @@ class OcrImagePreprocessor:
         w, h = pil_img.size
         if w < 1200:
             scale = 1200.0 / w
-            pil_img = pil_img.resize((int(w * scale), int(h * scale)), Image.Resampling.BICUBIC)
+            pil_img = pil_img.resize(
+                (int(w * scale), int(h * scale)), Image.Resampling.BICUBIC
+            )
 
         # Convert to OpenCV image format
         cv_img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
@@ -102,7 +118,10 @@ class OcrStructureParser:
             return "EMPTY"
 
         # Bullet point detection
-        if re.match(r"^([\u2022\u2023\u25e6\u2043\u2219\-\*\•\▪\▸]|\d+[\.\)]|[a-zA-Z][\.\)])\s+", t):
+        if re.match(
+            r"^([\u2022\u2023\u25e6\u2043\u2219\-\*\•\▪\▸]|\d+[\.\)]|[a-zA-Z][\.\)])\s+",
+            t,
+        ):
             return "BULLET"
 
         # Table detection (pipe or multi-tab spacing)
@@ -117,7 +136,9 @@ class OcrStructureParser:
         return "PARAGRAPH"
 
     @classmethod
-    def format_structured_text(cls, word_data: List[Dict[str, Any]]) -> Tuple[str, List[Dict[str, Any]], float]:
+    def format_structured_text(
+        cls, word_data: List[Dict[str, Any]]
+    ) -> Tuple[str, List[Dict[str, Any]], float]:
         """
         Group words into lines by Y-coordinate proximity, preserve reading order,
         and calculate average OCR confidence.
@@ -171,17 +192,20 @@ class OcrStructureParser:
                 elif not re.match(r"^\d+[\.\)]", line_str):
                     line_str = "• " + line_str
 
-            structured_blocks.append({
-                "type": line_type,
-                "text": line_str,
-                "confidence": round(sum(w["conf"] for w in line) / len(line), 1),
-            })
+            structured_blocks.append(
+                {
+                    "type": line_type,
+                    "text": line_str,
+                    "confidence": round(sum(w["conf"] for w in line) / len(line), 1),
+                }
+            )
             full_text_lines.append(line_str)
 
         return "\n".join(full_text_lines), structured_blocks, round(avg_confidence, 1)
 
 
 _PADDLE_INSTANCE = None
+
 
 def _get_paddle_instance():
     global _PADDLE_INSTANCE
@@ -197,10 +221,14 @@ class OcrEngineService:
     def __init__(self, preferred_provider: str = "PaddleOCR"):
         self.preferred_provider = preferred_provider
 
-    def _ocr_tesseract(self, pil_img: Image.Image) -> Tuple[str, List[Dict[str, Any]], float]:
+    def _ocr_tesseract(
+        self, pil_img: Image.Image
+    ) -> Tuple[str, List[Dict[str, Any]], float]:
         """Perform OCR using Tesseract OCR engine."""
         if not PYTESSERACT_AVAILABLE:
-            raise Exception("Tesseract OCR is not installed in current python environment.")
+            raise Exception(
+                "Tesseract OCR is not installed in current python environment."
+            )
 
         # Extract word bounding box data and confidence
         data = pytesseract.image_to_data(pil_img, output_type=pytesseract.Output.DICT)
@@ -210,21 +238,25 @@ class OcrEngineService:
             txt = data["text"][i].strip()
             conf = float(data["conf"][i])
             if txt and conf >= 0:
-                word_data.append({
-                    "text": txt,
-                    "conf": conf,
-                    "top": data["top"][i],
-                    "left": data["left"][i],
-                    "width": data["width"][i],
-                    "height": data["height"][i],
-                })
+                word_data.append(
+                    {
+                        "text": txt,
+                        "conf": conf,
+                        "top": data["top"][i],
+                        "left": data["left"][i],
+                        "width": data["width"][i],
+                        "height": data["height"][i],
+                    }
+                )
 
         if not word_data:
             raise Exception("No text detected by Tesseract")
 
         return OcrStructureParser.format_structured_text(word_data)
 
-    def _ocr_paddle(self, pil_img: Image.Image, cv_img: np.ndarray, file_path: str) -> Tuple[str, List[Dict[str, Any]], float]:
+    def _ocr_paddle(
+        self, pil_img: Image.Image, cv_img: np.ndarray, file_path: str
+    ) -> Tuple[str, List[Dict[str, Any]], float]:
         """Perform OCR using PaddleOCR engine with fallback."""
         try:
             paddle = _get_paddle_instance()
@@ -241,14 +273,16 @@ class OcrEngineService:
                     left = min(p[0] for p in box)
                     width = max(p[0] for p in box) - left
                     height = max(p[1] for p in box) - top
-                    word_data.append({
-                        "text": text,
-                        "conf": round(conf * 100.0, 1),
-                        "top": top,
-                        "left": left,
-                        "width": width,
-                        "height": height,
-                    })
+                    word_data.append(
+                        {
+                            "text": text,
+                            "conf": round(conf * 100.0, 1),
+                            "top": top,
+                            "left": left,
+                            "width": width,
+                            "height": height,
+                        }
+                    )
 
             if not word_data:
                 return self._ocr_fallback_extractor(file_path)
@@ -257,7 +291,9 @@ class OcrEngineService:
         except Exception:
             return self._ocr_fallback_extractor(file_path)
 
-    def _ocr_fallback_extractor(self, file_path: str) -> Tuple[str, List[Dict[str, Any]], float]:
+    def _ocr_fallback_extractor(
+        self, file_path: str
+    ) -> Tuple[str, List[Dict[str, Any]], float]:
         """Fallback OCR extractor when external binary drivers are missing or offline."""
         filename = os.path.basename(file_path)
         raw_text = f"RESUME DOCUMENT ({filename})\n\nSUMMARY\nSenior Software Engineer with full-stack experience.\n\nSKILLS\n• Python, JavaScript, React, PostgreSQL, Docker\n\nEXPERIENCE\nSoftware Engineer at Tech Corp | 2021 - Present"
@@ -306,10 +342,14 @@ class OcrEngineService:
         if selected_provider in ("GeminiVision", "ClaudeVision", "GptVision"):
             return {
                 "raw_text": f"[VISION MODEL STUB ({selected_provider}): Vision AI integration ready for future deployment]",
-                "structured_blocks": [{"type": "HEADER", "text": "Vision Model Stub", "confidence": 100.0}],
+                "structured_blocks": [
+                    {"type": "HEADER", "text": "Vision Model Stub", "confidence": 100.0}
+                ],
                 "confidence": 100.0,
                 "is_low_confidence": False,
-                "processing_time_ms": round((time.perf_counter() - start_time) * 1000, 2),
+                "processing_time_ms": round(
+                    (time.perf_counter() - start_time) * 1000, 2
+                ),
                 "provider_used": selected_provider,
                 "warning": None,
             }
@@ -338,11 +378,11 @@ class OcrEngineService:
             warning_msg = f"Low OCR Confidence ({conf}%). Scanned image quality may be low. Consider uploading a higher resolution PDF or image."
 
         return {
-          "raw_text": text,
-          "structured_blocks": blocks,
-          "confidence": conf,
-          "is_low_confidence": is_low,
-          "processing_time_ms": elapsed_ms,
-          "provider_used": provider_used,
-          "warning": warning_msg,
+            "raw_text": text,
+            "structured_blocks": blocks,
+            "confidence": conf,
+            "is_low_confidence": is_low,
+            "processing_time_ms": elapsed_ms,
+            "provider_used": provider_used,
+            "warning": warning_msg,
         }

@@ -9,9 +9,11 @@ class LanguageCreate(BaseModel):
     name: str
     proficiency: str
 
+
 class LanguageUpdate(BaseModel):
     name: Optional[str] = None
     proficiency: Optional[str] = None
+
 
 class LanguageResponse(LanguageCreate):
     id: int
@@ -47,7 +49,7 @@ class PersonalInfoResponse(PersonalInfoUpdate):
     email: Optional[str] = None
     is_verified: Optional[bool] = None
     languages: Optional[Any] = None
-    
+
     class Config:
         from_attributes = True
 
@@ -66,6 +68,7 @@ class ProfessionalSummaryResponse(ProfessionalSummaryUpdate):
     class Config:
         from_attributes = True
 
+
 # --- Professional Information (New Module) ---
 class ProfessionalInfoUpdate(BaseModel):
     # From UserProfile
@@ -80,20 +83,21 @@ class ProfessionalInfoUpdate(BaseModel):
     current_salary_currency: Optional[str] = None
     salary_type: Optional[str] = None
     notice_period: Optional[str] = None
-    
+
     # From CareerPreference
     expected_salary: Optional[str] = None
     expected_joining_bonus: Optional[str] = None
     negotiable_salary: Optional[bool] = None
     preferred_currency: Optional[str] = None
-    employment_types: Optional[str] = None # JSON/CSV
-    work_setup: Optional[str] = None # JSON/CSV
-    preferred_locations: Optional[str] = None # JSON/CSV
+    employment_types: Optional[str] = None  # JSON/CSV
+    work_setup: Optional[str] = None  # JSON/CSV
+    preferred_locations: Optional[str] = None  # JSON/CSV
     preferred_time_zone: Optional[str] = None
     willing_to_relocate: Optional[bool] = None
     relocation_countries: Optional[str] = None
     visa_status: Optional[str] = None
     travel_willingness: Optional[str] = None
+
 
 class ProfessionalInfoResponse(ProfessionalInfoUpdate):
     pass
@@ -242,7 +246,15 @@ class CertificationCreate(BaseModel):
     category: Optional[str] = None
     verification_status: Optional[str] = "unverified"
 
-    @field_validator("issue_date", "expiry_date", "credential_id", "verification_url", "certificate_image_url", "category", mode="before")
+    @field_validator(
+        "issue_date",
+        "expiry_date",
+        "credential_id",
+        "verification_url",
+        "certificate_image_url",
+        "category",
+        mode="before",
+    )
     def empty_str_to_none(cls, v):
         if v == "" or v is None:
             return None
@@ -261,7 +273,15 @@ class CertificationUpdate(BaseModel):
     category: Optional[str] = None
     verification_status: Optional[str] = None
 
-    @field_validator("issue_date", "expiry_date", "credential_id", "verification_url", "certificate_image_url", "category", mode="before")
+    @field_validator(
+        "issue_date",
+        "expiry_date",
+        "credential_id",
+        "verification_url",
+        "certificate_image_url",
+        "category",
+        mode="before",
+    )
     def empty_str_to_none(cls, v):
         if v == "" or v is None:
             return None
@@ -338,22 +358,22 @@ class ProjectResponse(ProjectCreate):
 # --- Career Preferences ---
 class CareerPreferenceUpdate(BaseModel):
     # Roles & Industries
-    preferred_roles: Optional[str] = None           # CSV chips
-    preferred_industries: Optional[str] = None      # CSV chips
+    preferred_roles: Optional[str] = None  # CSV chips
+    preferred_industries: Optional[str] = None  # CSV chips
     # Location
-    preferred_countries: Optional[str] = None       # CSV chips
-    preferred_cities: Optional[str] = None          # CSV chips
-    preferred_locations: Optional[str] = None       # Legacy
+    preferred_countries: Optional[str] = None  # CSV chips
+    preferred_cities: Optional[str] = None  # CSV chips
+    preferred_locations: Optional[str] = None  # Legacy
     # Work Setup
-    work_setup: Optional[str] = None                # CSV: "Remote,Hybrid,Onsite"
+    work_setup: Optional[str] = None  # CSV: "Remote,Hybrid,Onsite"
     # Compensation
     expected_salary: Optional[str] = None
     preferred_currency: Optional[str] = None
     negotiable_salary: Optional[bool] = None
     # Company Preferences
-    employment_types: Optional[str] = None          # CSV
-    company_size: Optional[str] = None              # CSV
-    startup_or_enterprise: Optional[str] = None     # "Startup", "Enterprise", "Any"
+    employment_types: Optional[str] = None  # CSV
+    company_size: Optional[str] = None  # CSV
+    startup_or_enterprise: Optional[str] = None  # "Startup", "Enterprise", "Any"
     # Mobility
     visa_sponsorship: Optional[bool] = None
     willing_to_relocate: Optional[bool] = None
@@ -410,17 +430,17 @@ class SocialProfileResponse(SocialProfileUpdate):
 # --- AI Preferences ---
 class AIPreferenceUpdate(BaseModel):
     # Aspirations
-    dream_companies: Optional[str] = None          # CSV chips
-    dream_roles: Optional[str] = None              # CSV chips
-    dream_technologies: Optional[str] = None       # CSV chips
+    dream_companies: Optional[str] = None  # CSV chips
+    dream_roles: Optional[str] = None  # CSV chips
+    dream_technologies: Optional[str] = None  # CSV chips
     # AI & Learning
-    preferred_ai_domains: Optional[str] = None     # CSV chips
-    learning_goals: Optional[str] = None           # Free text
+    preferred_ai_domains: Optional[str] = None  # CSV chips
+    learning_goals: Optional[str] = None  # Free text
     preferred_learning_resources: Optional[str] = None  # CSV chips
     # Career Goals
     target_salary: Optional[str] = None
-    target_countries: Optional[str] = None         # CSV chips
-    career_objectives: Optional[str] = None        # Free text
+    target_countries: Optional[str] = None  # CSV chips
+    career_objectives: Optional[str] = None  # Free text
     career_growth_priorities: Optional[str] = None  # CSV chips
 
 
@@ -491,24 +511,29 @@ class FullProfileResponse(BaseModel):
     ai_preferences: Optional[AIPreferenceResponse] = None
     resumes: List[ResumeResponse] = []
 
+
 # --- Career Profile Overview ---
 class ProfileStrengthResponse(BaseModel):
     score: int
     category: str
     explanation: str
 
+
 class ProfileCompletionResponse(BaseModel):
     completion_percentage: int
     missing_sections: List[str]
+
 
 class SectionCompletionItem(BaseModel):
     section: str
     completed: bool
     weight: int
 
+
 class RecentUpdateItem(BaseModel):
     section: str
     updated_at: str
+
 
 class ProfileAnalyticsResponse(BaseModel):
     profile_views: Optional[int] = 12
@@ -536,6 +561,7 @@ class ProfileAnalyticsResponse(BaseModel):
 
 class ImageUploadResponse(BaseModel):
     url: str
+
 
 ExperienceResponse.model_rebuild()
 
@@ -665,7 +691,3 @@ class ProfileStrengthResponse(BaseModel):
     score: int = 0
     level: str = "Beginner"
     suggestions: List[str] = []
-
-
-
-

@@ -25,6 +25,7 @@ export interface ResumeDiffViewerProps {
   companyName?: string;
 }
 
+
 export function ResumeDiffViewer({
   originalText,
   tailoredText,

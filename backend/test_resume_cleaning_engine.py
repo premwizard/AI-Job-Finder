@@ -28,11 +28,25 @@ from app.services.resume_cleaning_service import ResumeCleaner
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:
+    """Create an in-memory FastAPI UploadFile instance for testing.
+
+    Args:
+        filename: Name of the mock file to create.
+        content: Binary content payload of the file.
+
+    Returns:
+        UploadFile wrapping the byte stream.
+    """
     file_obj = io.BytesIO(content)
     return UploadFile(filename=filename, file=file_obj)
 
 
-def test_resume_cleaning_engine():
+def test_resume_cleaning_engine() -> None:
+    """Validate resume text cleaning and normalization engine.
+
+    Tests removal of headers/footers/page numbers, duplicate line pruning, bullet
+    standardization, date/email/phone/URL normalizations, and persistence of clean text.
+    """
     print("--- Starting Resume Cleaning Engine Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -54,7 +68,9 @@ def test_resume_cleaning_engine():
 
         # ── 1. Page Number, Header & Footer Removal Test ───────────────────
         raw_header_text = "ALEX JOHNSON\nConfidential\nPage 1 of 3\nSenior Full Stack Developer\n[Page 2]"
-        cleaned_headers = ResumeCleaner.remove_page_numbers_headers_footers(raw_header_text)
+        cleaned_headers = ResumeCleaner.remove_page_numbers_headers_footers(
+            raw_header_text
+        )
         assert "Page 1 of 3" not in cleaned_headers
         assert "Confidential" not in cleaned_headers
         assert "[Page 2]" not in cleaned_headers
@@ -73,7 +89,9 @@ def test_resume_cleaning_engine():
         cleaned_broken = ResumeCleaner.fix_broken_sentences(raw_broken)
         assert "software" in cleaned_broken
         assert "scaleable" in cleaned_broken
-        print("[SUCCESS] Broken hyphenated words stitched ('soft-\\nware' -> 'software')")
+        print(
+            "[SUCCESS] Broken hyphenated words stitched ('soft-\\nware' -> 'software')"
+        )
 
         # ── 4. Bullet Point Standardization Test ───────────────────────────
         raw_bullets = "* Implemented FastAPI backend\n- Built Next.js UI components\n▪ Managed PostgreSQL database"
@@ -84,7 +102,9 @@ def test_resume_cleaning_engine():
         print("[SUCCESS] Bullet points standardized to '• ' format")
 
         # ── 5. Date Normalization Test ──────────────────────────────────────
-        raw_dates = "Experience: 01/2021 - 12/2023 | Software Engineer\n05-2019 to Present"
+        raw_dates = (
+            "Experience: 01/2021 - 12/2023 | Software Engineer\n05-2019 to Present"
+        )
         cleaned_dates = ResumeCleaner.normalize_dates(raw_dates)
         assert "Jan 2021" in cleaned_dates
         assert "Dec 2023" in cleaned_dates
@@ -104,7 +124,12 @@ def test_resume_cleaning_engine():
 
         # ── 7. Full Cleaning Pipeline & DB Persistence Test ────────────────
         dummy_email = f"test_clean_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Cleaner", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Cleaner",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -123,7 +148,9 @@ def test_resume_cleaning_engine():
             "* Developed robust web-\n"
             "site architectures.\n"
         )
-        upload_file = create_dummy_upload_file("uncleaned_resume.txt", uncleaned_resume_text.encode("utf-8"))
+        upload_file = create_dummy_upload_file(
+            "uncleaned_resume.txt", uncleaned_resume_text.encode("utf-8")
+        )
         res = service.upload_resume(user_id, upload_file)
 
         assert res.raw_text is not None
@@ -132,7 +159,9 @@ def test_resume_cleaning_engine():
         assert "alex@techcorp.com" in res.clean_text
         assert "Page 1 of 2" not in res.clean_text
         assert res.clean_text != res.raw_text
-        print(f"[SUCCESS] DB Persistence — Stored raw_text ({len(res.raw_text)} chars) and clean_text ({len(res.clean_text)} chars) separately")
+        print(
+            f"[SUCCESS] DB Persistence — Stored raw_text ({len(res.raw_text)} chars) and clean_text ({len(res.clean_text)} chars) separately"
+        )
 
         # ── 8. Dedicated Service Re-Clean Test ─────────────────────────────
         recleaned = service.clean_resume_text(user_id, res.id)

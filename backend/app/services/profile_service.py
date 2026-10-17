@@ -35,7 +35,9 @@ class ProfileService:
     def __init__(self, db: Session):
         self.db = db
 
-    def calculate_completion_percentage(self, user_id: str) -> profile_schemas.ProfileCompletionResponse:
+    def calculate_completion_percentage(
+        self, user_id: str
+    ) -> profile_schemas.ProfileCompletionResponse:
         score = 0
         total_sections = 11
         missing_sections = []
@@ -120,8 +122,7 @@ class ProfileService:
 
         percentage = int((score / total_sections) * 100)
         return profile_schemas.ProfileCompletionResponse(
-            completion_percentage=percentage,
-            missing_sections=missing_sections
+            completion_percentage=percentage, missing_sections=missing_sections
         )
 
     def get_full_profile(self, user_id: str) -> profile_schemas.FullProfileResponse:
@@ -190,7 +191,9 @@ class ProfileService:
         )
 
         return profile_schemas.FullProfileResponse(
-            completion_percentage=completion_response.get("percentage", 0) if isinstance(completion_response, dict) else getattr(completion_response, "percentage", 0),
+            completion_percentage=completion_response.get("percentage", 0)
+            if isinstance(completion_response, dict)
+            else getattr(completion_response, "percentage", 0),
             personal_info=personal_info,
             professional_summary=prof_summary,
             skills=[profile_schemas.SkillResponse.model_validate(s) for s in skills],
@@ -218,53 +221,61 @@ class ProfileService:
             )
             if social_prof
             else None,
-            ai_preferences=profile_schemas.AIPreferenceResponse.model_validate(
-                ai_pref
-            )
+            ai_preferences=profile_schemas.AIPreferenceResponse.model_validate(ai_pref)
             if ai_pref
             else None,
             resumes=[profile_schemas.ResumeResponse.model_validate(r) for r in resumes],
         )
 
-    def get_profile_strength(self, user_id: str) -> profile_schemas.ProfileStrengthResponse:
+    def get_profile_strength(
+        self, user_id: str
+    ) -> profile_schemas.ProfileStrengthResponse:
         completion_response = self.calculate_completion_percentage(user_id)
         score = completion_response.completion_percentage
-        
+
         if score < 30:
             category = "Beginner"
-            explanation = "Your profile is just getting started. Add more details to stand out."
+            explanation = (
+                "Your profile is just getting started. Add more details to stand out."
+            )
         elif score < 60:
             category = "Intermediate"
             explanation = "You're making good progress. Complete more sections to improve visibility."
         elif score < 85:
             category = "Strong"
-            explanation = "Your profile is looking great and is highly visible to recruiters."
+            explanation = (
+                "Your profile is looking great and is highly visible to recruiters."
+            )
         else:
             category = "Excellent"
-            explanation = "Outstanding! Your profile is fully optimized for top opportunities."
-            
+            explanation = (
+                "Outstanding! Your profile is fully optimized for top opportunities."
+            )
+
         return profile_schemas.ProfileStrengthResponse(
-            score=score,
-            category=category,
-            explanation=explanation
+            score=score, category=category, explanation=explanation
         )
 
     def _save_upload_file(self, file: UploadFile, sub_folder: str) -> str:
         upload_dir = os.path.join("uploads", sub_folder)
         os.makedirs(upload_dir, exist_ok=True)
-        
+
         file_ext = os.path.splitext(file.filename)[1] if file.filename else ".png"
         unique_filename = f"{uuid.uuid4()}{file_ext}"
         file_path = os.path.join(upload_dir, unique_filename)
-        
+
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-            
+
         return f"/uploads/{sub_folder}/{unique_filename}"
 
-    def upload_avatar(self, user_id: str, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+    def upload_avatar(
+        self, user_id: str, file: UploadFile
+    ) -> profile_schemas.ImageUploadResponse:
         url = self._save_upload_file(file, "avatars")
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
@@ -272,9 +283,13 @@ class ProfileService:
         self.db.commit()
         return profile_schemas.ImageUploadResponse(url=url)
 
-    def upload_banner(self, user_id: str, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+    def upload_banner(
+        self, user_id: str, file: UploadFile
+    ) -> profile_schemas.ImageUploadResponse:
         url = self._save_upload_file(file, "banners")
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
@@ -282,7 +297,9 @@ class ProfileService:
         self.db.commit()
         return profile_schemas.ImageUploadResponse(url=url)
 
-    def upload_education_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+    def upload_education_file(
+        self, file: UploadFile
+    ) -> profile_schemas.ImageUploadResponse:
         url = self._save_upload_file(file, "education")
         return profile_schemas.ImageUploadResponse(url=url)
 
@@ -295,11 +312,15 @@ class ProfileService:
         )
         return [profile_schemas.EducationResponse.model_validate(e) for e in educations]
 
-    def upload_certification_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+    def upload_certification_file(
+        self, file: UploadFile
+    ) -> profile_schemas.ImageUploadResponse:
         url = self._save_upload_file(file, "certifications")
         return profile_schemas.ImageUploadResponse(url=url)
 
-    def get_certifications(self, user_id: str) -> List[profile_schemas.CertificationResponse]:
+    def get_certifications(
+        self, user_id: str
+    ) -> List[profile_schemas.CertificationResponse]:
         certs = (
             self.db.query(Certification)
             .filter(Certification.user_id == user_id)
@@ -308,7 +329,9 @@ class ProfileService:
         )
         return [profile_schemas.CertificationResponse.model_validate(c) for c in certs]
 
-    def upload_project_file(self, file: UploadFile) -> profile_schemas.ImageUploadResponse:
+    def upload_project_file(
+        self, file: UploadFile
+    ) -> profile_schemas.ImageUploadResponse:
         url = self._save_upload_file(file, "projects")
         return profile_schemas.ImageUploadResponse(url=url)
 
@@ -348,7 +371,10 @@ class ProfileService:
     SUPPORTED_EXTENSIONS = {
         ".pdf": ("PDF", "application/pdf"),
         ".doc": ("DOC", "application/msword"),
-        ".docx": ("DOCX", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        ".docx": (
+            "DOCX",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ),
         ".txt": ("TXT", "text/plain"),
         ".rtf": ("RTF", "application/rtf"),
         ".png": ("PNG", "image/png"),
@@ -390,17 +416,31 @@ class ProfileService:
         # 2. Header Corruption Check
         header = content[:16]
         if file_ext == ".pdf" and not content.startswith(b"%PDF"):
-            raise HTTPException(status_code=400, detail="Corrupted PDF file (invalid PDF header)")
+            raise HTTPException(
+                status_code=400, detail="Corrupted PDF file (invalid PDF header)"
+            )
         elif file_ext == ".png" and not content.startswith(b"\x89PNG"):
-            raise HTTPException(status_code=400, detail="Corrupted PNG file (invalid PNG header)")
+            raise HTTPException(
+                status_code=400, detail="Corrupted PNG file (invalid PNG header)"
+            )
         elif file_ext in (".jpg", ".jpeg") and not content.startswith(b"\xff\xd8\xff"):
-            raise HTTPException(status_code=400, detail="Corrupted JPEG file (invalid JPEG header)")
-        elif file_ext == ".webp" and (b"RIFF" not in header or b"WEBP" not in content[:32]):
-            raise HTTPException(status_code=400, detail="Corrupted WEBP file (invalid WEBP header)")
+            raise HTTPException(
+                status_code=400, detail="Corrupted JPEG file (invalid JPEG header)"
+            )
+        elif file_ext == ".webp" and (
+            b"RIFF" not in header or b"WEBP" not in content[:32]
+        ):
+            raise HTTPException(
+                status_code=400, detail="Corrupted WEBP file (invalid WEBP header)"
+            )
         elif file_ext == ".docx" and not content.startswith(b"PK"):
-            raise HTTPException(status_code=400, detail="Corrupted DOCX file (invalid ZIP/DOCX header)")
+            raise HTTPException(
+                status_code=400, detail="Corrupted DOCX file (invalid ZIP/DOCX header)"
+            )
         elif file_ext == ".doc" and not content.startswith(b"\xd0\xcf\x11\xe0"):
-            raise HTTPException(status_code=400, detail="Corrupted DOC file (invalid OLE/DOC header)")
+            raise HTTPException(
+                status_code=400, detail="Corrupted DOC file (invalid OLE/DOC header)"
+            )
 
         # 3. Duplicate Detection via SHA-256
         file_hash = hashlib.sha256(content).hexdigest()
@@ -429,7 +469,9 @@ class ProfileService:
         )
         return [profile_schemas.ResumeResponse.model_validate(r) for r in resumes]
 
-    def upload_resume(self, user_id: str, file: UploadFile) -> profile_schemas.ResumeResponse:
+    def upload_resume(
+        self, user_id: str, file: UploadFile
+    ) -> profile_schemas.ResumeResponse:
         """Upload a new resume, auto-incrementing version. Sets all previous versions to inactive."""
         content, file_size, file_type, mime_type, file_hash, file_ext = (
             self._validate_and_process_resume_file(user_id, file)
@@ -448,7 +490,9 @@ class ProfileService:
         next_version = max_version + 1
 
         # Deactivate all existing versions
-        self.db.query(Resume).filter(Resume.user_id == user_id).update({"is_active": False})
+        self.db.query(Resume).filter(Resume.user_id == user_id).update(
+            {"is_active": False}
+        )
         self.db.commit()
 
         # Create new active resume record
@@ -470,18 +514,27 @@ class ProfileService:
 
         # Trigger document processing engine
         from app.services.document_processing_service import DocumentProcessingService
-        return DocumentProcessingService(self.db).process_resume_document(user_id, new_resume.id)
 
-    def replace_resume(self, user_id: str, resume_id: int, file: UploadFile) -> profile_schemas.ResumeResponse:
+        return DocumentProcessingService(self.db).process_resume_document(
+            user_id, new_resume.id
+        )
+
+    def replace_resume(
+        self, user_id: str, resume_id: int, file: UploadFile
+    ) -> profile_schemas.ResumeResponse:
         """Replace a specific resume version with a new file, keeping same version number."""
-        resume = self.db.query(Resume).filter(
-            Resume.id == resume_id, Resume.user_id == user_id
-        ).first()
+        resume = (
+            self.db.query(Resume)
+            .filter(Resume.id == resume_id, Resume.user_id == user_id)
+            .first()
+        )
         if not resume:
             raise HTTPException(status_code=404, detail="Resume not found")
 
         content, file_size, file_type, mime_type, file_hash, file_ext = (
-            self._validate_and_process_resume_file(user_id, file, is_replace_id=resume_id)
+            self._validate_and_process_resume_file(
+                user_id, file, is_replace_id=resume_id
+            )
         )
 
         # Delete old file if it exists
@@ -514,37 +567,61 @@ class ProfileService:
 
         # Trigger document processing engine
         from app.services.document_processing_service import DocumentProcessingService
-        return DocumentProcessingService(self.db).process_resume_document(user_id, resume.id)
 
-    def process_resume_document(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        return DocumentProcessingService(self.db).process_resume_document(
+            user_id, resume.id
+        )
+
+    def process_resume_document(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         from app.services.document_processing_service import DocumentProcessingService
-        return DocumentProcessingService(self.db).process_resume_document(user_id, resume_id)
 
-    def clean_resume_text(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+        return DocumentProcessingService(self.db).process_resume_document(
+            user_id, resume_id
+        )
+
+    def clean_resume_text(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         from app.services.resume_cleaning_service import ResumeCleaningService
+
         return ResumeCleaningService(self.db).clean_user_resume(user_id, resume_id)
 
-    def parse_resume_ai(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def parse_resume_ai(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         from app.services.ai_resume_parser_service import AIResumeParserBackendService
+
         return AIResumeParserBackendService(self.db).parse_resume(user_id, resume_id)
 
     def get_merge_suggestions(self, user_id: str, resume_id: int):
         from app.services.profile_merge_service import ProfileMergeService
-        return ProfileMergeService(self.db).generate_merge_suggestions(user_id, resume_id)
+
+        return ProfileMergeService(self.db).generate_merge_suggestions(
+            user_id, resume_id
+        )
 
     def approve_resume_merge(self, user_id: str, request):
         from app.services.profile_approval_service import ProfileApprovalService
+
         return ProfileApprovalService(self.db).apply_approved_merge(user_id, request)
 
-    def set_active_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def set_active_resume(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         """Set a specific resume version as active and deactivate all others."""
-        resume = self.db.query(Resume).filter(
-            Resume.id == resume_id, Resume.user_id == user_id
-        ).first()
+        resume = (
+            self.db.query(Resume)
+            .filter(Resume.id == resume_id, Resume.user_id == user_id)
+            .first()
+        )
         if not resume:
             raise HTTPException(status_code=404, detail="Resume not found")
 
-        self.db.query(Resume).filter(Resume.user_id == user_id).update({"is_active": False})
+        self.db.query(Resume).filter(Resume.user_id == user_id).update(
+            {"is_active": False}
+        )
         resume.is_active = True
         self.db.commit()
         self.db.refresh(resume)
@@ -552,9 +629,11 @@ class ProfileService:
 
     def delete_resume(self, user_id: str, resume_id: int) -> bool:
         """Delete a resume version and its file."""
-        resume = self.db.query(Resume).filter(
-            Resume.id == resume_id, Resume.user_id == user_id
-        ).first()
+        resume = (
+            self.db.query(Resume)
+            .filter(Resume.id == resume_id, Resume.user_id == user_id)
+            .first()
+        )
         if not resume:
             raise HTTPException(status_code=404, detail="Resume not found")
 
@@ -587,30 +666,38 @@ class ProfileService:
 
     # --- Personal Information ---
     def get_personal_info(self, user_id: str) -> profile_schemas.PersonalInfoResponse:
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         user = self.db.query(User).filter(User.id == user_id).first()
-        
+
         if not profile:
             profile = UserProfile(user_id=user_id)
             self.db.add(profile)
             self.db.commit()
             self.db.refresh(profile)
-            
-        languages = self.db.query(Language).filter(Language.profile_id == profile.id).all()
-        
+
+        languages = (
+            self.db.query(Language).filter(Language.profile_id == profile.id).all()
+        )
+
         resp_data = {**profile.__dict__}
         if user:
             resp_data["email"] = user.email
             resp_data["is_verified"] = user.is_verified
             resp_data["first_name"] = user.first_name
             resp_data["last_name"] = user.last_name
-            
-        resp_data["languages"] = [profile_schemas.LanguageResponse.model_validate(lang) for lang in languages]
-        
+
+        resp_data["languages"] = [
+            profile_schemas.LanguageResponse.model_validate(lang) for lang in languages
+        ]
+
         return profile_schemas.PersonalInfoResponse(**resp_data)
 
     def delete_avatar(self, user_id: str):
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         if profile and profile.profile_picture_url:
             # We could optionally delete the file from the filesystem here if it exists locally
             # file_path = os.path.join(".", profile.profile_picture_url.lstrip("/"))
@@ -629,32 +716,37 @@ class ProfileService:
             self.db.add(profile)
             self.db.commit()
             self.db.refresh(profile)
-            
+
         user = self.db.query(User).filter(User.id == user_id).first()
-        
+
         data_dict = data.model_dump(exclude_unset=True)
-        
+
         if "first_name" in data_dict and user:
             user.first_name = data_dict.pop("first_name")
         if "last_name" in data_dict and user:
             user.last_name = data_dict.pop("last_name")
-            
+
         languages_data = data_dict.pop("languages", None)
 
         for key, value in data_dict.items():
             setattr(profile, key, value)
-            
+
         if languages_data is not None:
             # Delete existing languages
             self.db.query(Language).filter(Language.profile_id == profile.id).delete()
             # Add new languages
             for lang_data in languages_data:
-                new_lang = Language(user_id=user_id, profile_id=profile.id, name=lang_data["name"], proficiency=lang_data["proficiency"])
+                new_lang = Language(
+                    user_id=user_id,
+                    profile_id=profile.id,
+                    name=lang_data["name"],
+                    proficiency=lang_data["proficiency"],
+                )
                 self.db.add(new_lang)
 
         self.db.commit()
         self.db.refresh(profile)
-        
+
         return self.get_personal_info(user_id)
 
     def update_professional_summary(
@@ -672,7 +764,9 @@ class ProfileService:
         self.db.refresh(profile)
         return profile_schemas.ProfessionalSummaryResponse(**profile.__dict__)
 
-    def get_career_preferences(self, user_id: str) -> profile_schemas.CareerPreferenceResponse:
+    def get_career_preferences(
+        self, user_id: str
+    ) -> profile_schemas.CareerPreferenceResponse:
         pref = (
             self.db.query(CareerPreference)
             .filter(CareerPreference.user_id == user_id)
@@ -700,9 +794,17 @@ class ProfileService:
         return profile_schemas.CareerPreferenceResponse.model_validate(pref)
 
     # --- Professional Information (New Module) ---
-    def get_professional_info(self, user_id: str) -> profile_schemas.ProfessionalInfoResponse:
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+    def get_professional_info(
+        self, user_id: str
+    ) -> profile_schemas.ProfessionalInfoResponse:
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
+        career_pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
 
         if not profile:
             profile = UserProfile(user_id=user_id)
@@ -710,7 +812,7 @@ class ProfileService:
         if not career_pref:
             career_pref = CareerPreference(user_id=user_id)
             self.db.add(career_pref)
-            
+
         self.db.commit()
 
         resp_data = {}
@@ -718,12 +820,20 @@ class ProfileService:
             resp_data.update(profile.__dict__)
         if career_pref:
             resp_data.update(career_pref.__dict__)
-            
+
         return profile_schemas.ProfessionalInfoResponse(**resp_data)
 
-    def update_professional_info(self, user_id: str, data: profile_schemas.ProfessionalInfoUpdate) -> profile_schemas.ProfessionalInfoResponse:
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
+    def update_professional_info(
+        self, user_id: str, data: profile_schemas.ProfessionalInfoUpdate
+    ) -> profile_schemas.ProfessionalInfoResponse:
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
+        career_pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
 
         if not profile:
             profile = UserProfile(user_id=user_id)
@@ -733,22 +843,37 @@ class ProfileService:
             self.db.add(career_pref)
 
         data_dict = data.model_dump(exclude_unset=True)
-        
+
         # Determine which fields go to UserProfile and which go to CareerPreference
         profile_fields = [
-            "current_job_title", "current_company", "employment_status", 
-            "years_of_experience", "total_months_of_experience", "industry", 
-            "career_level", "current_annual_salary", "current_salary_currency", 
-            "salary_type", "notice_period"
+            "current_job_title",
+            "current_company",
+            "employment_status",
+            "years_of_experience",
+            "total_months_of_experience",
+            "industry",
+            "career_level",
+            "current_annual_salary",
+            "current_salary_currency",
+            "salary_type",
+            "notice_period",
         ]
-        
+
         career_pref_fields = [
-            "expected_salary", "expected_joining_bonus", "negotiable_salary",
-            "preferred_currency", "employment_types", "work_setup", 
-            "preferred_locations", "preferred_time_zone", "willing_to_relocate", 
-            "relocation_countries", "visa_status", "travel_willingness"
+            "expected_salary",
+            "expected_joining_bonus",
+            "negotiable_salary",
+            "preferred_currency",
+            "employment_types",
+            "work_setup",
+            "preferred_locations",
+            "preferred_time_zone",
+            "willing_to_relocate",
+            "relocation_countries",
+            "visa_status",
+            "travel_willingness",
         ]
-        
+
         for key, value in data_dict.items():
             if key in profile_fields:
                 setattr(profile, key, value)
@@ -756,10 +881,12 @@ class ProfileService:
                 setattr(career_pref, key, value)
 
         self.db.commit()
-        
+
         return self.get_professional_info(user_id)
 
-    def get_social_profiles(self, user_id: str) -> profile_schemas.SocialProfileResponse:
+    def get_social_profiles(
+        self, user_id: str
+    ) -> profile_schemas.SocialProfileResponse:
         social = (
             self.db.query(SocialProfile)
             .filter(SocialProfile.user_id == user_id)
@@ -816,6 +943,7 @@ class ProfileService:
             .order_by(Skill.featured_skill.desc(), Skill.skill_name.asc())
             .all()
         )
+
     def get_experiences(self, user_id: str):
         return (
             self.db.query(Experience)
@@ -824,7 +952,6 @@ class ProfileService:
             .all()
         )
 
-
     def create_experience(self, user_id: str, data: profile_schemas.ExperienceCreate):
         data_dict = data.model_dump(exclude_unset=True)
         skill_ids = data_dict.pop("skill_ids", [])
@@ -832,10 +959,18 @@ class ProfileService:
 
         exp = Experience(user_id=user_id, **data_dict)
         if skill_ids:
-            skills = self.db.query(Skill).filter(Skill.id.in_(skill_ids), Skill.user_id == user_id).all()
+            skills = (
+                self.db.query(Skill)
+                .filter(Skill.id.in_(skill_ids), Skill.user_id == user_id)
+                .all()
+            )
             exp.skills = skills
         if project_ids:
-            projects = self.db.query(Project).filter(Project.id.in_(project_ids), Project.user_id == user_id).all()
+            projects = (
+                self.db.query(Project)
+                .filter(Project.id.in_(project_ids), Project.user_id == user_id)
+                .all()
+            )
             exp.projects = projects
 
         self.db.add(exp)
@@ -843,8 +978,14 @@ class ProfileService:
         self.db.refresh(exp)
         return exp
 
-    def update_experience(self, exp_id: str, user_id: str, data: profile_schemas.ExperienceUpdate):
-        exp = self.db.query(Experience).filter(Experience.id == exp_id, Experience.user_id == user_id).first()
+    def update_experience(
+        self, exp_id: str, user_id: str, data: profile_schemas.ExperienceUpdate
+    ):
+        exp = (
+            self.db.query(Experience)
+            .filter(Experience.id == exp_id, Experience.user_id == user_id)
+            .first()
+        )
         if not exp:
             raise HTTPException(status_code=404, detail="Experience not found")
 
@@ -856,11 +997,19 @@ class ProfileService:
             setattr(exp, key, value)
 
         if skill_ids is not None:
-            skills = self.db.query(Skill).filter(Skill.id.in_(skill_ids), Skill.user_id == user_id).all()
+            skills = (
+                self.db.query(Skill)
+                .filter(Skill.id.in_(skill_ids), Skill.user_id == user_id)
+                .all()
+            )
             exp.skills = skills
-            
+
         if project_ids is not None:
-            projects = self.db.query(Project).filter(Project.id.in_(project_ids), Project.user_id == user_id).all()
+            projects = (
+                self.db.query(Project)
+                .filter(Project.id.in_(project_ids), Project.user_id == user_id)
+                .all()
+            )
             exp.projects = projects
 
         self.db.commit()
@@ -869,19 +1018,23 @@ class ProfileService:
 
     def _trigger_embedding_update(self, user_id: str, item_type: str, item: Any):
         from app.services.embedding_service import EmbeddingService
-        
+
         # Serialize item to dict and format it nicely for the embedding model
         # Note: In a real system, you might build a specific prose representation for each type
-        item_dict = {k: v for k, v in item.__dict__.items() if not k.startswith('_')}
-        
+        item_dict = {k: v for k, v in item.__dict__.items() if not k.startswith("_")}
+
         # Build text representation
         text_lines = []
         for k, v in item_dict.items():
-            if v is not None and v != "" and k not in ("id", "user_id", "created_at", "updated_at"):
+            if (
+                v is not None
+                and v != ""
+                and k not in ("id", "user_id", "created_at", "updated_at")
+            ):
                 text_lines.append(f"{k.replace('_', ' ').title()}: {v}")
-                
+
         text_rep = "\n".join(text_lines)
-        
+
         try:
             EmbeddingService(self.db).embed_item(
                 user_id=user_id,
@@ -889,21 +1042,28 @@ class ProfileService:
                 item_id=str(item.id),
                 text=text_rep,
                 metadata=item_dict,
-                chunk_large_text=False
+                chunk_large_text=False,
             )
         except Exception as e:
-            print(f"Warning: Failed to generate embedding for {item_type} {item.id}: {e}")
+            print(
+                f"Warning: Failed to generate embedding for {item_type} {item.id}: {e}"
+            )
 
     # --- Generic List CRUD Helpers ---
     def _create_item(self, model_class, user_id: str, data):
         # Prevent duplicates for skills
         if model_class == Skill:
-            existing_skill = self.db.query(Skill).filter(
-                Skill.user_id == user_id, 
-                Skill.skill_name.ilike(data.skill_name)
-            ).first()
+            existing_skill = (
+                self.db.query(Skill)
+                .filter(
+                    Skill.user_id == user_id, Skill.skill_name.ilike(data.skill_name)
+                )
+                .first()
+            )
             if existing_skill:
-                raise HTTPException(status_code=400, detail=f"Skill '{data.skill_name}' already exists.")
+                raise HTTPException(
+                    status_code=400, detail=f"Skill '{data.skill_name}' already exists."
+                )
 
         item = model_class(user_id=user_id, **data.model_dump())
         self.db.add(item)
@@ -935,11 +1095,14 @@ class ProfileService:
         )
         if not item:
             raise HTTPException(status_code=404, detail="Item not found")
-            
+
         # Delete embedding
         from app.services.embedding_service import EmbeddingService
-        EmbeddingService(self.db).delete_item_embeddings(user_id, model_class.__name__.lower(), str(item_id))
-        
+
+        EmbeddingService(self.db).delete_item_embeddings(
+            user_id, model_class.__name__.lower(), str(item_id)
+        )
+
         self.db.delete(item)
         self.db.commit()
         return True
@@ -1058,33 +1221,68 @@ class ProfileService:
         return profile_schemas.JobSearchPreferenceResponse.model_validate(pref)
 
     # --- Profile Analytics ---
-    def get_profile_analytics(self, user_id: str) -> profile_schemas.ProfileAnalyticsResponse:
-        user_prof = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    def get_profile_analytics(
+        self, user_id: str
+    ) -> profile_schemas.ProfileAnalyticsResponse:
+        user_prof = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
         exps = self.db.query(Experience).filter(Experience.user_id == user_id).all()
-        certs = self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        certs = (
+            self.db.query(Certification).filter(Certification.user_id == user_id).all()
+        )
         projs = self.db.query(Project).filter(Project.user_id == user_id).all()
         resumes = self.db.query(Resume).filter(Resume.user_id == user_id).all()
-        career_pref = self.db.query(CareerPreference).filter(CareerPreference.user_id == user_id).first()
-        social_prof = self.db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
-        ai_pref = self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
-        achievements = self.db.query(Achievement).filter(Achievement.user_id == user_id).all()
-        job_search_pref = self.db.query(JobSearchPreference).filter(JobSearchPreference.user_id == user_id).first()
+        career_pref = (
+            self.db.query(CareerPreference)
+            .filter(CareerPreference.user_id == user_id)
+            .first()
+        )
+        social_prof = (
+            self.db.query(SocialProfile)
+            .filter(SocialProfile.user_id == user_id)
+            .first()
+        )
+        ai_pref = (
+            self.db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
+        achievements = (
+            self.db.query(Achievement).filter(Achievement.user_id == user_id).all()
+        )
+        job_search_pref = (
+            self.db.query(JobSearchPreference)
+            .filter(JobSearchPreference.user_id == user_id)
+            .first()
+        )
 
         # Section completion & weights
         sections = [
-            ("Personal Info", bool(user_prof and user_prof.first_name and user_prof.email), 15),
+            (
+                "Personal Info",
+                bool(user_prof and user_prof.first_name and user_prof.email),
+                15,
+            ),
             ("Experience", bool(exps), 20),
             ("Skills", len(skills) >= 3, 15),
             ("Projects", bool(projs), 15),
             ("Certifications", bool(certs), 10),
             ("Resume", bool(resumes), 15),
-            ("Career Preferences", bool(career_pref and (career_pref.preferred_roles or career_pref.expected_salary)), 10),
+            (
+                "Career Preferences",
+                bool(
+                    career_pref
+                    and (career_pref.preferred_roles or career_pref.expected_salary)
+                ),
+                10,
+            ),
         ]
 
         total_weight = sum(w for _, _, w in sections)
         earned_weight = sum(w for _, completed, w in sections if completed)
-        completion_pct = int((earned_weight / total_weight) * 100) if total_weight > 0 else 0
+        completion_pct = (
+            int((earned_weight / total_weight) * 100) if total_weight > 0 else 0
+        )
 
         # Calculate experience years
         total_days = 0
@@ -1096,7 +1294,9 @@ class ProfileService:
         experience_years = round(total_days / 365.25, 1)
 
         # Resume status
-        active_resume = next((r for r in resumes if getattr(r, "is_active", False)), None)
+        active_resume = next(
+            (r for r in resumes if getattr(r, "is_active", False)), None
+        )
         if active_resume:
             resume_status = "Active Resume Uploaded"
         elif resumes:
@@ -1107,14 +1307,20 @@ class ProfileService:
         # Career Readiness Score
         # Combination of completion %, having a resume, having skills, having experience, and having AI preferences
         readiness_score = int(completion_pct * 0.5)
-        if resumes: readiness_score += 15
-        if len(skills) >= 5: readiness_score += 10
-        if exps: readiness_score += 15
-        if ai_pref or job_search_pref: readiness_score += 10
+        if resumes:
+            readiness_score += 15
+        if len(skills) >= 5:
+            readiness_score += 10
+        if exps:
+            readiness_score += 15
+        if ai_pref or job_search_pref:
+            readiness_score += 10
         readiness_score = min(100, readiness_score)
 
         section_breakdown = [
-            profile_schemas.SectionCompletionItem(section=name, completed=done, weight=w)
+            profile_schemas.SectionCompletionItem(
+                section=name, completed=done, weight=w
+            )
             for name, done, w in sections
         ]
 
@@ -1123,29 +1329,49 @@ class ProfileService:
         if user_prof and getattr(user_prof, "updated_at", None):
             updates.append(("Personal Info", user_prof.updated_at.isoformat()))
         if exps:
-            latest_exp = max(exps, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            latest_exp = max(
+                exps,
+                key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min,
+            )
             t = getattr(latest_exp, "updated_at", latest_exp.created_at)
-            if t: updates.append(("Experience", t.isoformat()))
+            if t:
+                updates.append(("Experience", t.isoformat()))
         if projs:
-            latest_proj = max(projs, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            latest_proj = max(
+                projs,
+                key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min,
+            )
             t = getattr(latest_proj, "updated_at", latest_proj.created_at)
-            if t: updates.append(("Projects", t.isoformat()))
+            if t:
+                updates.append(("Projects", t.isoformat()))
         if certs:
-            latest_cert = max(certs, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            latest_cert = max(
+                certs,
+                key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min,
+            )
             t = getattr(latest_cert, "updated_at", latest_cert.created_at)
-            if t: updates.append(("Certifications", t.isoformat()))
+            if t:
+                updates.append(("Certifications", t.isoformat()))
         if resumes:
-            latest_res = max(resumes, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            latest_res = max(
+                resumes,
+                key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min,
+            )
             t = getattr(latest_res, "updated_at", latest_res.created_at)
-            if t: updates.append(("Resume Center", t.isoformat()))
+            if t:
+                updates.append(("Resume Center", t.isoformat()))
         if career_pref and getattr(career_pref, "updated_at", None):
             updates.append(("Career Preferences", career_pref.updated_at.isoformat()))
         if ai_pref and getattr(ai_pref, "updated_at", None):
             updates.append(("AI Preferences", ai_pref.updated_at.isoformat()))
         if achievements:
-            latest_ach = max(achievements, key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min)
+            latest_ach = max(
+                achievements,
+                key=lambda x: getattr(x, "updated_at", x.created_at) or datetime.min,
+            )
             t = getattr(latest_ach, "updated_at", latest_ach.created_at)
-            if t: updates.append(("Achievements", t.isoformat()))
+            if t:
+                updates.append(("Achievements", t.isoformat()))
 
         updates.sort(key=lambda x: x[1], reverse=True)
         recent_updates = [
@@ -1197,7 +1423,9 @@ class ProfileService:
         return profile_schemas.PrivacySettingResponse.model_validate(setting)
 
     def export_user_data(self, user_id: str) -> dict:
-        user_prof = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        user_prof = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         privacy = self.get_privacy_settings(user_id)
         job_search = self.get_job_search_preferences(user_id)
         achievements = self.get_achievements(user_id)
@@ -1221,9 +1449,15 @@ class ProfileService:
                 "projects_count": len(projects),
                 "resumes_count": len(resumes),
             },
-            "privacy_settings": privacy.model_dump() if hasattr(privacy, "model_dump") else privacy,
-            "job_search_preferences": job_search.model_dump() if hasattr(job_search, "model_dump") else job_search,
-            "achievements": [a.model_dump() if hasattr(a, "model_dump") else a for a in achievements],
+            "privacy_settings": privacy.model_dump()
+            if hasattr(privacy, "model_dump")
+            else privacy,
+            "job_search_preferences": job_search.model_dump()
+            if hasattr(job_search, "model_dump")
+            else job_search,
+            "achievements": [
+                a.model_dump() if hasattr(a, "model_dump") else a for a in achievements
+            ],
         }
 
     # --- Notification Settings ---
@@ -1258,9 +1492,21 @@ class ProfileService:
 
     def get_profile_analytics(self, user_id: str) -> Dict[str, Any]:
         """Return analytics summary for profile overview."""
-        view_count = self.db.query(Analytics).filter(Analytics.user_id == user_id).count() if hasattr(Analytics, 'user_id') else 0
-        applications_count = self.db.query(Application).filter(Application.user_id == user_id).count() if hasattr(Application, 'user_id') else 0
-        saved_jobs_count = self.db.query(SavedJob).filter(SavedJob.user_id == user_id).count() if hasattr(SavedJob, 'user_id') else 0
+        view_count = (
+            self.db.query(Analytics).filter(Analytics.user_id == user_id).count()
+            if hasattr(Analytics, "user_id")
+            else 0
+        )
+        applications_count = (
+            self.db.query(Application).filter(Application.user_id == user_id).count()
+            if hasattr(Application, "user_id")
+            else 0
+        )
+        saved_jobs_count = (
+            self.db.query(SavedJob).filter(SavedJob.user_id == user_id).count()
+            if hasattr(SavedJob, "user_id")
+            else 0
+        )
         return {
             "profile_views": view_count or 12,
             "search_appearances": (view_count or 12) * 3,
@@ -1273,16 +1519,22 @@ class ProfileService:
 
     def calculate_completion_percentage(self, user_id: str) -> Dict[str, Any]:
         """Calculate percentage of completed sections in profile."""
-        profile = self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        profile = (
+            self.db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+        )
         user_obj = self.db.query(User).filter(User.id == user_id).first()
         skills = self.db.query(Skill).filter(Skill.user_id == user_id).all()
-        experiences = self.db.query(Experience).filter(Experience.user_id == user_id).all()
+        experiences = (
+            self.db.query(Experience).filter(Experience.user_id == user_id).all()
+        )
         educations = self.db.query(Education).filter(Education.user_id == user_id).all()
 
         sections = []
         missing = []
-        
-        if (user_obj and (user_obj.first_name or user_obj.last_name)) or (profile and (profile.headline or profile.bio)):
+
+        if (user_obj and (user_obj.first_name or user_obj.last_name)) or (
+            profile and (profile.headline or profile.bio)
+        ):
             sections.append("personal_info")
         else:
             missing.append("personal_info")
@@ -1322,10 +1574,8 @@ class ProfileService:
         return {
             "score": pct,
             "level": level,
-            "suggestions": [f"Add your {m.replace('_', ' ')}" for m in comp.get("missing_sections", [])],
+            "suggestions": [
+                f"Add your {m.replace('_', ' ')}"
+                for m in comp.get("missing_sections", [])
+            ],
         }
-
-
-
-
-

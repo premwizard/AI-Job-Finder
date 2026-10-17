@@ -1,16 +1,35 @@
+"""
+Worker Agent Code Generation Script.
+
+Generates worker agent implementations based on BaseAgent definitions
+for resume parsing, job searching, company intelligence, and career strategy.
+"""
+
 import os
 
-agents = [
+AGENTS = [
     ("resume_agent", "ResumeAgent", "['ANALYZE_RESUME', 'OPTIMIZE_RESUME']"),
     ("job_agent", "JobSearchAgent", "['FIND_MATCHING_JOBS', 'MONITOR_JOBS']"),
-    ("company_agent", "CompanyIntelligenceAgent", "['ANALYZE_COMPANY', 'COMPANY_FIT']"),
-    ("learning_agent", "LearningAgent", "['ANALYZE_SKILL_GAP', 'GENERATE_LEARNING_PLAN']"),
+    (
+        "company_agent",
+        "CompanyIntelligenceAgent",
+        "['ANALYZE_COMPANY', 'COMPANY_FIT']",
+    ),
+    (
+        "learning_agent",
+        "LearningAgent",
+        "['ANALYZE_SKILL_GAP', 'GENERATE_LEARNING_PLAN']",
+    ),
     ("interview_agent", "InterviewAgent", "['PREPARE_INTERVIEW']"),
     ("recommendation_agent", "RecommendationAgent", "['GENERATE_RECOMMENDATIONS']"),
-    ("career_strategy_agent", "CareerStrategyAgent", "['PLAN_CAREER_TRANSITION']")
+    (
+        "career_strategy_agent",
+        "CareerStrategyAgent",
+        "['PLAN_CAREER_TRANSITION']",
+    ),
 ]
 
-template = """from typing import Dict, Any
+TEMPLATE = """from typing import Dict, Any
 from app.agents.base.agent_base import BaseAgent
 from app.agents.context.shared_context import SharedContext
 from app.agents.communication.message import Message
@@ -52,13 +71,26 @@ class {class_name}(BaseAgent):
         pass
 """
 
-base_dir = r"c:\merged_partition_content\D drive\Crown Atlas\backend\app\agents\workers"
-os.makedirs(base_dir, exist_ok=True)
 
-for file_name, class_name, caps in agents:
-    filepath = os.path.join(base_dir, f"{file_name}.py")
-    content = template.format(class_name=class_name, capabilities=caps)
-    with open(filepath, "w") as f:
-        f.write(content)
-        
-print("Successfully generated all worker agents.")
+def generate_worker_agents() -> None:
+    """Generate worker agent class files from template definitions.
+
+    Iterates through configured agent specifications, formats boilerplate code,
+    and writes them into the workers directory.
+    """
+    base_dir = (
+        r"c:\merged_partition_content\D drive\Crown Atlas\backend\app\agents\workers"
+    )
+    os.makedirs(base_dir, exist_ok=True)
+
+    for file_name, class_name, caps in AGENTS:
+        filepath = os.path.join(base_dir, f"{file_name}.py")
+        content = TEMPLATE.format(class_name=class_name, capabilities=caps)
+        with open(filepath, "w") as f:
+            f.write(content)
+
+    print("Successfully generated all worker agents.")
+
+
+if __name__ == "__main__":
+    generate_worker_agents()

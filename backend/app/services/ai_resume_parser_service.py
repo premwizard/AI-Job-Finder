@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 # Import google.generativeai with fallback
 try:
     import google.generativeai as genai
+
     GENAI_AVAILABLE = True
 except ImportError:
     GENAI_AVAILABLE = False
@@ -25,6 +26,7 @@ from app.schemas import profile_schemas
 
 
 # ── Strongly Typed Schemas for Resume Extraction ─────────────────────────────
+
 
 class ParsedPersonalInfo(BaseModel):
     full_name: Optional[str] = None
@@ -85,14 +87,18 @@ class ParsedAchievement(BaseModel):
     title: str
     organization: Optional[str] = None
     date: Optional[str] = None
-    category: Optional[str] = None  # Award, Scholarship, Publication, Hackathon, Patent, etc.
+    category: Optional[str] = (
+        None  # Award, Scholarship, Publication, Hackathon, Patent, etc.
+    )
     description: Optional[str] = None
     url: Optional[str] = None
 
 
 class ParsedLanguage(BaseModel):
     language: str
-    proficiency: Optional[str] = None  # Native, Fluent, Professional, Intermediate, Basic
+    proficiency: Optional[str] = (
+        None  # Native, Fluent, Professional, Intermediate, Basic
+    )
 
 
 class ParsedSocialLink(BaseModel):
@@ -133,6 +139,7 @@ class ParsedResumeData(BaseModel):
 
 
 # ── AI Resume Parser Service Class ───────────────────────────────────────────
+
 
 class AIResumeParserService:
     """Parses clean resume text using Gemini Flash into structured JSON."""
@@ -272,7 +279,10 @@ JSON SCHEMA REQUIREMENT:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
-            generation_config={"temperature": 0.1, "response_mime_type": "application/json"},
+            generation_config={
+                "temperature": 0.1,
+                "response_mime_type": "application/json",
+            },
         )
 
         prompt = f"{cls.SYSTEM_PROMPT}\n\nRESUME TEXT TO PARSE:\n{resume_text}"
@@ -301,13 +311,27 @@ JSON SCHEMA REQUIREMENT:
         lines = [l.strip() for l in resume_text.split("\n") if l.strip()]
 
         # 1. Personal Info
-        email_match = re.search(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", resume_text)
+        email_match = re.search(
+            r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", resume_text
+        )
         phone_match = re.search(r"\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}", resume_text)
-        loc_match = re.search(r"\b([A-Z][a-zA-Za-z\s]+,\s*[A-Z]{2,3}(?:,\s*[A-Z][a-zA-Za-z\s]+)?)\b", resume_text)
+        loc_match = re.search(
+            r"\b([A-Z][a-zA-Za-z\s]+,\s*[A-Z]{2,3}(?:,\s*[A-Z][a-zA-Za-z\s]+)?)\b",
+            resume_text,
+        )
 
-        name = lines[0] if lines and len(lines[0].split()) <= 4 and "@" not in lines[0] else None
+        name = (
+            lines[0]
+            if lines and len(lines[0].split()) <= 4 and "@" not in lines[0]
+            else None
+        )
         headline_title = None
-        if len(lines) > 1 and len(lines[1].split()) <= 6 and "@" not in lines[1] and not re.search(r"\d", lines[1]):
+        if (
+            len(lines) > 1
+            and len(lines[1].split()) <= 6
+            and "@" not in lines[1]
+            and not re.search(r"\d", lines[1])
+        ):
             headline_title = lines[1]
 
         personal = ParsedPersonalInfo(
@@ -320,58 +344,96 @@ JSON SCHEMA REQUIREMENT:
 
         # 2. Skills
         skills: List[ParsedSkill] = []
-        skills_match = re.search(r"SKILLS\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        skills_match = re.search(
+            r"SKILLS\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)",
+            resume_text,
+            re.DOTALL | re.IGNORECASE,
+        )
         if skills_match:
             raw_skills = skills_match.group(1)
             items = re.split(r"[,•|\n]", raw_skills)
             for item in items:
                 item_clean = item.strip()
-                if item_clean and len(item_clean) < 40 and not item_clean.lower().startswith("skills"):
+                if (
+                    item_clean
+                    and len(item_clean) < 40
+                    and not item_clean.lower().startswith("skills")
+                ):
                     skills.append(ParsedSkill(name=item_clean))
 
         # 3. Work Experience
         work: List[ParsedWorkExperience] = []
-        exp_match = re.search(r"(EXPERIENCE|WORK HISTORY)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        exp_match = re.search(
+            r"(EXPERIENCE|WORK HISTORY)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)",
+            resume_text,
+            re.DOTALL | re.IGNORECASE,
+        )
         if exp_match:
             exp_text = exp_match.group(2).strip()
             exp_lines = [el.strip() for el in exp_text.split("\n") if el.strip()]
             if exp_lines:
-                work.append(ParsedWorkExperience(
-                    job_title=exp_lines[0],
-                    company=exp_lines[1] if len(exp_lines) > 1 else "Company",
-                    description="\n".join(exp_lines[2:6]) if len(exp_lines) > 2 else None,
-                ))
+                work.append(
+                    ParsedWorkExperience(
+                        job_title=exp_lines[0],
+                        company=exp_lines[1] if len(exp_lines) > 1 else "Company",
+                        description="\n".join(exp_lines[2:6])
+                        if len(exp_lines) > 2
+                        else None,
+                    )
+                )
 
         # 4. Education
         edu: List[ParsedEducation] = []
-        edu_match = re.search(r"EDUCATION\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        edu_match = re.search(
+            r"EDUCATION\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)",
+            resume_text,
+            re.DOTALL | re.IGNORECASE,
+        )
         if edu_match:
-            edu_lines = [el.strip() for el in edu_match.group(1).split("\n") if el.strip()]
+            edu_lines = [
+                el.strip() for el in edu_match.group(1).split("\n") if el.strip()
+            ]
             if edu_lines:
-                edu.append(ParsedEducation(
-                    degree=edu_lines[0],
-                    institution=edu_lines[1] if len(edu_lines) > 1 else "University",
-                ))
+                edu.append(
+                    ParsedEducation(
+                        degree=edu_lines[0],
+                        institution=edu_lines[1]
+                        if len(edu_lines) > 1
+                        else "University",
+                    )
+                )
 
         # 5. Projects
         projects: List[ParsedProject] = []
-        proj_match = re.search(r"(PROJECTS|PORTFOLIO|PERSONAL PROJECTS|KEY PROJECTS)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        proj_match = re.search(
+            r"(PROJECTS|PORTFOLIO|PERSONAL PROJECTS|KEY PROJECTS)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)",
+            resume_text,
+            re.DOTALL | re.IGNORECASE,
+        )
         if proj_match:
             proj_text = proj_match.group(2).strip()
-            proj_blocks = [pb.strip() for pb in re.split(r"\n\s*\n", proj_text) if pb.strip()]
+            proj_blocks = [
+                pb.strip() for pb in re.split(r"\n\s*\n", proj_text) if pb.strip()
+            ]
             for block in proj_blocks:
                 p_lines = [pl.strip() for pl in block.split("\n") if pl.strip()]
                 if p_lines:
                     p_title = p_lines[0]
                     p_desc = "\n".join(p_lines[1:]) if len(p_lines) > 1 else None
-                    projects.append(ParsedProject(
-                        title=p_title,
-                        description=p_desc,
-                    ))
+                    projects.append(
+                        ParsedProject(
+                            title=p_title,
+                            description=p_desc,
+                        )
+                    )
 
         # 6. Certifications
         certs: List[ParsedCertification] = []
-        cert_match = re.search(r"(CERTIFICATIONS|CERTIFICATES|LICENSES)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)", resume_text, re.DOTALL | re.IGNORECASE)
+        cert_match = re.search(
+            r"(CERTIFICATIONS|CERTIFICATES|LICENSES)\s*[:\n](.*?)(?=\n[A-Z\s]{4,}|\Z)",
+            resume_text,
+            re.DOTALL | re.IGNORECASE,
+        )
         if cert_match:
             cert_text = cert_match.group(2).strip()
             cert_lines = [cl.strip() for cl in cert_text.split("\n") if cl.strip()]
@@ -379,13 +441,20 @@ JSON SCHEMA REQUIREMENT:
                 if len(line) < 120:
                     parts = line.split(" - ")
                     if len(parts) > 1:
-                        certs.append(ParsedCertification(name=parts[0].strip(), issuing_organization=parts[1].strip()))
+                        certs.append(
+                            ParsedCertification(
+                                name=parts[0].strip(),
+                                issuing_organization=parts[1].strip(),
+                            )
+                        )
                     else:
                         certs.append(ParsedCertification(name=line))
 
         # 7. Social Links
         socials: List[ParsedSocialLink] = []
-        url_matches = re.findall(r"(linkedin\.com/[^\s]+|github\.com/[^\s]+)", resume_text, re.IGNORECASE)
+        url_matches = re.findall(
+            r"(linkedin\.com/[^\s]+|github\.com/[^\s]+)", resume_text, re.IGNORECASE
+        )
         for url in url_matches:
             platform = "LinkedIn" if "linkedin" in url.lower() else "GitHub"
             socials.append(ParsedSocialLink(platform=platform, url=url))
@@ -407,7 +476,9 @@ class AIResumeParserBackendService:
     def __init__(self, db: Session):
         self.db = db
 
-    def parse_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def parse_resume(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         """Parse clean/raw resume text into structured JSON and save in Resume.parsed_data_json."""
         resume = (
             self.db.query(Resume)

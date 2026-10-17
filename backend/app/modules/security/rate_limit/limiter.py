@@ -7,6 +7,7 @@ from fastapi import FastAPI
 # In production with load balancers, ensure X-Forwarded-For is properly extracted
 limiter = Limiter(key_func=get_remote_address)
 
+
 def init_rate_limiter(app: FastAPI):
     """
     Attaches the slowapi rate limiter to the FastAPI application instance.

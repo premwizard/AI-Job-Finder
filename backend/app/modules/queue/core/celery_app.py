@@ -14,20 +14,20 @@ celery_app = Celery(
         # Add future workers here:
         # "app.modules.queue.jobs.resume_worker",
         # "app.modules.queue.jobs.ai_worker",
-    ]
+    ],
 )
 
 # Optional configuration, see the application user guide.
 celery_app.conf.update(
-    task_serializer='json',
-    accept_content=['json'],  # Ignore other content
-    result_serializer='json',
-    timezone='UTC',
+    task_serializer="json",
+    accept_content=["json"],  # Ignore other content
+    result_serializer="json",
+    timezone="UTC",
     enable_utc=True,
     task_track_started=True,
-    worker_prefetch_multiplier=1, # Fair distribution
-    task_acks_late=True, # Ensure job is only acknowledged when completed successfully
-    broker_connection_retry_on_startup=True
+    worker_prefetch_multiplier=1,  # Fair distribution
+    task_acks_late=True,  # Ensure job is only acknowledged when completed successfully
+    broker_connection_retry_on_startup=True,
 )
 
 # Define priority queues if needed (Optional for now)

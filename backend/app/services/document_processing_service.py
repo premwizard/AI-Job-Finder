@@ -14,12 +14,14 @@ from sqlalchemy.orm import Session
 # Import document libraries with graceful fallback
 try:
     import pypdf
+
     PYPDF_AVAILABLE = True
 except ImportError:
     PYPDF_AVAILABLE = False
 
 try:
     import docx
+
     PYTHON_DOCX_AVAILABLE = True
 except ImportError:
     PYTHON_DOCX_AVAILABLE = False
@@ -27,6 +29,7 @@ except ImportError:
 try:
     from PIL import Image
     import pytesseract
+
     OCR_AVAILABLE = True
 except ImportError:
     OCR_AVAILABLE = False
@@ -104,7 +107,9 @@ class DocumentProcessingEngine:
                         full_text.append(p.text)
                 for table in doc.tables:
                     for row in table.rows:
-                        row_txt = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                        row_txt = " | ".join(
+                            cell.text.strip() for cell in row.cells if cell.text.strip()
+                        )
                         if row_txt:
                             full_text.append(row_txt)
                 text = "\n".join(full_text)
@@ -137,7 +142,7 @@ class DocumentProcessingEngine:
             with open(file_path, "rb") as f:
                 content = f.read()
             # Extract ASCII/UTF-8 printable character sequences >= 4 chars
-            words = re.findall(b"[\x20-\x7E]{4,}", content)
+            words = re.findall(b"[\x20-\x7e]{4,}", content)
             text = " ".join(w.decode("ascii", errors="ignore") for w in words)
             return cls.clean_text(text)
         except Exception:
@@ -209,7 +214,12 @@ class DocumentProcessingEngine:
                 text = cls.extract_docx(file_path)
             elif file_type_upper == "DOC" or ext == ".doc":
                 text = cls.extract_doc(file_path)
-            elif file_type_upper in ("PNG", "JPEG", "JPG", "WEBP") or ext in (".png", ".jpg", ".jpeg", ".webp"):
+            elif file_type_upper in ("PNG", "JPEG", "JPG", "WEBP") or ext in (
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".webp",
+            ):
                 text = cls.extract_image_ocr(file_path)
             elif file_type_upper == "RTF" or ext == ".rtf":
                 text = cls.extract_rtf(file_path)
@@ -230,7 +240,9 @@ class DocumentProcessingService:
     def __init__(self, db: Session):
         self.db = db
 
-    def process_resume_document(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def process_resume_document(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         """Process a resume document synchronously or in background, updating DB state."""
         resume = (
             self.db.query(Resume)
@@ -252,10 +264,16 @@ class DocumentProcessingService:
         # Execute extraction engine
         file_type_upper = (resume.file_type or "").upper()
         ext = os.path.splitext(abs_path)[1].lower()
-        is_image = file_type_upper in ("PNG", "JPEG", "JPG", "WEBP") or ext in (".png", ".jpg", ".jpeg", ".webp")
+        is_image = file_type_upper in ("PNG", "JPEG", "JPG", "WEBP") or ext in (
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+        )
 
         if is_image:
             from app.services.ocr_service import OcrEngineService
+
             try:
                 ocr_service = OcrEngineService()
                 ocr_res = ocr_service.process_image_resume(abs_path)
@@ -265,7 +283,9 @@ class DocumentProcessingService:
                 resume.ocr_processing_time_ms = ocr_res["processing_time_ms"]
                 resume.is_low_confidence = ocr_res["is_low_confidence"]
                 resume.ocr_provider = ocr_res["provider_used"]
-                resume.processing_error = ocr_res["warning"]  # Store low-confidence user notice if present
+                resume.processing_error = ocr_res[
+                    "warning"
+                ]  # Store low-confidence user notice if present
                 resume.processed_at = datetime.utcnow()
             except Exception as err:
                 resume.parsing_status = "Failed"
@@ -283,7 +303,9 @@ class DocumentProcessingService:
             else:
                 resume.parsing_status = "Completed"
                 resume.raw_text = extracted_text
-                resume.ocr_confidence = 100.0  # Native text documents have 100% text fidelity
+                resume.ocr_confidence = (
+                    100.0  # Native text documents have 100% text fidelity
+                )
                 resume.ocr_processing_time_ms = 10.0
                 resume.is_low_confidence = False
                 resume.ocr_provider = "Native Extractor"
@@ -293,12 +315,14 @@ class DocumentProcessingService:
         # Run Resume Cleaning Engine on extracted raw text
         if resume.raw_text and resume.parsing_status == "Completed":
             from app.services.resume_cleaning_service import ResumeCleaner
+
             resume.clean_text = ResumeCleaner.clean_raw_text(resume.raw_text)
             resume.cleaned_at = datetime.utcnow()
 
             # Run AI Resume Parser Engine (Gemini Flash)
             try:
                 from app.services.ai_resume_parser_service import AIResumeParserService
+
                 target_text = resume.clean_text or resume.raw_text
                 parsed = AIResumeParserService.parse_with_gemini(target_text)
                 resume.parsed_data_json = parsed.model_dump_json()
@@ -308,22 +332,24 @@ class DocumentProcessingService:
 
         # Create Version Snapshot
         from app.services.version_service import VersionService
+
         VersionService.create_snapshot(
             resume=resume,
             change_summary="Initial Parse" if resume.version == 1 else "File Replaced",
-            db=self.db
+            db=self.db,
         )
 
         # Generate Resume Embeddings
         try:
             from app.services.embedding_service import EmbeddingService
+
             if resume.clean_text:
                 EmbeddingService(self.db).embed_item(
                     user_id=user_id,
                     item_type="resume",
                     item_id=str(resume.id),
                     text=resume.clean_text,
-                    chunk_large_text=True
+                    chunk_large_text=True,
                 )
         except Exception as e:
             print(f"Warning: Failed to generate embedding for resume {resume.id}: {e}")
@@ -332,6 +358,8 @@ class DocumentProcessingService:
         self.db.refresh(resume)
         return profile_schemas.ResumeResponse.model_validate(resume)
 
-    def retry_processing(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def retry_processing(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         """Retry document processing for a resume."""
         return self.process_resume_document(user_id, resume_id)

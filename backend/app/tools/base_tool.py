@@ -2,17 +2,18 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, Type
 from pydantic import BaseModel
 
+
 class BaseTool(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
         pass
-        
+
     @property
     @abstractmethod
     def description(self) -> str:
         pass
-        
+
     @property
     @abstractmethod
     def category(self) -> str:

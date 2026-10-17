@@ -6,9 +6,11 @@ from app.modules.auth.repositories.auth_repository import AuthRepository
 
 router = APIRouter(prefix="/api/v2/auth", tags=["Auth V2"])
 
+
 def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
     repo = AuthRepository(db)
     return AuthService(repo)
+
 
 @router.get("/health")
 def auth_health():

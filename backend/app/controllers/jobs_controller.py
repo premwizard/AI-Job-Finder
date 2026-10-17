@@ -14,7 +14,11 @@ def get_jobs(db: Session):
 
 
 def get_recommended_jobs(db: Session, current_user: models.User):
-    pref = db.query(models.CareerPreference).filter(models.CareerPreference.user_id == current_user.id).first()
+    pref = (
+        db.query(models.CareerPreference)
+        .filter(models.CareerPreference.user_id == current_user.id)
+        .first()
+    )
     role = pref.preferred_roles if pref and pref.preferred_roles else None
     return get_recommended_jobs_for_role(db, role)
 

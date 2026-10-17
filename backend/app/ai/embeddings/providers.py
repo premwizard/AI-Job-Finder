@@ -3,11 +3,12 @@ from abc import ABC, abstractmethod
 from typing import List
 import google.generativeai as genai
 
+
 class EmbeddingProvider(ABC):
     @abstractmethod
     def generate_embedding(self, text: str) -> List[float]:
         pass
-        
+
     @abstractmethod
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         pass
@@ -23,18 +24,14 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
 
     def generate_embedding(self, text: str) -> List[float]:
         result = genai.embed_content(
-            model=self.model_name,
-            content=text,
-            task_type="retrieval_document"
+            model=self.model_name, content=text, task_type="retrieval_document"
         )
-        return result['embedding']
-        
+        return result["embedding"]
+
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         # In a real app we might batch this better depending on the provider API limits.
         # GenAI allows sending a list of strings directly:
         result = genai.embed_content(
-            model=self.model_name,
-            content=texts,
-            task_type="retrieval_document"
+            model=self.model_name, content=texts, task_type="retrieval_document"
         )
-        return result['embedding']
+        return result["embedding"]

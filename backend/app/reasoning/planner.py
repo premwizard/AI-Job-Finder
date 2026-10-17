@@ -4,6 +4,7 @@ import google.generativeai as genai
 from typing import Dict, Any
 from app.memory.context_builder import MemoryContextBuilder
 
+
 class CognitivePlanner:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -13,14 +14,18 @@ class CognitivePlanner:
         self.model = genai.GenerativeModel("gemini-1.5-pro")
         self.context_builder = MemoryContextBuilder()
 
-    def generate_plan(self, user_id: str, goal_title: str, goal_description: str) -> Dict[str, Any]:
-        memory_context = self.context_builder.build_context(user_id, goal_title, limit=10)
-        
+    def generate_plan(
+        self, user_id: str, goal_title: str, goal_description: str
+    ) -> Dict[str, Any]:
+        memory_context = self.context_builder.build_context(
+            user_id, goal_title, limit=10
+        )
+
         prompt = f"""
         You are the Cognitive Planning Engine for an AI Career Agent.
         A user has submitted the following career goal:
         TITLE: {goal_title}
-        DESCRIPTION: {goal_description or 'None provided.'}
+        DESCRIPTION: {goal_description or "None provided."}
         
         USER MEMORY CONTEXT:
         {memory_context}
@@ -52,12 +57,14 @@ class CognitivePlanner:
             ]
         }}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
-            if text.startswith("```json"): text = text[7:]
-            if text.endswith("```"): text = text[:-3]
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.endswith("```"):
+                text = text[:-3]
             return json.loads(text.strip())
         except Exception as e:
             print(f"Planner Error: {e}")

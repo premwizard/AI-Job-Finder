@@ -5,13 +5,16 @@ import os
 
 router = APIRouter(prefix="/api/system", tags=["System Health"])
 
+
 class HealthStatus(BaseModel):
     status: str
     environment: str
     uptime_seconds: float
     version: str
 
+
 start_time = time.time()
+
 
 @router.get("/health", response_model=HealthStatus)
 async def get_health():
@@ -23,8 +26,9 @@ async def get_health():
         status="ok",
         environment=os.environ.get("ENVIRONMENT", "development"),
         uptime_seconds=round(time.time() - start_time, 2),
-        version="1.0.0"
+        version="1.0.0",
     )
+
 
 @router.get("/ready")
 async def get_readiness():
@@ -33,6 +37,7 @@ async def get_readiness():
     """
     # In a full implementation, you would ping the DB and Redis here.
     return {"status": "ready"}
+
 
 @router.get("/live")
 async def get_liveness():

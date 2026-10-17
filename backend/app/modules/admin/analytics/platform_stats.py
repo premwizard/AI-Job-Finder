@@ -3,6 +3,7 @@ class PlatformStats:
     Aggregates metrics for the Admin Dashboard.
     In a real application, these would be complex JOINs or Redis metric queries.
     """
+
     @staticmethod
     async def get_dashboard_overview() -> dict:
         return {
@@ -14,5 +15,5 @@ class PlatformStats:
             "queue_pending_jobs": 12,
             "queue_failed_jobs": 0,
             "api_avg_latency_ms": 45.2,
-            "recent_incidents": 0
+            "recent_incidents": 0,
         }

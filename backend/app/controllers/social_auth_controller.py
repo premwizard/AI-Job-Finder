@@ -21,9 +21,7 @@ def login_via_provider(provider: AuthProvider):
         auth_url = social_auth_service.get_authorization_url(provider)
         return RedirectResponse(url=auth_url)
     except HTTPException as e:
-        return RedirectResponse(
-            url=f"{config.FRONTEND_URL}/login?error={e.detail}"
-        )
+        return RedirectResponse(url=f"{config.FRONTEND_URL}/login?error={e.detail}")
     except Exception:
         return RedirectResponse(
             url=f"{config.FRONTEND_URL}/login?error={provider.value.title()} login is currently unavailable"

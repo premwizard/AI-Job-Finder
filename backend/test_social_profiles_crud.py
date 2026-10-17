@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 12: Social Profiles
 Tests: GET (empty), PUT (set URLs), GET (verify), PUT (update), PUT (clear field).
 """
+
 import sys
 import os
 import uuid
@@ -14,7 +15,13 @@ from app.schemas.profile_schemas import SocialProfileUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_social_profiles_crud():
+def test_social_profiles_crud() -> None:
+    """Validate CRUD operations and URL persistence for user social profiles.
+
+    Tests retrieval of empty social profiles, setting URLs across all platforms
+    (GitHub, LinkedIn, Portfolio, Kaggle, LeetCode, Codeforces, HackerRank, Medium, Dev.to,
+    YouTube, Twitter/X), updating URLs, and clearing fields.
+    """
     print("--- Starting Social Profiles CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -25,7 +32,12 @@ def test_social_profiles_crud():
 
         # Create test user
         dummy_email = f"test_social_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Social", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Social",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -95,16 +107,25 @@ def test_social_profiles_crud():
         # ── 6. Verify all platforms accessible in response ─────────────────
         final = service.get_social_profiles(user_id)
         platforms_checked = [
-            "github_url", "linkedin_url", "portfolio_url", "kaggle_url",
-            "leetcode_url", "codeforces_url", "hackerrank_url",
-            "medium_url", "devto_url", "youtube_url",
+            "github_url",
+            "linkedin_url",
+            "portfolio_url",
+            "kaggle_url",
+            "leetcode_url",
+            "codeforces_url",
+            "hackerrank_url",
+            "medium_url",
+            "devto_url",
+            "youtube_url",
         ]
         for p in platforms_checked:
             assert getattr(final, p) is not None, f"Field {p} should not be None"
         print("[SUCCESS] All 10 remaining platforms accessible in response")
 
         # Cleanup
-        social_record = db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
+        social_record = (
+            db.query(SocialProfile).filter(SocialProfile.user_id == user_id).first()
+        )
         if social_record:
             db.delete(social_record)
         db.delete(user)

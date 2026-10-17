@@ -3,14 +3,15 @@ from app.agents.base.agent_base import BaseAgent
 from app.agents.context.shared_context import SharedContext
 from app.agents.communication.message import Message
 
+
 class LearningAgent(BaseAgent):
     @property
     def name(self) -> str:
         return "LearningAgent"
-        
+
     @property
     def capabilities(self) -> list:
-        return ['ANALYZE_SKILL_GAP', 'GENERATE_LEARNING_PLAN']
+        return ["ANALYZE_SKILL_GAP", "GENERATE_LEARNING_PLAN"]
 
     def initialize(self):
         pass
@@ -23,7 +24,9 @@ class LearningAgent(BaseAgent):
 
     def execute(self, shared_context: SharedContext, message: Message) -> Message:
         # Simulate execution by delegating to underlying services
-        result_str = f"{self.name} successfully executed {message.payload.get('task_type')}."
+        result_str = (
+            f"{self.name} successfully executed {message.payload.get('task_type')}."
+        )
         message.mark_processed({"status": "success", "result": result_str})
         return message
 

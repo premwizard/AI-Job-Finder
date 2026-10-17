@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 17: Privacy Settings
 Tests: GET (empty/default), PUT (create/update toggles & dropdowns), GET (verify), GET export-data.
 """
+
 import sys
 import os
 import uuid
@@ -14,7 +15,13 @@ from app.schemas.profile_schemas import PrivacySettingUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_privacy_settings_crud():
+def test_privacy_settings_crud() -> None:
+    """Validate CRUD operations and visibility controls for privacy settings.
+
+    Verifies retrieval of default privacy configurations, updates of visibility
+    toggles (public profile, hide email/phone, recruiter visibility, search engine indexing),
+    and verified persistence.
+    """
     print("--- Starting Privacy Settings CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -25,7 +32,12 @@ def test_privacy_settings_crud():
 
         # Create test user
         dummy_email = f"test_privacy_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Privacy", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Privacy",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -35,8 +47,13 @@ def test_privacy_settings_crud():
         # ── 1. GET — empty/default privacy settings ───────────────────────
         empty_settings = service.get_privacy_settings(user_id)
         assert empty_settings is not None
-        assert empty_settings.is_public_profile is None or empty_settings.is_public_profile is True
-        print("[SUCCESS] GET empty/default privacy settings — returned expected response")
+        assert (
+            empty_settings.is_public_profile is None
+            or empty_settings.is_public_profile is True
+        )
+        print(
+            "[SUCCESS] GET empty/default privacy settings — returned expected response"
+        )
 
         # ── 2. PUT — create initial privacy settings ───────────────────────
         create_data = PrivacySettingUpdate(
@@ -56,7 +73,9 @@ def test_privacy_settings_crud():
         assert created.recruiter_visibility is True
         assert created.search_engine_indexing is False
         assert created.account_visibility == "Public"
-        print(f"[SUCCESS] PUT create — hide_email: {created.hide_email}, resume_vis: {created.resume_visibility}")
+        print(
+            f"[SUCCESS] PUT create — hide_email: {created.hide_email}, resume_vis: {created.resume_visibility}"
+        )
 
         # ── 3. GET — verify persisted settings ────────────────────────────
         fetched = service.get_privacy_settings(user_id)
@@ -77,7 +96,9 @@ def test_privacy_settings_crud():
         # Unchanged fields preserved
         assert updated.hide_phone is True
         assert updated.account_visibility == "Public"
-        print(f"[SUCCESS] PUT update — hide_email: {updated.hide_email}, resume_vis: {updated.resume_visibility}")
+        print(
+            f"[SUCCESS] PUT update — hide_email: {updated.hide_email}, resume_vis: {updated.resume_visibility}"
+        )
 
         # ── 5. GET export-data ─────────────────────────────────────────────
         export_snapshot = service.export_user_data(user_id)
@@ -85,10 +106,14 @@ def test_privacy_settings_crud():
         assert export_snapshot["user_id"] == user_id
         assert "privacy_settings" in export_snapshot
         assert "profile" in export_snapshot
-        print(f"[SUCCESS] GET export-data — exported snapshot successfully for user {user_id}")
+        print(
+            f"[SUCCESS] GET export-data — exported snapshot successfully for user {user_id}"
+        )
 
         # Cleanup
-        setting_record = db.query(PrivacySetting).filter(PrivacySetting.user_id == user_id).first()
+        setting_record = (
+            db.query(PrivacySetting).filter(PrivacySetting.user_id == user_id).first()
+        )
         if setting_record:
             db.delete(setting_record)
         db.delete(user)

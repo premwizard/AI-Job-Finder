@@ -29,11 +29,25 @@ from app.services.document_processing_service import DocumentProcessingService
 
 
 def create_dummy_upload_file(filename: str, content: bytes) -> UploadFile:
+    """Create an in-memory FastAPI UploadFile instance for testing.
+
+    Args:
+        filename: Name of the mock file to create.
+        content: Binary content payload of the file.
+
+    Returns:
+        UploadFile wrapping the byte stream.
+    """
     file_obj = io.BytesIO(content)
     return UploadFile(filename=filename, file=file_obj)
 
 
-def test_document_processing_engine():
+def test_document_processing_engine() -> None:
+    """Validate document processing pipeline across all supported file formats.
+
+    Tests text extraction across PDF, DOCX, TXT, and RTF formats, status lifecycle
+    transitions (Queued -> Processing -> Completed), raw text persistence, and error handling.
+    """
     print("--- Starting Document Processing Engine Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -57,7 +71,12 @@ def test_document_processing_engine():
 
         # Create test user
         dummy_email = f"test_doc_proc_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="DocProc", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="DocProc",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -73,7 +92,9 @@ def test_document_processing_engine():
         assert txt_res.raw_text is not None
         assert "John Doe" in txt_res.raw_text
         assert "Python" in txt_res.raw_text
-        print(f"[SUCCESS] TXT Extraction — status: {txt_res.parsing_status}, text length: {len(txt_res.raw_text)} chars")
+        print(
+            f"[SUCCESS] TXT Extraction — status: {txt_res.parsing_status}, text length: {len(txt_res.raw_text)} chars"
+        )
 
         # ── 2. Test RTF Extraction ─────────────────────────────────────────
         rtf_content = b"{\\rtf1\\ansi\\deff0 {\\fonttbl{\\f0 Arial;}}\n\\f0\\fs24 Jane Smith\\par Lead Data Scientist\\par PyTorch, TensorFlow\\par}"
@@ -84,7 +105,9 @@ def test_document_processing_engine():
         assert rtf_res.raw_text is not None
         assert "Jane Smith" in rtf_res.raw_text
         assert "PyTorch" in rtf_res.raw_text
-        print(f"[SUCCESS] RTF Extraction — status: {rtf_res.parsing_status}, clean text extracted")
+        print(
+            f"[SUCCESS] RTF Extraction — status: {rtf_res.parsing_status}, clean text extracted"
+        )
 
         # ── 3. Test PDF Extraction ─────────────────────────────────────────
         pdf_content = b"%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kinds 3 0 R /Count 1 >> endobj\nBT (Alex Johnson) Tj (AI Specialist) Tj ET\n%%EOF"
@@ -93,7 +116,9 @@ def test_document_processing_engine():
 
         assert pdf_res.parsing_status == "Completed"
         assert pdf_res.raw_text is not None
-        print(f"[SUCCESS] PDF Extraction — status: {pdf_res.parsing_status}, raw text stored separately")
+        print(
+            f"[SUCCESS] PDF Extraction — status: {pdf_res.parsing_status}, raw text stored separately"
+        )
 
         # ── 4. Test Image (PNG / OCR) Extraction ──────────────────────────
         png_content = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\x00\x00\x00\x1f\xf3\xff\xa2"
@@ -108,7 +133,9 @@ def test_document_processing_engine():
         retried_res = service.process_resume_document(user_id, txt_res.id)
         assert retried_res.parsing_status == "Completed"
         assert retried_res.processed_at is not None
-        print(f"[SUCCESS] Retry Processing — re-processed resume {txt_res.id} successfully")
+        print(
+            f"[SUCCESS] Retry Processing — re-processed resume {txt_res.id} successfully"
+        )
 
         # ── 6. Test Error Handling for Invalid / Empty File Path ──────────
         dummy_res = Resume(
@@ -129,7 +156,9 @@ def test_document_processing_engine():
         assert failed_res.parsing_status == "Failed"
         assert failed_res.processing_error is not None
         assert "not found" in failed_res.processing_error.lower()
-        print(f"[SUCCESS] Processing Failure Handling — status set to Failed with error details: {failed_res.processing_error}")
+        print(
+            f"[SUCCESS] Processing Failure Handling — status set to Failed with error details: {failed_res.processing_error}"
+        )
 
         # Cleanup
         db.query(Resume).filter(Resume.user_id == user_id).delete()

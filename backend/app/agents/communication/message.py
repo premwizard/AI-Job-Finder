@@ -1,8 +1,17 @@
 from typing import Dict, Any
 from datetime import datetime
 
+
 class Message:
-    def __init__(self, sender: str, receiver: str, task_id: int, goal_id: int, payload: Dict[str, Any], priority: int = 1):
+    def __init__(
+        self,
+        sender: str,
+        receiver: str,
+        task_id: int,
+        goal_id: int,
+        payload: Dict[str, Any],
+        priority: int = 1,
+    ):
         self.sender = sender
         self.receiver = receiver
         self.task_id = task_id
@@ -10,7 +19,7 @@ class Message:
         self.payload = payload
         self.priority = priority
         self.timestamp = datetime.utcnow()
-        self.status = "sent" # sent, delivered, processed, failed
+        self.status = "sent"  # sent, delivered, processed, failed
         self.metadata: Dict[str, Any] = {}
 
     def mark_processed(self, result: Dict[str, Any] = None):

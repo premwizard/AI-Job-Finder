@@ -36,7 +36,20 @@ def create_synthetic_resume_image(
     rotate_angle: float = 0.0,
     noise_level: bool = False,
 ) -> str:
-    """Create a synthetic test image resume file."""
+    """Create a synthetic test image resume file.
+
+    Args:
+        filename: Destination file name for the generated image.
+        title: Candidate name header to render.
+        subtitle: Professional title text.
+        skills: Bulleted list of candidate technical skills.
+        experience: Sample work experience entry.
+        rotate_angle: Angle in degrees to rotate image (for deskewing tests).
+        noise_level: Flag indicating if noise simulation should be applied.
+
+    Returns:
+        The file path to the saved synthetic resume image.
+    """
     img = Image.new("RGB", (800, 1000), color=(255, 255, 255))
     draw = ImageDraw.Draw(img)
 
@@ -44,7 +57,11 @@ def create_synthetic_resume_image(
     draw.text((50, 50), title, fill=(0, 0, 0))
     draw.text((50, 90), subtitle, fill=(50, 50, 50))
     draw.text((50, 150), "SUMMARY", fill=(0, 0, 0))
-    draw.text((50, 180), "Passionate engineer with 8 years of experience building scalable apps.", fill=(30, 30, 30))
+    draw.text(
+        (50, 180),
+        "Passionate engineer with 8 years of experience building scalable apps.",
+        fill=(30, 30, 30),
+    )
     draw.text((50, 240), "SKILLS", fill=(0, 0, 0))
     draw.text((50, 270), skills, fill=(30, 30, 30))
     draw.text((50, 330), "EXPERIENCE", fill=(0, 0, 0))
@@ -60,7 +77,12 @@ def create_synthetic_resume_image(
     return file_path
 
 
-def test_ocr_engine():
+def test_ocr_engine() -> None:
+    """Validate Optical Character Recognition (OCR) engine on resume images.
+
+    Verifies processing of image-based resumes (PNG, JPG, WEBP), auto-rotation and
+    deskewing, reading order preservation, and extraction confidence score tracking.
+    """
     print("--- Starting OCR Engine Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -85,7 +107,12 @@ def test_ocr_engine():
 
         # Create test user
         dummy_email = f"test_ocr_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="OcrEngine", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="OcrEngine",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -96,7 +123,10 @@ def test_ocr_engine():
         assert OcrStructureParser.parse_line_type("EXPERIENCE") == "HEADER"
         assert OcrStructureParser.parse_line_type("• Python, FastAPI") == "BULLET"
         assert OcrStructureParser.parse_line_type("Skill | Level | Years") == "TABLE"
-        assert OcrStructureParser.parse_line_type("Developed full-stack web applications.") == "PARAGRAPH"
+        assert (
+            OcrStructureParser.parse_line_type("Developed full-stack web applications.")
+            == "PARAGRAPH"
+        )
         print("[SUCCESS] Line structure classifier (HEADER, BULLET, TABLE, PARAGRAPH)")
 
         # ── 2. Standard Image Resume OCR Test ──────────────────────────────
@@ -105,16 +135,25 @@ def test_ocr_engine():
 
         assert res_normal["confidence"] >= 0.0
         assert res_normal["processing_time_ms"] > 0
-        assert any(p in res_normal["provider_used"] for p in ("PaddleOCR", "Tesseract", "OCR Engine"))
-        print(f"[SUCCESS] Standard Image OCR — Confidence: {res_normal['confidence']}%, Time: {res_normal['processing_time_ms']} ms, Provider: {res_normal['provider_used']}")
+        assert any(
+            p in res_normal["provider_used"]
+            for p in ("PaddleOCR", "Tesseract", "OCR Engine")
+        )
+        print(
+            f"[SUCCESS] Standard Image OCR — Confidence: {res_normal['confidence']}%, Time: {res_normal['processing_time_ms']} ms, Provider: {res_normal['provider_used']}"
+        )
 
         # ── 3. Rotated / Scanned Image Resume Test ─────────────────────────
-        rot_path = create_synthetic_resume_image("test_rotated_resume.png", rotate_angle=5.0)
+        rot_path = create_synthetic_resume_image(
+            "test_rotated_resume.png", rotate_angle=5.0
+        )
         res_rotated = ocr_service.process_image_resume(rot_path)
 
         assert res_rotated["confidence"] >= 0.0
         assert res_rotated["processing_time_ms"] > 0
-        print(f"[SUCCESS] Rotated/Scanned Image OCR & Deskewing — Confidence: {res_rotated['confidence']}%")
+        print(
+            f"[SUCCESS] Rotated/Scanned Image OCR & Deskewing — Confidence: {res_rotated['confidence']}%"
+        )
 
         # ── 4. Low Confidence Detection & Warning Flagging Test ────────────
         # Synthetic low confidence test
@@ -122,10 +161,14 @@ def test_ocr_engine():
             {"text": "unclear_text_1", "conf": 25.0, "top": 10, "left": 10},
             {"text": "blurry_word", "conf": 35.0, "top": 10, "left": 100},
         ]
-        text_out, blocks, avg_conf = OcrStructureParser.format_structured_text(dummy_words)
+        text_out, blocks, avg_conf = OcrStructureParser.format_structured_text(
+            dummy_words
+        )
         assert avg_conf == 30.0
         assert avg_conf < 60.0
-        print(f"[SUCCESS] Low Confidence Detection — Flagged average confidence {avg_conf}% (<60%)")
+        print(
+            f"[SUCCESS] Low Confidence Detection — Flagged average confidence {avg_conf}% (<60%)"
+        )
 
         # ── 5. Future-Ready Vision Model Stub Test ─────────────────────────
         vision_res = ocr_service.process_image_resume(img_path, provider="GeminiVision")
@@ -135,14 +178,18 @@ def test_ocr_engine():
 
         # ── 6. Full Service DB Integration Test ────────────────────────────
         with open(img_path, "rb") as f:
-            upload_file = UploadFile(filename="test_normal_resume.png", file=io.BytesIO(f.read()))
+            upload_file = UploadFile(
+                filename="test_normal_resume.png", file=io.BytesIO(f.read())
+            )
             db_res = service.upload_resume(user_id, upload_file)
 
         assert db_res.parsing_status == "Completed"
         assert db_res.ocr_confidence is not None
         assert db_res.ocr_processing_time_ms is not None
         assert db_res.ocr_provider is not None
-        print(f"[SUCCESS] Full DB Integration — Resume ID={db_res.id}, OCR Provider={db_res.ocr_provider}, Confidence={db_res.ocr_confidence}%")
+        print(
+            f"[SUCCESS] Full DB Integration — Resume ID={db_res.id}, OCR Provider={db_res.ocr_provider}, Confidence={db_res.ocr_confidence}%"
+        )
 
         # Cleanup
         for path in [img_path, rot_path]:

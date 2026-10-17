@@ -1,5 +1,6 @@
 from typing import Dict
 
+
 class RankingEngine:
     def __init__(self):
         # Semantic Match — 40%
@@ -16,21 +17,21 @@ class RankingEngine:
             "career_growth_score": 0.10,
             "freshness_score": 0.05,
             "compensation_score": 0.05,
-            "company_score": 0.05
+            "company_score": 0.05,
         }
 
     def calculate_recommendation(self, factors: Dict[str, float]) -> float:
         overall = 0.0
         total_weight = 0.0
-        
+
         for key, weight in self.weights.items():
             if key in factors and factors[key] is not None:
                 overall += factors[key] * weight
                 total_weight += weight
-                
+
         if total_weight == 0:
             return 0.0
-            
+
         final_score = overall / total_weight
         return round(final_score, 2)
 

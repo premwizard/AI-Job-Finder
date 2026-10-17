@@ -55,7 +55,10 @@ from app.modules.security.controllers import security_controller
 from app.modules.admin.controllers import admin_controller
 from app.modules.billing.controllers import billing_controller
 from app.modules.system.controllers import health_controller
-from app.modules.cache.providers.redis_provider import init_redis_cache, close_redis_cache
+from app.modules.cache.providers.redis_provider import (
+    init_redis_cache,
+    close_redis_cache,
+)
 from app.modules.observability.logging.structured_logger import structured_logger
 from app.modules.observability.tracing.tracer import init_tracer
 from app.modules.observability.middleware.metrics_middleware import init_metrics
@@ -87,7 +90,9 @@ app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 cors_origins_env = os.environ.get("CORS_ORIGINS", "http://localhost:3000")
-cors_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+cors_origins = [
+    origin.strip() for origin in cors_origins_env.split(",") if origin.strip()
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -99,7 +104,9 @@ app.add_middleware(
 
 # Add Security Headers Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
+
 app.add_middleware(BaseHTTPMiddleware, dispatch=security_headers_middleware)
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -112,10 +119,11 @@ async def log_requests(request: Request, call_next):
             "http.method": request.method,
             "http.url": str(request.url),
             "http.status_code": response.status_code,
-            "http.duration_seconds": process_time
-        }
+            "http.duration_seconds": process_time,
+        },
     )
     return response
+
 
 # Include Routers
 app.include_router(auth_routes.router)
@@ -174,12 +182,15 @@ from fastapi.staticfiles import StaticFiles
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
+
 @app.get("/favicon.ico", include_in_schema=False)
 def favicon():
     return Response(status_code=204)
 
+
 from app.database.database import engine, Base
 from sqlalchemy import text
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -232,6 +243,7 @@ async def startup_event():
             except Exception:
                 pass
 
+
 @app.on_event("shutdown")
 async def shutdown_event():
     await close_redis_cache()
@@ -241,14 +253,12 @@ async def shutdown_event():
 def read_root():
     return {"message": "Welcome to the Crown Atlas API"}
 
+
 @app.get("/api/v1/health")
 def health_check():
     return {
         "status": "ok",
         "service": "Crown Atlas API",
         "version": "1.0.0",
-        "components": {
-            "database": "connected",
-            "mcp": "ready"
-        }
+        "components": {"database": "connected", "mcp": "ready"},
     }

@@ -1,6 +1,7 @@
 from app.rag.providers.vector_store import ChromaMultiCollectionStore
 from app.rag.retrievers.hybrid_retriever import HybridRetriever
 
+
 class MemoryRetrievalService:
     def __init__(self):
         store = ChromaMultiCollectionStore()
@@ -12,6 +13,6 @@ class MemoryRetrievalService:
             collection_name="memories",
             query=query,
             k=limit,
-            metadata_filter={"owner_id": user_id}
+            metadata_filter={"owner_id": user_id},
         )
         return results

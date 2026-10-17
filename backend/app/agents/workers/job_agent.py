@@ -3,14 +3,15 @@ from app.agents.base.agent_base import BaseAgent
 from app.agents.context.shared_context import SharedContext
 from app.agents.communication.message import Message
 
+
 class JobSearchAgent(BaseAgent):
     @property
     def name(self) -> str:
         return "JobSearchAgent"
-        
+
     @property
     def capabilities(self) -> list:
-        return ['FIND_MATCHING_JOBS', 'MONITOR_JOBS']
+        return ["FIND_MATCHING_JOBS", "MONITOR_JOBS"]
 
     def initialize(self):
         pass
@@ -23,7 +24,9 @@ class JobSearchAgent(BaseAgent):
 
     def execute(self, shared_context: SharedContext, message: Message) -> Message:
         # Simulate execution by delegating to underlying services
-        result_str = f"{self.name} successfully executed {message.payload.get('task_type')}."
+        result_str = (
+            f"{self.name} successfully executed {message.payload.get('task_type')}."
+        )
         message.mark_processed({"status": "success", "result": result_str})
         return message
 

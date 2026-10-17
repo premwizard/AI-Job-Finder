@@ -1,6 +1,7 @@
 from typing import Dict, Any
 import random
 
+
 class OpportunityEvaluator:
     def __init__(self):
         pass
@@ -9,7 +10,7 @@ class OpportunityEvaluator:
         # In a real system, this invokes the Semantic Matching tool & Skill Gap tools.
         # For prototype, we generate mock scores based on simulated matching.
         score = random.uniform(50, 100)
-        
+
         category = "Good Match"
         if score > 90:
             category = "Perfect Match"
@@ -19,9 +20,9 @@ class OpportunityEvaluator:
             category = "Stretch Opportunity"
 
         reasoning = f"Based on semantic matching, this role has an estimated ATS compatibility of {score:.1f}%. It strongly aligns with your stated career goals."
-        
+
         return {
             "match_score": round(score, 2),
             "category": category,
-            "reasoning": reasoning
+            "reasoning": reasoning,
         }

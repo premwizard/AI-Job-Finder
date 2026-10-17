@@ -9,15 +9,26 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
+
 class ImprovementSuggestion(BaseModel):
-    section: str = Field(description="The section this applies to, e.g., 'Summary', 'Experience', 'Projects', 'Skills'")
-    original_text: str = Field(description="The exact original text snippet to be replaced")
+    section: str = Field(
+        description="The section this applies to, e.g., 'Summary', 'Experience', 'Projects', 'Skills'"
+    )
+    original_text: str = Field(
+        description="The exact original text snippet to be replaced"
+    )
     suggested_text: str = Field(description="The improved version of the text")
-    improvement_type: str = Field(description="Type of improvement: 'Action Verb', 'Quantification', 'Professional Phrasing', 'ATS Keywords', 'Grammar'")
-    reason: str = Field(description="A short explanation of why this suggestion improves the resume")
+    improvement_type: str = Field(
+        description="Type of improvement: 'Action Verb', 'Quantification', 'Professional Phrasing', 'ATS Keywords', 'Grammar'"
+    )
+    reason: str = Field(
+        description="A short explanation of why this suggestion improves the resume"
+    )
+
 
 class ImprovementResult(BaseModel):
     suggestions: List[ImprovementSuggestion]
+
 
 class ImprovementEngineService:
     @staticmethod
@@ -49,16 +60,16 @@ Return a list of suggestions matching the JSON schema.
 """
         model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
-            generation_config={"response_mime_type": "application/json"}
+            generation_config={"response_mime_type": "application/json"},
         )
-        
+
         try:
             response = model.generate_content(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     response_mime_type="application/json",
-                    response_schema=ImprovementResult
-                )
+                    response_schema=ImprovementResult,
+                ),
             )
             data = json.loads(response.text)
             result = ImprovementResult(**data)
@@ -75,20 +86,20 @@ Return a list of suggestions matching the JSON schema.
                 original_text="Worked on the backend API.",
                 suggested_text="Engineered and optimized RESTful backend APIs, improving response times.",
                 improvement_type="Action Verb",
-                reason="Uses stronger action verbs and highlights impact rather than just stating responsibilities."
+                reason="Uses stronger action verbs and highlights impact rather than just stating responsibilities.",
             ),
             ImprovementSuggestion(
                 section="Experience",
                 original_text="Helped increase sales.",
                 suggested_text="Drove a 20% increase in quarterly sales by implementing a targeted email campaign.",
                 improvement_type="Quantification",
-                reason="Adding specific numbers provides concrete evidence of your success."
+                reason="Adding specific numbers provides concrete evidence of your success.",
             ),
             ImprovementSuggestion(
                 section="Summary",
                 original_text="I am a software engineer looking for a job.",
                 suggested_text="Results-driven Software Engineer with expertise in scalable architectures and a passion for building robust web applications.",
                 improvement_type="Professional Phrasing",
-                reason="Creates a stronger, more professional first impression."
-            )
+                reason="Creates a stronger, more professional first impression.",
+            ),
         ]

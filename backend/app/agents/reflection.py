@@ -8,11 +8,11 @@ class Reflection:
             return {
                 "success": True,
                 "confidence": 0.95,
-                "reflection_note": "Task executed correctly and returned expected output."
+                "reflection_note": "Task executed correctly and returned expected output.",
             }
         else:
             return {
                 "success": False,
                 "confidence": 0.0,
-                "reflection_note": "Task failed to execute properly."
+                "reflection_note": "Task failed to execute properly.",
             }

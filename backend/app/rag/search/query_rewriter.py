@@ -3,6 +3,7 @@ import os
 import google.generativeai as genai
 from typing import Dict, Any
 
+
 class QueryRewriter:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -31,7 +32,7 @@ class QueryRewriter:
             "target_collections": ["jobs", "users", "learning", "companies"] // Select all that apply
         }}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
@@ -39,7 +40,7 @@ class QueryRewriter:
                 text = text[7:]
             if text.endswith("```"):
                 text = text[:-3]
-                
+
             parsed = json.loads(text.strip())
             return parsed
         except Exception as e:
@@ -48,5 +49,5 @@ class QueryRewriter:
                 "original_query": query,
                 "expanded_query": query,
                 "extracted_filters": {},
-                "target_collections": ["jobs", "users", "learning", "companies"]
+                "target_collections": ["jobs", "users", "learning", "companies"],
             }

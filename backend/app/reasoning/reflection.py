@@ -3,6 +3,7 @@ import json
 import google.generativeai as genai
 from typing import Dict, Any
 
+
 class ReflectionEngine:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -11,9 +12,11 @@ class ReflectionEngine:
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel("gemini-1.5-pro")
 
-    def reflect_on_task(self, task_type: str, result_summary: str, failed: bool = False) -> Dict[str, Any]:
+    def reflect_on_task(
+        self, task_type: str, result_summary: str, failed: bool = False
+    ) -> Dict[str, Any]:
         status_text = "FAILED" if failed else "COMPLETED"
-        
+
         prompt = f"""
         You are the Cognitive Reflection Engine for an AI Career Agent.
         A task has just finished executing.
@@ -30,12 +33,14 @@ class ReflectionEngine:
             "requires_replanning": true/false
         }}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
-            if text.startswith("```json"): text = text[7:]
-            if text.endswith("```"): text = text[:-3]
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.endswith("```"):
+                text = text[:-3]
             return json.loads(text.strip())
         except Exception as e:
             print(f"Reflection Error: {e}")
@@ -44,5 +49,5 @@ class ReflectionEngine:
                 "confidence": 0.5,
                 "reasoning": "Fallback reflection due to parsing error.",
                 "mitigation": "Manual intervention may be required.",
-                "requires_replanning": failed
+                "requires_replanning": failed,
             }

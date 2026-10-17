@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 13: AI Preferences
 Tests: GET (empty), PUT (create all 9 fields), GET (verify), PUT (partial update), field persistence.
 """
+
 import sys
 import os
 import uuid
@@ -15,7 +16,12 @@ from app.schemas.profile_schemas import AIPreferenceUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_ai_preferences_crud():
+def test_ai_preferences_crud() -> None:
+    """Validate CRUD operations and persistence for AI preferences.
+
+    Verifies retrieval of empty/default settings, creation across all AI preference
+    fields (roles, dream companies, technologies, domains), partial updates, and field persistence.
+    """
     print("--- Starting AI Preferences CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -38,7 +44,12 @@ def test_ai_preferences_crud():
 
         # Create test user
         dummy_email = f"test_ai_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="AI", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="AI",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -69,21 +80,40 @@ def test_ai_preferences_crud():
         assert created.dream_companies == "OpenAI,Google,Anthropic"
         assert created.dream_roles == "AI Researcher,Staff Engineer"
         assert created.dream_technologies == "LLMs,PyTorch,Rust"
-        assert created.preferred_ai_domains == "Natural Language Processing,Generative AI"
+        assert (
+            created.preferred_ai_domains == "Natural Language Processing,Generative AI"
+        )
         assert "RLHF" in created.learning_goals
-        assert created.preferred_learning_resources == "Fast.ai,ArXiv Papers,Deeplearning.ai"
+        assert (
+            created.preferred_learning_resources
+            == "Fast.ai,ArXiv Papers,Deeplearning.ai"
+        )
         assert created.target_salary == "$200,000"
-        assert created.target_countries == "United States,United Kingdom,Remote / Worldwide"
+        assert (
+            created.target_countries
+            == "United States,United Kingdom,Remote / Worldwide"
+        )
         assert "frontier AI lab" in created.career_objectives
-        assert created.career_growth_priorities == "Technical Leadership,Research Publications,Open Source Contributions"
+        assert (
+            created.career_growth_priorities
+            == "Technical Leadership,Research Publications,Open Source Contributions"
+        )
         print("[SUCCESS] PUT create — all 9 fields set correctly")
 
         # ── 3. GET — verify persistence ────────────────────────────────────
         fetched = service.get_ai_preferences(user_id)
         assert fetched.dream_companies == "OpenAI,Google,Anthropic"
-        assert fetched.preferred_learning_resources == "Fast.ai,ArXiv Papers,Deeplearning.ai"
-        assert fetched.target_countries == "United States,United Kingdom,Remote / Worldwide"
-        print(f"[SUCCESS] GET after create — dream_companies: {fetched.dream_companies[:30]}…")
+        assert (
+            fetched.preferred_learning_resources
+            == "Fast.ai,ArXiv Papers,Deeplearning.ai"
+        )
+        assert (
+            fetched.target_countries
+            == "United States,United Kingdom,Remote / Worldwide"
+        )
+        print(
+            f"[SUCCESS] GET after create — dream_companies: {fetched.dream_companies[:30]}…"
+        )
 
         # ── 4. PUT — partial update ────────────────────────────────────────
         partial = AIPreferenceUpdate(
@@ -95,8 +125,13 @@ def test_ai_preferences_crud():
         assert updated.target_salary == "$250,000"
         # Unchanged fields must be preserved
         assert updated.dream_roles == "AI Researcher,Staff Engineer"
-        assert updated.preferred_learning_resources == "Fast.ai,ArXiv Papers,Deeplearning.ai"
-        print("[SUCCESS] PUT partial update — dream_companies updated, dream_roles preserved")
+        assert (
+            updated.preferred_learning_resources
+            == "Fast.ai,ArXiv Papers,Deeplearning.ai"
+        )
+        print(
+            "[SUCCESS] PUT partial update — dream_companies updated, dream_roles preserved"
+        )
 
         # ── 5. Verify updated_at is populated ─────────────────────────────
         final = service.get_ai_preferences(user_id)
@@ -104,7 +139,9 @@ def test_ai_preferences_crud():
         print(f"[SUCCESS] updated_at is set: {final.updated_at}")
 
         # Cleanup
-        ai_record = db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        ai_record = (
+            db.query(AIPreference).filter(AIPreference.user_id == user_id).first()
+        )
         if ai_record:
             db.delete(ai_record)
         db.delete(user)

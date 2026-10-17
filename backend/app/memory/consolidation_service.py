@@ -2,6 +2,7 @@ import os
 import google.generativeai as genai
 from typing import List
 
+
 class ConsolidationService:
     def __init__(self):
         api_key = os.environ.get("GEMINI_API_KEY")
@@ -13,9 +14,9 @@ class ConsolidationService:
     def consolidate(self, memories: List[str]) -> str:
         if len(memories) <= 1:
             return memories[0] if memories else ""
-            
+
         context = "\n---\n".join(memories)
-        
+
         prompt = f"""
         You are the Master Memory Consolidation Engine.
         Below are multiple distinct memory fragments relating to a single user.
@@ -25,7 +26,7 @@ class ConsolidationService:
         MEMORIES:
         {context}
         """
-        
+
         try:
             response = self.model.generate_content(prompt)
             return response.text.strip()

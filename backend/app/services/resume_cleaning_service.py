@@ -126,20 +126,34 @@ class ResumeCleaner:
             return ""
 
         # Normalize "Present" variants
-        text = re.compile(r"\b(current|till date|to date)\b", re.IGNORECASE).sub("Present", text)
+        text = re.compile(r"\b(current|till date|to date)\b", re.IGNORECASE).sub(
+            "Present", text
+        )
 
         # Normalize Month Year e.g. 01/2021 or 01-2021 -> Jan 2021
         months = {
-            "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
-            "05": "May", "06": "Jun", "07": "Jul", "08": "Aug",
-            "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
+            "01": "Jan",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Apr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Aug",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dec",
         }
+
         def replace_num_date(match):
             m, y = match.group(1), match.group(2)
             month_name = months.get(m, m)
             return f"{month_name} {y}"
 
-        text = re.sub(r"\b(0[1-9]|1[0-2])[-/](20\d{2}|19\d{2})\b", replace_num_date, text)
+        text = re.sub(
+            r"\b(0[1-9]|1[0-2])[-/](20\d{2}|19\d{2})\b", replace_num_date, text
+        )
         return text
 
     @classmethod
@@ -160,7 +174,9 @@ class ResumeCleaner:
         def lower_email(match):
             return match.group(0).lower()
 
-        text = re.sub(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", lower_email, text)
+        text = re.sub(
+            r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", lower_email, text
+        )
         return text
 
     @classmethod
@@ -174,7 +190,9 @@ class ResumeCleaner:
             area, prefix, line = match.group(1), match.group(2), match.group(3)
             return f"({area}) {prefix}-{line}"
 
-        text = re.sub(r"\b\(?(\d{3})\)?[-. ]?(\d{3})[-. ]?(\d{4})\b", format_phone, text)
+        text = re.sub(
+            r"\b\(?(\d{3})\)?[-. ]?(\d{3})[-. ]?(\d{4})\b", format_phone, text
+        )
         return text
 
     @classmethod
@@ -226,7 +244,9 @@ class ResumeCleaningService:
     def __init__(self, db: Session):
         self.db = db
 
-    def clean_user_resume(self, user_id: str, resume_id: int) -> profile_schemas.ResumeResponse:
+    def clean_user_resume(
+        self, user_id: str, resume_id: int
+    ) -> profile_schemas.ResumeResponse:
         """Clean raw resume text for a specific user resume record."""
         resume = (
             self.db.query(Resume)

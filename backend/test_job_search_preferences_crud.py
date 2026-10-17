@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 15: Job Search Preferences
 Tests: GET (empty/default), PUT (create), PUT (update fields), verify persistence.
 """
+
 import sys
 import os
 import uuid
@@ -14,7 +15,13 @@ from app.schemas.profile_schemas import JobSearchPreferenceUpdate
 from app.services.profile_service import ProfileService
 
 
-def test_job_search_preferences_crud():
+def test_job_search_preferences_crud() -> None:
+    """Validate CRUD operations and persistence for job search preferences.
+
+    Verifies retrieval of default search preferences, creation with alerting parameters
+    (search frequency, notification digests, min match score, blocked locations),
+    and field persistence.
+    """
     print("--- Starting Job Search Preferences CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -25,7 +32,12 @@ def test_job_search_preferences_crud():
 
         # Create test user
         dummy_email = f"test_jsp_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="SearchPref", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="SearchPref",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -35,7 +47,10 @@ def test_job_search_preferences_crud():
         # ── 1. GET — empty/default prefs ──────────────────────────────────
         empty_prefs = service.get_job_search_preferences(user_id)
         assert empty_prefs is not None
-        assert empty_prefs.search_frequency is None or empty_prefs.search_frequency == "Daily"
+        assert (
+            empty_prefs.search_frequency is None
+            or empty_prefs.search_frequency == "Daily"
+        )
         print("[SUCCESS] GET empty/default prefs — returned expected response")
 
         # ── 2. PUT — create initial preferences ───────────────────────────
@@ -60,7 +75,9 @@ def test_job_search_preferences_crud():
         assert created.ignore_companies == "Revature,Consulting Co"
         assert created.ignore_keywords == "Unpaid,Onsite Only"
         assert created.blocked_locations == "High-Tax Region"
-        print(f"[SUCCESS] PUT create — search_freq: {created.search_frequency}, match_score: {created.min_match_score}")
+        print(
+            f"[SUCCESS] PUT create — search_freq: {created.search_frequency}, match_score: {created.min_match_score}"
+        )
 
         # ── 3. GET — verify persisted ──────────────────────────────────────
         fetched = service.get_job_search_preferences(user_id)
@@ -79,10 +96,16 @@ def test_job_search_preferences_crud():
         # Unchanged fields preserved
         assert updated.job_alert_keywords == "React,Python,Full Stack"
         assert updated.email_notifications is True
-        print(f"[SUCCESS] PUT update — min_match_score: {updated.min_match_score}, search_frequency: {updated.search_frequency}")
+        print(
+            f"[SUCCESS] PUT update — min_match_score: {updated.min_match_score}, search_frequency: {updated.search_frequency}"
+        )
 
         # Cleanup
-        pref_record = db.query(JobSearchPreference).filter(JobSearchPreference.user_id == user_id).first()
+        pref_record = (
+            db.query(JobSearchPreference)
+            .filter(JobSearchPreference.user_id == user_id)
+            .first()
+        )
         if pref_record:
             db.delete(pref_record)
         db.delete(user)

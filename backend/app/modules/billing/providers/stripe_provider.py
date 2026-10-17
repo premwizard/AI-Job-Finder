@@ -1,13 +1,15 @@
 import os
 import stripe
 
+
 class StripeProvider:
     """
     Abstract wrapper around the official Stripe SDK.
     Never leak Stripe IDs or Stripe specific exceptions outside of this module.
     """
+
     def __init__(self):
-        # Fallback to a mock key to prevent crashing during local development 
+        # Fallback to a mock key to prevent crashing during local development
         # when the API key is not yet provided by the user.
         stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_mock_key")
 
@@ -19,7 +21,7 @@ class StripeProvider:
         # and create a session. For this scaffold, we return a mock URL.
         if stripe.api_key == "sk_test_mock_key":
             return f"https://checkout.stripe.com/pay/mock_session_{user_id}_{plan_id}"
-            
+
         # Example Stripe implementation:
         # session = stripe.checkout.Session.create(
         #     customer=user_id,

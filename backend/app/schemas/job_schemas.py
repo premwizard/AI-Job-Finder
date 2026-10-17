@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 
+
 class JobLocationSchema(BaseModel):
     country: Optional[str] = None
     state: Optional[str] = None
@@ -12,6 +13,7 @@ class JobLocationSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class JobSkillSchema(BaseModel):
     skill_name: str
     category: Optional[str] = None
@@ -19,17 +21,20 @@ class JobSkillSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class JobRequirementSchema(BaseModel):
     requirement_text: str
 
     class Config:
         from_attributes = True
 
+
 class JobBenefitSchema(BaseModel):
     benefit_text: str
 
     class Config:
         from_attributes = True
+
 
 class JobSchema(BaseModel):
     id: int
@@ -74,12 +79,14 @@ class JobSchema(BaseModel):
     class Config:
         from_attributes = True
 
+
 class JobPaginationResponse(BaseModel):
     total: int
     page: int
     size: int
     pages: int
     items: List[JobSchema]
+
 
 class JobStatisticsResponse(BaseModel):
     total_jobs: int

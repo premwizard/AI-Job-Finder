@@ -2,6 +2,7 @@
 Automated Test — Phase 2 Module 14: Achievements
 Tests: GET (empty), POST (create each type), GET (verify), PUT (update), filter by type, DELETE.
 """
+
 import sys
 import os
 import uuid
@@ -28,7 +29,12 @@ ACHIEVEMENT_TYPES = [
 ]
 
 
-def test_achievements_crud():
+def test_achievements_crud() -> None:
+    """Validate CRUD operations and filtering for achievement records.
+
+    Verifies empty retrieval, creation of all supported achievement types,
+    fetching by ID, updating, category-based filtering, and deletion.
+    """
     print("--- Starting Achievements CRUD Test ---")
 
     Base.metadata.create_all(bind=engine)
@@ -39,7 +45,12 @@ def test_achievements_crud():
 
         # Create test user
         dummy_email = f"test_ach_{uuid.uuid4().hex[:6]}@example.com"
-        user = User(first_name="Ach", last_name="Tester", email=dummy_email, password_hash="dummy")
+        user = User(
+            first_name="Ach",
+            last_name="Tester",
+            email=dummy_email,
+            password_hash="dummy",
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -68,7 +79,9 @@ def test_achievements_crud():
             assert result.organization == f"Org for {ach_type}"
             assert result.created_at is not None
             created_ids.append(result.id)
-        print(f"[SUCCESS] POST create — all 8 types created ({len(created_ids)} records)")
+        print(
+            f"[SUCCESS] POST create — all 8 types created ({len(created_ids)} records)"
+        )
 
         # ── 3. GET all — verify count ──────────────────────────────────────
         all_items = service.get_achievements(user_id)

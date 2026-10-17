@@ -24,22 +24,52 @@ from app.database.database import Base
 experience_skills = Table(
     "experience_skills",
     Base.metadata,
-    Column("experience_id", String, ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True),
-    Column("skill_id", Integer, ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+    Column(
+        "experience_id",
+        String,
+        ForeignKey("experiences.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "skill_id",
+        Integer,
+        ForeignKey("skills.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 experience_projects = Table(
     "experience_projects",
     Base.metadata,
-    Column("experience_id", String, ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True),
-    Column("project_id", String, ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True)
+    Column(
+        "experience_id",
+        String,
+        ForeignKey("experiences.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "project_id",
+        String,
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 project_skills = Table(
     "project_skills",
     Base.metadata,
-    Column("project_id", String, ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True),
-    Column("skill_id", Integer, ForeignKey("skills.id", ondelete="CASCADE"), primary_key=True)
+    Column(
+        "project_id",
+        String,
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "skill_id",
+        Integer,
+        ForeignKey("skills.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
 )
 
 
@@ -87,7 +117,9 @@ class User(Base):
     applications = relationship("Application", back_populates="user")
     analytics = relationship("Analytics", back_populates="user", uselist=False)
     connected_accounts = relationship("ConnectedAccount", back_populates="user")
-    education = relationship("Education", back_populates="user", cascade="all, delete-orphan")
+    education = relationship(
+        "Education", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class UserProfile(Base):
@@ -142,7 +174,9 @@ class UserProfile(Base):
     )
 
     user = relationship("User", back_populates="profile")
-    language_proficiencies = relationship("Language", back_populates="profile", cascade="all, delete-orphan")
+    language_proficiencies = relationship(
+        "Language", back_populates="profile", cascade="all, delete-orphan"
+    )
 
 
 class Language(Base):
@@ -152,7 +186,9 @@ class Language(Base):
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
     profile_id: Any = Column(String, ForeignKey("user_profiles.id"), nullable=False)
     name: Any = Column(String, nullable=False)
-    proficiency: Any = Column(String, nullable=False)  # Native, Fluent, Professional, Intermediate, Beginner
+    proficiency: Any = Column(
+        String, nullable=False
+    )  # Native, Fluent, Professional, Intermediate, Beginner
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
@@ -168,13 +204,13 @@ class Skill(Base):
     category: Any = Column(String, nullable=True)
     level: Any = Column(String, nullable=True)  # Beginner, Intermediate, Expert
     years_of_experience: Any = Column(Integer, nullable=True)
-    
+
     # New Fields for Module 4
     last_used: Any = Column(Integer, nullable=True)  # Year
     currently_using: Any = Column(Boolean, default=False)
     featured_skill: Any = Column(Boolean, default=False)
     verified: Any = Column(Boolean, default=False)
-    
+
     # Future AI Fields
     ai_skill_confidence: Any = Column(Float, nullable=True)
     resume_extracted: Any = Column(Boolean, default=False)
@@ -183,8 +219,12 @@ class Skill(Base):
     learning_priority: Any = Column(String, nullable=True)
 
     user = relationship("User", back_populates="skills")
-    experiences = relationship("Experience", secondary="experience_skills", back_populates="skills")
-    projects = relationship("Project", secondary="project_skills", back_populates="skills")
+    experiences = relationship(
+        "Experience", secondary="experience_skills", back_populates="skills"
+    )
+    projects = relationship(
+        "Project", secondary="project_skills", back_populates="skills"
+    )
 
 
 class Resume(Base):
@@ -195,16 +235,18 @@ class Resume(Base):
     file_url: Any = Column(String)
     file_name: Any = Column(String, nullable=True)
     file_size: Any = Column(Integer, nullable=True)  # in bytes
-    file_type: Any = Column(String, nullable=True)   # e.g. "PDF", "DOCX"
-    mime_type: Any = Column(String, nullable=True)   # e.g. "application/pdf"
-    file_hash: Any = Column(String, nullable=True)   # SHA-256 content hash
+    file_type: Any = Column(String, nullable=True)  # e.g. "PDF", "DOCX"
+    mime_type: Any = Column(String, nullable=True)  # e.g. "application/pdf"
+    file_hash: Any = Column(String, nullable=True)  # SHA-256 content hash
     version: Any = Column(Integer, default=1)
     is_active: Any = Column(Boolean, default=True)
 
     # Reserved — AI / Parsing fields (not implemented yet)
     resume_score: Any = Column(Float, nullable=True)
     ats_score: Any = Column(Float, nullable=True)
-    parsing_status: Any = Column(String, default="Queued")  # Queued, Processing, Completed, Failed
+    parsing_status: Any = Column(
+        String, default="Queued"
+    )  # Queued, Processing, Completed, Failed
     raw_text: Any = Column(Text, nullable=True)
     clean_text: Any = Column(Text, nullable=True)
     parsed_data_json: Any = Column(Text, nullable=True)
@@ -226,19 +268,31 @@ class Resume(Base):
     )
 
     user = relationship("User", back_populates="resumes")
-    ats_history = relationship("ATSAnalysisHistory", back_populates="resume", cascade="all, delete-orphan")
-    quality_history = relationship("QualityAnalysisHistory", back_populates="resume", cascade="all, delete-orphan")
+    ats_history = relationship(
+        "ATSAnalysisHistory", back_populates="resume", cascade="all, delete-orphan"
+    )
+    quality_history = relationship(
+        "QualityAnalysisHistory", back_populates="resume", cascade="all, delete-orphan"
+    )
 
 
 class ATSAnalysisHistory(Base):
     __tablename__ = "ats_analysis_history"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    resume_id: Any = Column(
+        Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False
+    )
     overall_score: Any = Column(Integer, nullable=False)
-    category_scores_json: Any = Column(Text, nullable=True) # Contains category breakdown
-    full_analysis_json: Any = Column(Text, nullable=True) # Full JSON output
+    category_scores_json: Any = Column(
+        Text, nullable=True
+    )  # Contains category breakdown
+    full_analysis_json: Any = Column(Text, nullable=True)  # Full JSON output
     analyzed_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
@@ -248,12 +302,20 @@ class ATSAnalysisHistory(Base):
 class QualityAnalysisHistory(Base):
     __tablename__ = "quality_analysis_history"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    resume_id: Any = Column(
+        Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False
+    )
     overall_score: Any = Column(Integer, nullable=False)
-    category_scores_json: Any = Column(Text, nullable=True) # Contains category breakdown
-    full_analysis_json: Any = Column(Text, nullable=True) # Full JSON output
+    category_scores_json: Any = Column(
+        Text, nullable=True
+    )  # Contains category breakdown
+    full_analysis_json: Any = Column(Text, nullable=True)  # Full JSON output
     analyzed_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
@@ -263,18 +325,30 @@ class QualityAnalysisHistory(Base):
 class ResumeImprovementSuggestion(Base):
     __tablename__ = "resume_improvement_suggestions"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
-    
-    section: Any = Column(String, nullable=False) # e.g. "Experience", "Summary", "Skills"
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    resume_id: Any = Column(
+        Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False
+    )
+
+    section: Any = Column(
+        String, nullable=False
+    )  # e.g. "Experience", "Summary", "Skills"
     original_text: Any = Column(Text, nullable=False)
     suggested_text: Any = Column(Text, nullable=False)
-    improvement_type: Any = Column(String, nullable=False) # e.g. "Action Verb", "Quantification"
-    reason: Any = Column(Text, nullable=True) # Why this is better
-    
-    status: Any = Column(String, default="PENDING") # PENDING, ACCEPTED, REJECTED, EDITED
-    
+    improvement_type: Any = Column(
+        String, nullable=False
+    )  # e.g. "Action Verb", "Quantification"
+    reason: Any = Column(Text, nullable=True)  # Why this is better
+
+    status: Any = Column(
+        String, default="PENDING"
+    )  # PENDING, ACCEPTED, REJECTED, EDITED
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
     resolved_at: Any = Column(DateTime, nullable=True)
 
@@ -285,15 +359,23 @@ class ResumeImprovementSuggestion(Base):
 class SkillGapAnalysis(Base):
     __tablename__ = "skill_gap_analyses"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="SET NULL"), nullable=True)
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    resume_id: Any = Column(
+        Integer, ForeignKey("resumes.id", ondelete="SET NULL"), nullable=True
+    )
+
     target_role: Any = Column(String, nullable=False)
     target_industry: Any = Column(String, nullable=False)
     gap_percentage: Any = Column(Integer, nullable=False)
-    analysis_data_json: Any = Column(Text, nullable=False) # JSON structure with all the skills and roadmap
-    
+    analysis_data_json: Any = Column(
+        Text, nullable=False
+    )  # JSON structure with all the skills and roadmap
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
@@ -303,17 +385,21 @@ class SkillGapAnalysis(Base):
 class ResumeVersion(Base):
     __tablename__ = "resume_versions"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    resume_id: Any = Column(Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    resume_id: Any = Column(
+        Integer, ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False
+    )
+
     version_number: Any = Column(Integer, nullable=False)
     change_summary: Any = Column(String, nullable=False)
-    
+
     parsed_data_json: Any = Column(Text, nullable=True)
     clean_text: Any = Column(Text, nullable=True)
     ats_score: Any = Column(Float, nullable=True)
     quality_score: Any = Column(Float, nullable=True)
-    
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
     resume = relationship("Resume")
@@ -322,19 +408,31 @@ class ResumeVersion(Base):
 class ProfileEmbedding(Base):
     __tablename__ = "profile_embeddings"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    
-    item_type: Any = Column(String, nullable=False, index=True) # e.g. "resume", "skill", "project"
-    item_id: Any = Column(String, nullable=False, index=True)   # The string or int ID of the original record
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+    item_type: Any = Column(
+        String, nullable=False, index=True
+    )  # e.g. "resume", "skill", "project"
+    item_id: Any = Column(
+        String, nullable=False, index=True
+    )  # The string or int ID of the original record
+
     chunk_index: Any = Column(Integer, default=0)
     text_chunk: Any = Column(Text, nullable=False)
-    embedding_vector: Any = Column(Text, nullable=False) # JSON array of floats
-    metadata_json: Any = Column(Text, nullable=True)     # JSON object for additional context
-    
+    embedding_vector: Any = Column(Text, nullable=False)  # JSON array of floats
+    metadata_json: Any = Column(
+        Text, nullable=True
+    )  # JSON object for additional context
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
 
@@ -346,33 +444,35 @@ class Job(Base):
     job_hash: Any = Column(String, unique=True, index=True, nullable=True)
     source: Any = Column(String, index=True)
     original_url: Any = Column(String, nullable=True)
-    
+
     company_name: Any = Column(String, index=True)
     company_logo: Any = Column(String, nullable=True)
     company_size: Any = Column(String, nullable=True)
     company_industry: Any = Column(String, nullable=True)
     company_website: Any = Column(String, nullable=True)
-    
+
     job_title: Any = Column(String, index=True)
-    employment_type: Any = Column(String, nullable=True) # Full-time, Part-time, Contract
-    work_mode: Any = Column(String, nullable=True) # Remote, Hybrid, Onsite
+    employment_type: Any = Column(
+        String, nullable=True
+    )  # Full-time, Part-time, Contract
+    work_mode: Any = Column(String, nullable=True)  # Remote, Hybrid, Onsite
     industry: Any = Column(String, nullable=True)
-    
+
     min_salary: Any = Column(Integer, nullable=True)
     max_salary: Any = Column(Integer, nullable=True)
     salary_currency: Any = Column(String, nullable=True)
     salary_period: Any = Column(String, nullable=True)
     salary_available: Any = Column(Boolean, default=False)
-    
+
     min_experience: Any = Column(Integer, nullable=True)
     max_experience: Any = Column(Integer, nullable=True)
     career_level: Any = Column(String, nullable=True)
-    
+
     description_raw: Any = Column(Text, nullable=True)
     description_clean: Any = Column(Text, nullable=True)
     description_markdown: Any = Column(Text, nullable=True)
     description_summary: Any = Column(Text, nullable=True)
-    
+
     # Metadata
     posted_date: Any = Column(DateTime, nullable=True)
     collected_date: Any = Column(DateTime, default=datetime.utcnow)
@@ -382,7 +482,7 @@ class Job(Base):
     parsing_status: Any = Column(String, default="pending")
     embedding_status: Any = Column(Boolean, default=False)
     ai_processed: Any = Column(Boolean, default=False)
-    
+
     # AI Parsing Data
     parsed_data_json: Any = Column(Text, nullable=True)
     ai_summary: Any = Column(Text, nullable=True)
@@ -390,56 +490,80 @@ class Job(Base):
     processing_version: Any = Column(Integer, default=0)
     ai_model_used: Any = Column(String, nullable=True)
     prompt_version: Any = Column(String, nullable=True)
-    
+
     # Existing relationships
-    saved_by = relationship("SavedJob", back_populates="job", cascade="all, delete-orphan")
-    applications = relationship("Application", back_populates="job", cascade="all, delete-orphan")
-    
+    saved_by = relationship(
+        "SavedJob", back_populates="job", cascade="all, delete-orphan"
+    )
+    applications = relationship(
+        "Application", back_populates="job", cascade="all, delete-orphan"
+    )
+
     # New relationships
-    locations = relationship("JobLocation", back_populates="job", cascade="all, delete-orphan")
-    skills = relationship("JobSkill", back_populates="job", cascade="all, delete-orphan")
-    requirements = relationship("JobRequirement", back_populates="job", cascade="all, delete-orphan")
-    benefits = relationship("JobBenefit", back_populates="job", cascade="all, delete-orphan")
-    chunks = relationship("JobChunkMetadata", back_populates="job", cascade="all, delete-orphan")
+    locations = relationship(
+        "JobLocation", back_populates="job", cascade="all, delete-orphan"
+    )
+    skills = relationship(
+        "JobSkill", back_populates="job", cascade="all, delete-orphan"
+    )
+    requirements = relationship(
+        "JobRequirement", back_populates="job", cascade="all, delete-orphan"
+    )
+    benefits = relationship(
+        "JobBenefit", back_populates="job", cascade="all, delete-orphan"
+    )
+    chunks = relationship(
+        "JobChunkMetadata", back_populates="job", cascade="all, delete-orphan"
+    )
 
 
 class JobChunkMetadata(Base):
     __tablename__ = "job_chunks_metadata"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
     job_id: Any = Column(Integer, ForeignKey("jobs.id"), nullable=False, index=True)
-    chunk_id: Any = Column(String, unique=True, index=True, nullable=False) # e.g. job_123_skills
-    chunk_type: Any = Column(String, nullable=False) # Overview, Skills, Responsibilities, etc.
+    chunk_id: Any = Column(
+        String, unique=True, index=True, nullable=False
+    )  # e.g. job_123_skills
+    chunk_type: Any = Column(
+        String, nullable=False
+    )  # Overview, Skills, Responsibilities, etc.
     chunk_order: Any = Column(Integer, default=0)
     token_count: Any = Column(Integer, default=0)
     embedding_version: Any = Column(String, nullable=True)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     job = relationship("Job", back_populates="chunks")
 
 
 class JobMatchResult(Base):
     __tablename__ = "job_match_results"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
     overall_score: Any = Column(Float, nullable=False)
     semantic_score: Any = Column(Float, nullable=True)
     skills_score: Any = Column(Float, nullable=True)
     experience_score: Any = Column(Float, nullable=True)
     salary_score: Any = Column(Float, nullable=True)
-    
+
     missing_skills_json: Any = Column(Text, nullable=True)
     matched_skills_json: Any = Column(Text, nullable=True)
-    
+
     explanation_summary: Any = Column(Text, nullable=True)
     explanation_missing: Any = Column(Text, nullable=True)
-    
+
     is_stale: Any = Column(Boolean, default=False)
     calculated_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
     job = relationship("Job")
 
@@ -447,22 +571,30 @@ class JobMatchResult(Base):
 class JobRecommendation(Base):
     __tablename__ = "job_recommendations"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
     recommendation_score: Any = Column(Float, nullable=False)
     confidence_score: Any = Column(Float, nullable=False)
     career_growth_score: Any = Column(Float, nullable=False)
-    category: Any = Column(String, nullable=False) # Top Pick, Highly Recommended, Recommended
-    
+    category: Any = Column(
+        String, nullable=False
+    )  # Top Pick, Highly Recommended, Recommended
+
     explanation_strengths_json: Any = Column(Text, nullable=True)
     explanation_weaknesses_json: Any = Column(Text, nullable=True)
     explanation_summary: Any = Column(Text, nullable=True)
-    
+
     is_stale: Any = Column(Boolean, default=False)
     calculated_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
     job = relationship("Job")
 
@@ -470,23 +602,29 @@ class JobRecommendation(Base):
 class JobExplanation(Base):
     __tablename__ = "job_explanations"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
     overall_summary: Any = Column(Text, nullable=True)
     strengths_json: Any = Column(Text, nullable=True)
     missing_skills_json: Any = Column(Text, nullable=True)
     risk_factors_json: Any = Column(Text, nullable=True)
     improvement_suggestions_json: Any = Column(Text, nullable=True)
-    
+
     career_growth_analysis: Any = Column(Text, nullable=True)
     confidence_explanation: Any = Column(Text, nullable=True)
     confidence_score: Any = Column(Float, nullable=False, default=0.0)
-    
+
     is_stale: Any = Column(Boolean, default=False)
     generated_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
     job = relationship("Job")
 
@@ -494,17 +632,27 @@ class JobExplanation(Base):
 class JobLearningRoadmap(Base):
     __tablename__ = "job_learning_roadmaps"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    
-    roadmap_json: Any = Column(Text, nullable=False) # JSON array of learning phases/steps
-    projected_improvements_json: Any = Column(Text, nullable=False) # JSON mapping skill -> score improvement
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+    roadmap_json: Any = Column(
+        Text, nullable=False
+    )  # JSON array of learning phases/steps
+    projected_improvements_json: Any = Column(
+        Text, nullable=False
+    )  # JSON mapping skill -> score improvement
     career_growth_insights_json: Any = Column(Text, nullable=True)
-    
+
     is_stale: Any = Column(Boolean, default=False)
     generated_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
     job = relationship("Job")
 
@@ -512,27 +660,41 @@ class JobLearningRoadmap(Base):
 class RAGDocumentMetadata(Base):
     __tablename__ = "rag_document_metadata"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    collection_name: Any = Column(String, nullable=False, index=True) # e.g. "jobs", "users", "learning"
-    entity_id: Any = Column(String, nullable=False, index=True) # e.g. job_id, user_id
-    chunk_type: Any = Column(String, nullable=False) # e.g. "skills", "experience", "requirements"
-    visibility: Any = Column(String, nullable=False, default="public") # "public" or "private"
-    
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    collection_name: Any = Column(
+        String, nullable=False, index=True
+    )  # e.g. "jobs", "users", "learning"
+    entity_id: Any = Column(String, nullable=False, index=True)  # e.g. job_id, user_id
+    chunk_type: Any = Column(
+        String, nullable=False
+    )  # e.g. "skills", "experience", "requirements"
+    visibility: Any = Column(
+        String, nullable=False, default="public"
+    )  # "public" or "private"
+
     last_indexed: Any = Column(DateTime, default=datetime.utcnow)
 
 
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
-    id: Any = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    role: Any = Column(String, nullable=False) # "user" or "assistant"
+    id: Any = Column(
+        String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
+    )
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    role: Any = Column(String, nullable=False)  # "user" or "assistant"
     content: Any = Column(Text, nullable=False)
-    citations_json: Any = Column(Text, nullable=True) # JSON list of citations
-    suggested_actions_json: Any = Column(Text, nullable=True) # JSON list of suggested actions
-    
+    citations_json: Any = Column(Text, nullable=True)  # JSON list of citations
+    suggested_actions_json: Any = Column(
+        Text, nullable=True
+    )  # JSON list of suggested actions
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
 
 
@@ -543,96 +705,132 @@ class CompanyProfile(Base):
     company_name: Any = Column(String, nullable=False, unique=True, index=True)
     logo_url: Any = Column(String, nullable=True)
     industry: Any = Column(String, nullable=True)
-    
-    tech_stack_json: Any = Column(Text, nullable=True) # JSON list/dict
-    benefits_json: Any = Column(Text, nullable=True) # JSON list
-    culture_json: Any = Column(Text, nullable=True) # JSON dict (mission, engineering_culture)
+
+    tech_stack_json: Any = Column(Text, nullable=True)  # JSON list/dict
+    benefits_json: Any = Column(Text, nullable=True)  # JSON list
+    culture_json: Any = Column(
+        Text, nullable=True
+    )  # JSON dict (mission, engineering_culture)
     ai_summary: Any = Column(Text, nullable=True)
-    
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
 
 class ResumeOptimization(Base):
     __tablename__ = "resume_optimizations"
 
     id: Any = Column(Integer, primary_key=True, index=True)
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    
-    suggestions_json: Any = Column(Text, nullable=False) # JSON list of suggestion objects
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+
+    suggestions_json: Any = Column(
+        Text, nullable=False
+    )  # JSON list of suggestion objects
     projected_ats_score: Any = Column(Integer, nullable=True)
     projected_match_score: Any = Column(Integer, nullable=True)
-    
-    status: Any = Column(String, default="pending") # "pending", "applied"
-    
+
+    status: Any = Column(String, default="pending")  # "pending", "applied"
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User")
     job = relationship("Job")
 
 
 class AgentGoal(Base):
     __tablename__ = "agent_goals"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     title: Any = Column(String, nullable=False)
     description: Any = Column(Text, nullable=True)
-    status: Any = Column(String, default="pending") # pending, planning, active, completed, failed
+    status: Any = Column(
+        String, default="pending"
+    )  # pending, planning, active, completed, failed
     progress: Any = Column(Integer, default=0)
-    
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
     user = relationship("User")
-    tasks = relationship("AgentTask", back_populates="goal", cascade="all, delete-orphan")
+    tasks = relationship(
+        "AgentTask", back_populates="goal", cascade="all, delete-orphan"
+    )
 
 
 class AgentTask(Base):
     __tablename__ = "agent_tasks"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    goal_id: Any = Column(Integer, ForeignKey("agent_goals.id", ondelete="CASCADE"), nullable=False, index=True)
-    task_type: Any = Column(String, nullable=False) # e.g. ANALYZE_RESUME
+    goal_id: Any = Column(
+        Integer,
+        ForeignKey("agent_goals.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    task_type: Any = Column(String, nullable=False)  # e.g. ANALYZE_RESUME
     description: Any = Column(Text, nullable=False)
-    status: Any = Column(String, default="pending") # pending, running, completed, failed
+    status: Any = Column(
+        String, default="pending"
+    )  # pending, running, completed, failed
     result_summary: Any = Column(Text, nullable=True)
     priority: Any = Column(Integer, default=1)
     retries: Any = Column(Integer, default=0)
     max_retries: Any = Column(Integer, default=3)
-    
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
     completed_at: Any = Column(DateTime, nullable=True)
-    
+
     goal = relationship("AgentGoal", back_populates="tasks")
 
 
 class UserMemory(Base):
     __tablename__ = "user_memories"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    memory_type: Any = Column(String, nullable=False) # short_term, long_term, episodic, semantic, working
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    memory_type: Any = Column(
+        String, nullable=False
+    )  # short_term, long_term, episodic, semantic, working
     title: Any = Column(String, nullable=True)
     content: Any = Column(Text, nullable=False)
-    importance_score: Any = Column(Integer, default=3) # 1-5
+    importance_score: Any = Column(Integer, default=3)  # 1-5
     source: Any = Column(String, nullable=True)
-    tags: Any = Column(String, nullable=True) # comma separated
-    
+    tags: Any = Column(String, nullable=True)  # comma separated
+
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
     last_accessed: Any = Column(DateTime, default=datetime.utcnow)
     access_count: Any = Column(Integer, default=0)
-    
+
     user = relationship("User")
 
 
 class AgentReflection(Base):
     __tablename__ = "agent_reflections"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    task_id: Any = Column(Integer, ForeignKey("agent_tasks.id", ondelete="CASCADE"), nullable=False, index=True)
+    task_id: Any = Column(
+        Integer,
+        ForeignKey("agent_tasks.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     success: Any = Column(Boolean, default=False)
     confidence: Any = Column(Float, default=0.0)
     reasoning: Any = Column(Text, nullable=False)
@@ -642,9 +840,14 @@ class AgentReflection(Base):
 
 class AgentDecision(Base):
     __tablename__ = "agent_decisions"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    goal_id: Any = Column(Integer, ForeignKey("agent_goals.id", ondelete="CASCADE"), nullable=False, index=True)
+    goal_id: Any = Column(
+        Integer,
+        ForeignKey("agent_goals.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
     question: Any = Column(String, nullable=False)
     decision: Any = Column(String, nullable=False)
     reasoning: Any = Column(Text, nullable=False)
@@ -655,10 +858,12 @@ class AgentDecision(Base):
 
 class ToolExecutionLog(Base):
     __tablename__ = "tool_execution_logs"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
     tool_name: Any = Column(String, nullable=False, index=True)
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     success: Any = Column(Boolean, default=True)
     latency_ms: Any = Column(Float, default=0.0)
     error_message: Any = Column(Text, nullable=True)
@@ -667,14 +872,18 @@ class ToolExecutionLog(Base):
 
 class Opportunity(Base):
     __tablename__ = "opportunities"
-    
+
     id: Any = Column(Integer, primary_key=True, index=True)
-    user_id: Any = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Any = Column(
+        String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    job_id: Any = Column(
+        Integer, ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
     match_score: Any = Column(Float, default=0.0)
     category: Any = Column(String, default="Unknown")
     reasoning: Any = Column(Text, nullable=True)
-    status: Any = Column(String, default="new") # new, saved, ignored, applied
+    status: Any = Column(String, default="new")  # new, saved, ignored, applied
     created_at: Any = Column(DateTime, default=datetime.utcnow)
 
 
@@ -687,7 +896,7 @@ class JobLocation(Base):
     city: Any = Column(String, nullable=True)
     is_remote: Any = Column(Boolean, default=False)
     is_hybrid: Any = Column(Boolean, default=False)
-    
+
     job = relationship("Job", back_populates="locations")
 
 
@@ -696,8 +905,8 @@ class JobSkill(Base):
     id: Any = Column(Integer, primary_key=True, index=True)
     job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
     skill_name: Any = Column(String, index=True)
-    category: Any = Column(String, nullable=True) # Required, Preferred, Soft, AI, etc.
-    
+    category: Any = Column(String, nullable=True)  # Required, Preferred, Soft, AI, etc.
+
     job = relationship("Job", back_populates="skills")
 
 
@@ -706,7 +915,7 @@ class JobRequirement(Base):
     id: Any = Column(Integer, primary_key=True, index=True)
     job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
     requirement_text: Any = Column(String)
-    
+
     job = relationship("Job", back_populates="requirements")
 
 
@@ -715,7 +924,7 @@ class JobBenefit(Base):
     id: Any = Column(Integer, primary_key=True, index=True)
     job_id: Any = Column(Integer, ForeignKey("jobs.id", ondelete="CASCADE"))
     benefit_text: Any = Column(String)
-    
+
     job = relationship("Job", back_populates="benefits")
 
 
@@ -883,13 +1092,17 @@ class Experience(Base):
     manager_name: Any = Column(String, nullable=True)
     order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
-    skills = relationship("Skill", secondary="experience_skills", back_populates="experiences")
-    projects = relationship("Project", secondary="experience_projects", back_populates="experiences")
-
-
+    skills = relationship(
+        "Skill", secondary="experience_skills", back_populates="experiences"
+    )
+    projects = relationship(
+        "Project", secondary="experience_projects", back_populates="experiences"
+    )
 
 
 class Certification(Base):
@@ -910,7 +1123,9 @@ class Certification(Base):
     category: Any = Column(String, nullable=True)
     verification_status: Any = Column(String, default="unverified")
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
 
@@ -942,11 +1157,17 @@ class Project(Base):
     status: Any = Column(String, default="Completed")
     is_featured: Any = Column(Boolean, default=False)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
-    skills = relationship("Skill", secondary="project_skills", back_populates="projects")
-    experiences = relationship("Experience", secondary="experience_projects", back_populates="projects")
+    skills = relationship(
+        "Skill", secondary="project_skills", back_populates="projects"
+    )
+    experiences = relationship(
+        "Experience", secondary="experience_projects", back_populates="projects"
+    )
 
 
 class CareerPreference(Base):
@@ -962,18 +1183,20 @@ class CareerPreference(Base):
     # Location
     preferred_locations: Any = Column(String, nullable=True)  # Legacy combined
     preferred_countries: Any = Column(String, nullable=True)  # CSV e.g. "India,USA"
-    preferred_cities: Any = Column(String, nullable=True)     # CSV e.g. "Bangalore,Remote"
+    preferred_cities: Any = Column(String, nullable=True)  # CSV e.g. "Bangalore,Remote"
     # Work Setup
-    work_setup: Any = Column(String, nullable=True)           # CSV: "Remote,Hybrid,Onsite"
+    work_setup: Any = Column(String, nullable=True)  # CSV: "Remote,Hybrid,Onsite"
     # Compensation
     expected_salary: Any = Column(String, nullable=True)
     preferred_currency: Any = Column(String, nullable=True)
     negotiable_salary: Any = Column(Boolean, default=False)
     expected_joining_bonus: Any = Column(String, nullable=True)
     # Company
-    employment_types: Any = Column(String, nullable=True)     # CSV: "Full-Time,Contract"
-    company_size: Any = Column(String, nullable=True)         # CSV: "1-50,51-200"
-    startup_or_enterprise: Any = Column(String, nullable=True)  # "Startup","Enterprise","Any"
+    employment_types: Any = Column(String, nullable=True)  # CSV: "Full-Time,Contract"
+    company_size: Any = Column(String, nullable=True)  # CSV: "1-50,51-200"
+    startup_or_enterprise: Any = Column(
+        String, nullable=True
+    )  # "Startup","Enterprise","Any"
     # Mobility
     visa_sponsorship: Any = Column(Boolean, default=False)
     visa_status: Any = Column(String, nullable=True)
@@ -1024,17 +1247,19 @@ class AIPreference(Base):
     )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
     # Aspirations
-    dream_companies: Any = Column(String, nullable=True)         # CSV chips
-    dream_roles: Any = Column(String, nullable=True)             # CSV chips
-    dream_technologies: Any = Column(String, nullable=True)      # CSV chips
+    dream_companies: Any = Column(String, nullable=True)  # CSV chips
+    dream_roles: Any = Column(String, nullable=True)  # CSV chips
+    dream_technologies: Any = Column(String, nullable=True)  # CSV chips
     # AI & Learning
-    preferred_ai_domains: Any = Column(String, nullable=True)    # CSV chips
+    preferred_ai_domains: Any = Column(String, nullable=True)  # CSV chips
     learning_goals: Any = Column(Text, nullable=True)
-    preferred_learning_resources: Any = Column(String, nullable=True)  # CSV: "Coursera,YouTube"
+    preferred_learning_resources: Any = Column(
+        String, nullable=True
+    )  # CSV: "Coursera,YouTube"
     # Career Goals
     target_salary: Any = Column(String, nullable=True)
-    target_country: Any = Column(String, nullable=True)          # Legacy single
-    target_countries: Any = Column(String, nullable=True)        # CSV chips
+    target_country: Any = Column(String, nullable=True)  # Legacy single
+    target_countries: Any = Column(String, nullable=True)  # CSV chips
     career_objectives: Any = Column(Text, nullable=True)
     career_growth_priorities: Any = Column(String, nullable=True)  # CSV chips
     # Meta
@@ -1071,7 +1296,9 @@ class Education(Base):
     verification_status: Any = Column(String, default="unverified")
     order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User", back_populates="education")
 
@@ -1083,17 +1310,19 @@ class Achievement(Base):
         String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Any = Column(String, ForeignKey("users.id"), nullable=False)
-    type: Any = Column(String, nullable=False)          # Award, Scholarship, Publication, etc.
+    type: Any = Column(String, nullable=False)  # Award, Scholarship, Publication, etc.
     title: Any = Column(String, nullable=False)
-    organization: Any = Column(String, nullable=True)   # Issuing org / event name
+    organization: Any = Column(String, nullable=True)  # Issuing org / event name
     date: Any = Column(Date, nullable=True)
     description: Any = Column(Text, nullable=True)
-    url: Any = Column(String, nullable=True)             # Reference / proof link
-    file_url: Any = Column(String, nullable=True)        # Supporting document
+    url: Any = Column(String, nullable=True)  # Reference / proof link
+    file_url: Any = Column(String, nullable=True)  # Supporting document
     file_name: Any = Column(String, nullable=True)
     order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User")
 
@@ -1105,15 +1334,19 @@ class JobSearchPreference(Base):
         String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
-    search_frequency: Any = Column(String, default="Daily")          # Daily, Weekly, Instant, Manual
+    search_frequency: Any = Column(
+        String, default="Daily"
+    )  # Daily, Weekly, Instant, Manual
     email_notifications: Any = Column(Boolean, default=True)
-    digest_frequency: Any = Column(String, default="Daily")           # Daily, Weekly, Never
-    job_alert_keywords: Any = Column(String, nullable=True)          # CSV chips
-    min_match_score: Any = Column(Integer, default=70)               # Percentage integer (0-100)
-    preferred_sources: Any = Column(String, nullable=True)           # CSV chips (e.g. LinkedIn, Indeed, Glassdoor)
-    ignore_companies: Any = Column(String, nullable=True)            # CSV chips
-    ignore_keywords: Any = Column(String, nullable=True)             # CSV chips
-    blocked_locations: Any = Column(String, nullable=True)           # CSV chips
+    digest_frequency: Any = Column(String, default="Daily")  # Daily, Weekly, Never
+    job_alert_keywords: Any = Column(String, nullable=True)  # CSV chips
+    min_match_score: Any = Column(Integer, default=70)  # Percentage integer (0-100)
+    preferred_sources: Any = Column(
+        String, nullable=True
+    )  # CSV chips (e.g. LinkedIn, Indeed, Glassdoor)
+    ignore_companies: Any = Column(String, nullable=True)  # CSV chips
+    ignore_keywords: Any = Column(String, nullable=True)  # CSV chips
+    blocked_locations: Any = Column(String, nullable=True)  # CSV chips
     updated_at: Any = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
@@ -1131,10 +1364,14 @@ class PrivacySetting(Base):
     is_public_profile: Any = Column(Boolean, default=True)
     hide_email: Any = Column(Boolean, default=False)
     hide_phone: Any = Column(Boolean, default=False)
-    resume_visibility: Any = Column(String, default="Recruiters Only")  # Public, Recruiters Only, Private
+    resume_visibility: Any = Column(
+        String, default="Recruiters Only"
+    )  # Public, Recruiters Only, Private
     recruiter_visibility: Any = Column(Boolean, default=True)
     search_engine_indexing: Any = Column(Boolean, default=False)
-    account_visibility: Any = Column(String, default="Public")          # Public, Connections Only, Private
+    account_visibility: Any = Column(
+        String, default="Public"
+    )  # Public, Connections Only, Private
     updated_at: Any = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
@@ -1149,7 +1386,7 @@ class NotificationSetting(Base):
         String, primary_key=True, index=True, default=lambda: str(uuid.uuid4())
     )
     user_id: Any = Column(String, ForeignKey("users.id"), unique=True, nullable=False)
-    
+
     # Types
     job_matches: Any = Column(Boolean, default=True)
     daily_digest: Any = Column(Boolean, default=True)
@@ -1166,7 +1403,9 @@ class NotificationSetting(Base):
     push_channel: Any = Column(Boolean, default=False)  # Reserved for future
 
     # Frequency & Quiet Hours
-    notification_frequency: Any = Column(String, default="Instant")  # Instant, Hourly, Daily Batch
+    notification_frequency: Any = Column(
+        String, default="Instant"
+    )  # Instant, Hourly, Daily Batch
     quiet_hours_enabled: Any = Column(Boolean, default=False)
     quiet_hours_start: Any = Column(String, default="22:00")
     quiet_hours_end: Any = Column(String, default="08:00")
@@ -1176,6 +1415,3 @@ class NotificationSetting(Base):
     )
 
     user = relationship("User")
-
-
-

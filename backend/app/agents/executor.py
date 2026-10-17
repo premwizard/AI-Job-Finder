@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.models import AgentTask
 import time
 
+
 class Executor:
     def __init__(self, db: Session):
         self.db = db
@@ -15,24 +16,45 @@ class Executor:
         """
         # Simulate processing time
         time.sleep(1)
-        
+
         if task.task_type == "ANALYZE_RESUME":
-            return {"status": "success", "result": "Resume successfully parsed and indexed into RAG."}
-            
+            return {
+                "status": "success",
+                "result": "Resume successfully parsed and indexed into RAG.",
+            }
+
         elif task.task_type == "FIND_MATCHING_JOBS":
-            return {"status": "success", "result": "Found 12 highly relevant semantCrown Atlas matches."}
-            
+            return {
+                "status": "success",
+                "result": "Found 12 highly relevant semantCrown Atlas matches.",
+            }
+
         elif task.task_type == "ANALYZE_SKILL_GAP":
-            return {"status": "success", "result": "Identified 3 missing skills for target roles: GraphQL, Kafka, CI/CD."}
-            
+            return {
+                "status": "success",
+                "result": "Identified 3 missing skills for target roles: GraphQL, Kafka, CI/CD.",
+            }
+
         elif task.task_type == "GENERATE_LEARNING_PLAN":
-            return {"status": "success", "result": "Generated a 4-week roadmap to master missing skills."}
-            
+            return {
+                "status": "success",
+                "result": "Generated a 4-week roadmap to master missing skills.",
+            }
+
         elif task.task_type == "OPTIMIZE_RESUME":
-            return {"status": "success", "result": "Generated 5 resume optimization suggestions. Projected ATS score: 92."}
-            
+            return {
+                "status": "success",
+                "result": "Generated 5 resume optimization suggestions. Projected ATS score: 92.",
+            }
+
         elif task.task_type == "MANUAL_ACTION":
-            return {"status": "success", "result": "Manual task marked as completed by user."}
-            
+            return {
+                "status": "success",
+                "result": "Manual task marked as completed by user.",
+            }
+
         else:
-            return {"status": "success", "result": f"Executed generic task: {task.description}"}
+            return {
+                "status": "success",
+                "result": f"Executed generic task: {task.description}",
+            }

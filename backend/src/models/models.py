@@ -2,7 +2,19 @@ import enum
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text, Boolean, Date, Table
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    Date,
+    Table,
+)
 from sqlalchemy.orm import relationship
 
 from src.database.database import Base
@@ -64,7 +76,11 @@ class User(Base):
     saved_jobs = relationship("SavedJob", back_populates="user")
     applications = relationship("Application", back_populates="user")
     analytics = relationship("Analytics", back_populates="user", uselist=False)
-    work_experiences = relationship("WorkExperience", back_populates="user", order_by="desc(WorkExperience.start_date)")
+    work_experiences = relationship(
+        "WorkExperience",
+        back_populates="user",
+        order_by="desc(WorkExperience.start_date)",
+    )
     projects = relationship("Project", back_populates="user")
 
 
@@ -176,7 +192,9 @@ class WorkExperience(Base):
     company_logo: Any = Column(String, nullable=True)
     role: Any = Column(String, index=True)
     department: Any = Column(String, nullable=True)
-    employment_type: Any = Column(Enum(EmploymentType), default=EmploymentType.full_time)
+    employment_type: Any = Column(
+        Enum(EmploymentType), default=EmploymentType.full_time
+    )
     location: Any = Column(String, nullable=True)
     work_model: Any = Column(Enum(WorkModel), default=WorkModel.onsite)
     start_date: Any = Column(Date)
@@ -184,11 +202,15 @@ class WorkExperience(Base):
     is_current: Any = Column(Boolean, default=False)
     description: Any = Column(Text, nullable=True)
     achievements: Any = Column(Text, nullable=True)  # Can store JSON array as string
-    technologies_used: Any = Column(Text, nullable=True)  # Can store JSON array as string
+    technologies_used: Any = Column(
+        Text, nullable=True
+    )  # Can store JSON array as string
     manager_name: Any = Column(String, nullable=True)
     sort_order: Any = Column(Integer, default=0)
     created_at: Any = Column(DateTime, default=datetime.utcnow)
-    updated_at: Any = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Any = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     user = relationship("User", back_populates="work_experiences")
     skills_used = relationship(
